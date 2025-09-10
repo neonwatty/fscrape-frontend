@@ -1,5 +1,8 @@
 import { ForumPost, PostFilters } from '@/lib/db/types'
 
+// Re-export PostFilters for convenience
+export type { PostFilters }
+
 // Filter preset types
 export interface FilterPreset {
   id: string

@@ -1,10 +1,12 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import { DatabaseProvider } from '@/lib/db/database-context'
-import { PostsExplorer } from '@/components/posts/PostsExplorer'
+import { PostsTableEnhanced } from '@/components/posts/PostsTableEnhanced'
+import { ForumPost } from '@/lib/db/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
 function PostsExplorerSkeleton() {
   return (
@@ -40,6 +42,8 @@ function PostsExplorerSkeleton() {
 }
 
 export default function PostsPage() {
+  const [selectedPosts, setSelectedPosts] = useState<ForumPost[]>([])
+
   return (
     <DatabaseProvider>
       <div className="container mx-auto py-8 px-4 max-w-7xl">
@@ -50,9 +54,42 @@ export default function PostsPage() {
           </p>
         </div>
 
-        <Suspense fallback={<PostsExplorerSkeleton />}>
-          <PostsExplorer />
-        </Suspense>
+        <Tabs defaultValue="enhanced" className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="enhanced">Enhanced Table</TabsTrigger>
+            <TabsTrigger value="virtualized">Virtualized (10k+ rows)</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="enhanced" className="mt-6">
+            <Suspense fallback={<PostsExplorerSkeleton />}>
+              <PostsTableEnhanced
+                enableVirtualization={false}
+                showFilters={true}
+                showSearch={true}
+                onSelectionChange={setSelectedPosts}
+              />
+            </Suspense>
+          </TabsContent>
+          
+          <TabsContent value="virtualized" className="mt-6">
+            <Suspense fallback={<PostsExplorerSkeleton />}>
+              <PostsTableEnhanced
+                enableVirtualization={true}
+                showFilters={true}
+                showSearch={true}
+                onSelectionChange={setSelectedPosts}
+              />
+            </Suspense>
+          </TabsContent>
+        </Tabs>
+
+        {selectedPosts.length > 0 && (
+          <div className="mt-4 p-4 bg-muted rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              {selectedPosts.length} posts selected for bulk operations
+            </p>
+          </div>
+        )}
       </div>
     </DatabaseProvider>
   )
