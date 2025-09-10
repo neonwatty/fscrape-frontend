@@ -1,15 +1,34 @@
+import { StatsCards } from '@/components/dashboard/StatsCards'
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-24">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">fscrape Frontend</h1>
-        <p className="text-lg text-gray-600">
-          Data visualization and exploration for scraped forum posts
+    <div className="container mx-auto py-8 px-4">
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+        <p className="text-muted-foreground">
+          Overview of scraped forum posts and platform statistics
         </p>
-        <div className="mt-8 p-4 bg-gray-100 dark:bg-gray-900 rounded-lg">
-          <p className="text-sm">Project foundation successfully initialized!</p>
+      </div>
+      
+      <div className="space-y-8">
+        <StatsCards />
+        
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="rounded-lg border bg-card p-6">
+            <h2 className="text-lg font-semibold mb-2">Recent Activity</h2>
+            <p className="text-sm text-muted-foreground">
+              Recent posts and scraping activity will appear here
+            </p>
+          </div>
+          
+          <div className="rounded-lg border bg-card p-6">
+            <h2 className="text-lg font-semibold mb-2">Platform Distribution</h2>
+            <p className="text-sm text-muted-foreground">
+              Platform statistics and charts will appear here
+            </p>
+          </div>
         </div>
       </div>
-    </main>
+    </div>
   )
 }
