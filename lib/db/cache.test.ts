@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
+import { describe, it, expect, afterEach } from 'vitest'
 import { LRUCache, generateCacheKey, withCache, clearGlobalCache } from './cache'
 
 describe('LRU Cache', () => {

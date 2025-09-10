@@ -1,4 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { useDatabase } from '@/lib/db/database-context'
+import { Activity, Database, TrendingUp, Users } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { getPosts } from '@/lib/db/queries'
 
 interface StatsCardProps {
   title: string
@@ -23,27 +27,54 @@ function StatsCard({ title, value, description, icon }: StatsCardProps) {
 }
 
 export function StatsCards() {
-  // Placeholder data - will be replaced with real data from database
+  const { summary, isInitialized } = useDatabase()
+  const [last24HoursPosts, setLast24HoursPosts] = useState(0)
+  const [topScore, setTopScore] = useState(0)
+
+  useEffect(() => {
+    if (isInitialized) {
+      // Get posts from last 24 hours
+      const dayAgo = new Date()
+      dayAgo.setDate(dayAgo.getDate() - 1)
+      const recentPosts = getPosts({ 
+        dateFrom: dayAgo,
+        sortBy: 'score',
+        sortOrder: 'desc',
+        limit: 100
+      })
+      setLast24HoursPosts(recentPosts.length)
+      
+      // Get top score
+      if (recentPosts.length > 0) {
+        setTopScore(recentPosts[0]?.score || 0)
+      }
+    }
+  }, [isInitialized])
+
   const stats = [
     {
       title: 'Total Posts',
-      value: '0',
+      value: summary?.totalPosts?.toLocaleString() || '0',
       description: 'Across all platforms',
+      icon: <Database className="h-4 w-4 text-muted-foreground" />
     },
     {
-      title: 'Active Platforms',
-      value: '0',
-      description: 'Reddit, Hacker News',
+      title: 'Total Authors',
+      value: summary?.totalAuthors?.toLocaleString() || '0',
+      description: 'Unique contributors',
+      icon: <Users className="h-4 w-4 text-muted-foreground" />
     },
     {
       title: 'Last 24 Hours',
-      value: '0',
+      value: last24HoursPosts.toLocaleString(),
       description: 'New posts collected',
+      icon: <Activity className="h-4 w-4 text-muted-foreground" />
     },
     {
       title: 'Top Score',
-      value: '0',
+      value: topScore.toLocaleString(),
       description: 'Highest rated post',
+      icon: <TrendingUp className="h-4 w-4 text-muted-foreground" />
     },
   ]
 
@@ -55,6 +86,7 @@ export function StatsCards() {
           title={stat.title}
           value={stat.value}
           description={stat.description}
+          icon={stat.icon}
         />
       ))}
     </div>

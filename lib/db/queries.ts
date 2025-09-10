@@ -1,6 +1,8 @@
 import { executeQuery, executeQueryFirst } from './sql-loader'
 import type { ForumPost, PostFilters, PlatformStats, TimeSeriesData, AuthorStats } from './types'
 
+export type { ForumPost, PostFilters, PlatformStats, TimeSeriesData, AuthorStats }
+
 // Get posts with filters
 export function getPosts(filters: PostFilters = {}): ForumPost[] {
   let sql = 'SELECT * FROM posts WHERE 1=1'
