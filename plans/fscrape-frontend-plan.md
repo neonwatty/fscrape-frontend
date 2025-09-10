@@ -1,10 +1,13 @@
 # fscrape Frontend - Data Visualization Dashboard
+
 ## Modern Next.js Static Site with sql.js Integration
 
 ## Overview
+
 A beautiful, responsive web application for visualizing and exploring data collected by the fscrape tool. Built with Next.js (static export), sql.js for browser-based SQLite queries, and modern visualization libraries.
 
 ## Tech Stack
+
 - **Framework**: Next.js 14+ with App Router (static export)
 - **Database**: sql.js (SQLite in the browser)
 - **Styling**: Tailwind CSS + shadcn/ui components
@@ -16,6 +19,7 @@ A beautiful, responsive web application for visualizing and exploring data colle
 - **Mobile**: Responsive-first design with touch gestures
 
 ## Project Structure
+
 ```
 fscrape-frontend/
 ├── app/
@@ -85,6 +89,7 @@ fscrape-frontend/
 ## Key Features
 
 ### 1. Dashboard (Home Page)
+
 ```typescript
 // Main metrics displayed
 - Total posts collected (by platform)
@@ -98,12 +103,15 @@ fscrape-frontend/
 ```
 
 **Mobile Layout**:
+
 - Stacked cards for metrics
 - Swipeable chart views
 - Collapsible sections
 
 ### 2. Posts Explorer
+
 **Features**:
+
 - Full-text search across titles and content
 - Filters:
   - Platform (Reddit, HN, etc.)
@@ -127,12 +135,15 @@ fscrape-frontend/
   - Export selection
 
 **Mobile Optimizations**:
+
 - Card view for posts on mobile
 - Swipe gestures for actions
 - Bottom sheet filters
 
 ### 3. Analytics & Trends
+
 **Visualizations**:
+
 - **Posting Time Heatmap**: Best times to post by day/hour
 - **Growth Trends**: Posts over time by platform/source
 - **Engagement Patterns**: Score vs. time of day
@@ -141,12 +152,14 @@ fscrape-frontend/
 - **Sentiment Analysis**: If text content available
 
 **Interactive Features**:
+
 - Zoom and pan on charts
 - Toggle data series
 - Export charts as images
 - Custom date ranges
 
 ### 4. Compare Sources
+
 - Side-by-side comparison of:
   - Different subreddits
   - Reddit vs. Hacker News
@@ -155,10 +168,11 @@ fscrape-frontend/
 - Normalized metrics for fair comparison
 
 ### 5. Mobile-First Features
+
 ```typescript
 // Responsive breakpoints
 - Mobile: < 640px
-- Tablet: 640px - 1024px  
+- Tablet: 640px - 1024px
 - Desktop: > 1024px
 
 // Touch optimizations
@@ -172,105 +186,108 @@ fscrape-frontend/
 ## Database Integration
 
 ### Database Types (Matching Backend Schema)
+
 ```typescript
 // lib/db/types.ts
 
 export interface ForumPost {
-  id: number;
-  platform: 'reddit' | 'hackernews' | string;
-  platform_id: string;
-  source: string;
-  title: string;
-  author: string | null;
-  created_utc: number;
-  score: number | null;
-  num_comments: number | null;
-  post_url: string;
-  selftext: string | null;
-  is_video: boolean;
-  is_self: boolean;
-  is_crosspost: boolean;
-  media_url: string | null;
-  thumbnail: string | null;
-  flair: string | null;
-  awards_count: number;
-  upvote_ratio: number | null;
-  post_hint: string | null;
-  is_deleted: boolean;
-  is_removed: boolean;
-  platform_metadata: Record<string, any> | null;
-  scraped_at: string;
-  time_period: string | null;
-  category: string | null;
+  id: number
+  platform: 'reddit' | 'hackernews' | string
+  platform_id: string
+  source: string
+  title: string
+  author: string | null
+  created_utc: number
+  score: number | null
+  num_comments: number | null
+  post_url: string
+  selftext: string | null
+  is_video: boolean
+  is_self: boolean
+  is_crosspost: boolean
+  media_url: string | null
+  thumbnail: string | null
+  flair: string | null
+  awards_count: number
+  upvote_ratio: number | null
+  post_hint: string | null
+  is_deleted: boolean
+  is_removed: boolean
+  platform_metadata: Record<string, any> | null
+  scraped_at: string
+  time_period: string | null
+  category: string | null
   // Generated columns
-  year: number;
-  month: number;
-  day_of_week: string;
-  hour: number;
+  year: number
+  month: number
+  day_of_week: string
+  hour: number
 }
 
 export interface ScrapingSession {
-  id: number;
-  session_id: string;
-  platform: string;
-  source: string;
-  time_period: string | null;
-  category: string | null;
-  started_at: string;
-  completed_at: string | null;
-  posts_found: number;
-  posts_new: number;
-  posts_updated: number;
-  status: 'running' | 'completed' | 'failed';
-  error_message: string | null;
+  id: number
+  session_id: string
+  platform: string
+  source: string
+  time_period: string | null
+  category: string | null
+  started_at: string
+  completed_at: string | null
+  posts_found: number
+  posts_new: number
+  posts_updated: number
+  status: 'running' | 'completed' | 'failed'
+  error_message: string | null
 }
 
 export interface ScrapingMetric {
-  id: number;
-  session_id: string;
-  metric_name: string;
-  metric_value: number;
-  recorded_at: string;
+  id: number
+  session_id: string
+  metric_name: string
+  metric_value: number
+  recorded_at: string
 }
 
-export type TimePeriod = 'hour' | 'day' | 'week' | 'month' | 'year' | 'all';
-export type Category = 'hot' | 'new' | 'top' | 'rising' | 'controversial';
-export type Platform = 'reddit' | 'hackernews';
+export type TimePeriod = 'hour' | 'day' | 'week' | 'month' | 'year' | 'all'
+export type Category = 'hot' | 'new' | 'top' | 'rising' | 'controversial'
+export type Platform = 'reddit' | 'hackernews'
 ```
 
 ### sql.js Setup
+
 ```typescript
 // lib/db/sql-loader.ts
-import initSqlJs from 'sql.js';
+import initSqlJs from 'sql.js'
 
 export async function loadDatabase() {
   const SQL = await initSqlJs({
-    locateFile: file => `/sql-js/${file}`
-  });
-  
+    locateFile: (file) => `/sql-js/${file}`,
+  })
+
   // Support configurable database path
-  const dbPath = process.env.NEXT_PUBLIC_DB_PATH || '/.fscrape/forum_posts.db';
-  const response = await fetch(dbPath);
-  const buffer = await response.arrayBuffer();
-  
-  const db = new SQL.Database(new Uint8Array(buffer));
-  
+  const dbPath = process.env.NEXT_PUBLIC_DB_PATH || '/.fscrape/forum_posts.db'
+  const response = await fetch(dbPath)
+  const buffer = await response.arrayBuffer()
+
+  const db = new SQL.Database(new Uint8Array(buffer))
+
   // Verify schema version and tables exist
   const tables = db.exec(`
     SELECT name FROM sqlite_master 
     WHERE type='table' 
     AND name IN ('forum_posts', 'scraping_sessions', 'scraping_metrics')
-  `);
-  
+  `)
+
   if (tables[0]?.values?.length !== 3) {
-    console.warn('Database schema may be outdated or incomplete');
+    console.warn('Database schema may be outdated or incomplete')
   }
-  
-  return db;
+
+  return db
 }
 ```
 
 ### Query Examples
+
 ```typescript
 // lib/db/queries.ts
 export const queries = {
@@ -288,7 +305,7 @@ export const queries = {
     ORDER BY created_utc DESC 
     LIMIT ?
   `,
-  
+
   postsByHour: `
     SELECT 
       hour,
@@ -301,7 +318,7 @@ export const queries = {
     GROUP BY hour
     ORDER BY hour
   `,
-  
+
   topSources: `
     SELECT 
       source, 
@@ -316,7 +333,7 @@ export const queries = {
     ORDER BY post_count DESC
     LIMIT 10
   `,
-  
+
   scrapingSessions: `
     SELECT 
       session_id, platform, source, time_period, category,
@@ -327,7 +344,7 @@ export const queries = {
     ORDER BY started_at DESC
     LIMIT ?
   `,
-  
+
   sessionMetrics: `
     SELECT 
       metric_name, 
@@ -337,7 +354,7 @@ export const queries = {
     WHERE session_id = ?
     ORDER BY recorded_at
   `,
-  
+
   platformComparison: `
     SELECT 
       platform,
@@ -350,7 +367,7 @@ export const queries = {
     WHERE datetime(created_utc, 'unixepoch') > datetime('now', '-30 days')
     GROUP BY platform
   `,
-  
+
   postingHeatmap: `
     SELECT 
       day_of_week,
@@ -362,7 +379,7 @@ export const queries = {
     GROUP BY day_of_week, hour
     ORDER BY day_of_week, hour
   `,
-  
+
   authorStats: `
     SELECT 
       author,
@@ -376,11 +393,12 @@ export const queries = {
     GROUP BY author, platform
     ORDER BY post_count DESC
     LIMIT ?
-  `
-};
+  `,
+}
 ```
 
 ### Performance Optimizations
+
 - **Lazy Loading**: Load database only when needed
 - **Query Caching**: Cache results with TTL
 - **Web Workers**: Run heavy queries in background
@@ -390,6 +408,7 @@ export const queries = {
 ## UI/UX Design
 
 ### Color Scheme
+
 ```css
 /* Light mode */
 --background: white;
@@ -407,6 +426,7 @@ export const queries = {
 ### Component Examples
 
 #### Stats Card
+
 ```tsx
 <Card className="p-6">
   <div className="flex items-center justify-between">
@@ -421,6 +441,7 @@ export const queries = {
 ```
 
 #### Mobile Navigation
+
 ```tsx
 <nav className="fixed bottom-0 left-0 right-0 bg-background border-t md:hidden">
   <div className="flex justify-around py-2">
@@ -435,18 +456,20 @@ export const queries = {
 ## Build & Deployment
 
 ### Next.js Configuration
+
 ```javascript
 // next.config.js
 module.exports = {
-  output: 'export',  // Static HTML export
+  output: 'export', // Static HTML export
   basePath: '/fscrape-frontend', // If deploying to GitHub Pages subfolder
   images: {
-    unoptimized: true  // Required for static export
-  }
-};
+    unoptimized: true, // Required for static export
+  },
+}
 ```
 
 ### Package.json Scripts
+
 ```json
 {
   "scripts": {
@@ -463,6 +486,7 @@ module.exports = {
 ```
 
 ### GitHub Actions Deployment
+
 ```yaml
 name: Deploy to GitHub Pages
 
@@ -476,18 +500,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Build static site
         run: npm run build
-        
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
@@ -498,6 +522,7 @@ jobs:
 ## Progressive Enhancement
 
 ### Initial Load Strategy
+
 1. Show loading skeleton
 2. Load sql.js library
 3. Fetch and load database
@@ -505,6 +530,7 @@ jobs:
 5. Prefetch other routes
 
 ### Offline Support
+
 ```javascript
 // Enable PWA features
 - Service worker for caching
@@ -515,6 +541,7 @@ jobs:
 ## Dependencies
 
 ### Core Dependencies
+
 ```json
 {
   "dependencies": {
@@ -543,6 +570,7 @@ jobs:
 ```
 
 ## Performance Targets
+
 - **Lighthouse Score**: > 90 for all metrics
 - **Initial Load**: < 3s on 3G
 - **Time to Interactive**: < 5s
@@ -550,6 +578,7 @@ jobs:
 - **Query Response**: < 100ms for most queries
 
 ## Future Enhancements
+
 1. **Real-time Updates**: WebSocket connection to live data
 2. **AI Insights**: GPT-powered trend analysis
 3. **Collaborative Features**: Share and comment on findings
@@ -562,6 +591,7 @@ jobs:
 ## Development Workflow
 
 ### Local Development
+
 ```bash
 # Install dependencies
 npm install
@@ -580,6 +610,7 @@ npm run serve
 ```
 
 ### Testing Strategy
+
 - Unit tests for utility functions
 - Integration tests for database queries
 - E2E tests for critical user flows
@@ -587,13 +618,16 @@ npm run serve
 - Performance testing with Lighthouse
 
 ## Mobile App Considerations
+
 While this is a web app, it's designed to work excellently as a PWA:
+
 - Add to home screen capability
 - Native-like navigation
 - Offline functionality
 - Push notifications (future)
 
 ## Security Considerations
+
 - No sensitive data in the database
 - Read-only database access
 - Content Security Policy headers

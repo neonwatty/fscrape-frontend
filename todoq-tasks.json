@@ -1,0 +1,1071 @@
+{
+  "tasks": [
+    {
+      "number": "1.0",
+      "name": "Project Foundation & Setup",
+      "description": "Initialize Next.js 14+ project with complete tooling setup, dependencies installation, and basic project structure creation",
+      "parent": null,
+      "status": "pending",
+      "priority": 10,
+      "dependencies": [],
+      "files": [],
+      "docs_references": [
+        "https://nextjs.org/docs/getting-started/installation",
+        "https://tailwindcss.com/docs/guides/nextjs"
+      ],
+      "testing_strategy": "Verify project builds and starts without errors",
+      "notes": "Critical foundation task - all other tasks depend on this setup being completed successfully"
+    },
+    {
+      "number": "1.1",
+      "name": "Initialize Next.js Project",
+      "description": "Create new Next.js 14+ project with TypeScript, ESLint, and Tailwind CSS configured for static export",
+      "parent": "1.0",
+      "status": "pending",
+      "priority": 10,
+      "dependencies": [],
+      "files": ["package.json", "next.config.js", "tsconfig.json", "tailwind.config.ts"],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/deploying/static-exports"
+      ],
+      "testing_strategy": "Run 'npm run build' and verify static export generation",
+      "notes": "Use 'npx create-next-app@latest' with TypeScript and Tailwind options, configure for static export"
+    },
+    {
+      "number": "1.2",
+      "name": "Install Core Dependencies",
+      "description": "Install and configure all essential dependencies including sql.js, shadcn/ui, Recharts, TanStack Table, and utility libraries",
+      "parent": "1.0",
+      "status": "pending",
+      "priority": 10,
+      "dependencies": ["1.1"],
+      "files": ["package.json", "components/ui/*"],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/installation/next",
+        "https://sql.js.org/",
+        "https://recharts.org/",
+        "https://tanstack.com/table/latest"
+      ],
+      "testing_strategy": "Verify all dependencies install without conflicts, run type checking",
+      "notes": "Install sql.js, @radix-ui components, recharts, @tanstack/react-table, date-fns, lucide-react, zustand"
+    },
+    {
+      "number": "1.3",
+      "name": "Setup shadcn/ui Components",
+      "description": "Initialize shadcn/ui and install essential components (card, button, select, table, input, sheet, dialog)",
+      "parent": "1.0",
+      "status": "pending",
+      "priority": 10,
+      "dependencies": ["1.2"],
+      "files": [
+        "components/ui/card.tsx",
+        "components/ui/button.tsx",
+        "components/ui/select.tsx",
+        "components/ui/table.tsx",
+        "components/ui/input.tsx",
+        "components/ui/sheet.tsx",
+        "components/ui/dialog.tsx",
+        "lib/utils.ts"
+      ],
+      "docs_references": ["https://ui.shadcn.com/docs/components"],
+      "testing_strategy": "Import and render each component in a test page to verify functionality",
+      "notes": "Run 'npx shadcn-ui@latest init' and add core components needed for dashboard interface"
+    },
+    {
+      "number": "1.4",
+      "name": "Configure Project Structure",
+      "description": "Create complete directory structure matching planned architecture with placeholder files",
+      "parent": "1.0",
+      "status": "pending",
+      "priority": 9,
+      "dependencies": ["1.3"],
+      "files": [
+        "app/layout.tsx",
+        "app/page.tsx",
+        "app/posts/page.tsx",
+        "app/analytics/page.tsx",
+        "app/compare/page.tsx",
+        "components/layout/Header.tsx",
+        "components/dashboard/StatsCards.tsx",
+        "lib/db/sql-loader.ts",
+        "lib/db/queries.ts",
+        "lib/db/types.ts"
+      ],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts"
+      ],
+      "testing_strategy": "Navigate to each route and verify placeholder content renders",
+      "notes": "Create app router pages, component directories, lib utilities with basic placeholder content"
+    },
+    {
+      "number": "1.5",
+      "name": "Setup Development Tools",
+      "description": "Configure ESLint, Prettier, TypeScript strict mode, and add development scripts to package.json",
+      "parent": "1.0",
+      "status": "pending",
+      "priority": 8,
+      "dependencies": ["1.4"],
+      "files": [".eslintrc.json", ".prettierrc", "tsconfig.json", "package.json"],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/configuring/eslint",
+        "https://prettier.io/docs/en/configuration.html"
+      ],
+      "testing_strategy": "Run 'npm run lint' and 'npm run build' to verify no errors",
+      "notes": "Add scripts for dev, build, export, serve, lint, and type-check commands"
+    },
+    {
+      "number": "2.0",
+      "name": "Database Integration & Core Infrastructure",
+      "description": "Implement sql.js integration, database loading, query system, and data types matching backend schema",
+      "parent": null,
+      "status": "pending",
+      "priority": 9,
+      "dependencies": ["1.0"],
+      "files": [],
+      "docs_references": [
+        "https://sql.js.org/examples/",
+        "https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API"
+      ],
+      "testing_strategy": "Load sample database and execute queries successfully",
+      "notes": "Critical infrastructure for all data-dependent features"
+    },
+    {
+      "number": "2.1",
+      "name": "Implement Database Types",
+      "description": "Create TypeScript interfaces matching the backend database schema for ForumPost, ScrapingSession, and ScrapingMetric",
+      "parent": "2.0",
+      "status": "pending",
+      "priority": 9,
+      "dependencies": ["1.0"],
+      "files": ["lib/db/types.ts"],
+      "docs_references": ["https://www.typescriptlang.org/docs/handbook/interfaces.html"],
+      "testing_strategy": "Verify types compile without errors and match expected schema",
+      "notes": "Define interfaces for ForumPost, ScrapingSession, ScrapingMetric with all fields from planning doc"
+    },
+    {
+      "number": "2.2",
+      "name": "Create SQL.js Database Loader",
+      "description": "Implement database initialization, loading from public directory, and error handling for missing/corrupt databases",
+      "parent": "2.0",
+      "status": "pending",
+      "priority": 9,
+      "dependencies": ["2.1"],
+      "files": ["lib/db/sql-loader.ts", "public/.fscrape/.gitkeep"],
+      "docs_references": [
+        "https://sql.js.org/examples/",
+        "https://nextjs.org/docs/app/building-your-application/optimizing/lazy-loading"
+      ],
+      "testing_strategy": "Test with valid database file, missing file, and corrupted file scenarios",
+      "notes": "Support configurable database path, validate schema version, handle initialization errors gracefully"
+    },
+    {
+      "number": "2.3",
+      "name": "Build Database Query System",
+      "description": "Create query functions for all data access patterns including dashboard stats, post filtering, analytics, and session data",
+      "parent": "2.0",
+      "status": "pending",
+      "priority": 9,
+      "dependencies": ["2.2"],
+      "files": ["lib/db/queries.ts"],
+      "docs_references": ["https://www.sqlite.org/lang.html"],
+      "testing_strategy": "Test each query function with mock data, verify performance with large datasets",
+      "notes": "Implement recentPosts, postsByHour, topSources, scrapingSessions, platformComparison, postingHeatmap, authorStats queries"
+    },
+    {
+      "number": "2.4",
+      "name": "Create Database React Context",
+      "description": "Implement React context provider for database access, loading states, error handling, and query caching",
+      "parent": "2.0",
+      "status": "pending",
+      "priority": 8,
+      "dependencies": ["2.3"],
+      "files": ["components/providers/DatabaseProvider.tsx", "lib/hooks/useDatabase.ts"],
+      "docs_references": [
+        "https://react.dev/reference/react/useContext",
+        "https://react.dev/reference/react/useMemo"
+      ],
+      "testing_strategy": "Test loading states, error states, and successful data access in components",
+      "notes": "Provide loading state, error state, database instance, and cached query results to child components"
+    },
+    {
+      "number": "2.5",
+      "name": "Add Query Caching System",
+      "description": "Implement intelligent caching for database queries with TTL, cache invalidation, and memory management",
+      "parent": "2.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["2.4"],
+      "files": ["lib/db/cache.ts"],
+      "docs_references": ["https://developer.mozilla.org/en-US/docs/Web/API/Cache"],
+      "testing_strategy": "Test cache hits/misses, TTL expiration, and memory usage under load",
+      "notes": "Cache query results with configurable TTL, implement LRU eviction, track cache performance"
+    },
+    {
+      "number": "3.0",
+      "name": "Dashboard Implementation",
+      "description": "Build comprehensive dashboard with stats cards, recent posts table, trend charts, and platform selector",
+      "parent": null,
+      "status": "pending",
+      "priority": 9,
+      "dependencies": ["2.0"],
+      "files": [],
+      "docs_references": ["https://recharts.org/en-US/guide/getting-started"],
+      "testing_strategy": "Test with various data sizes, verify mobile responsiveness, validate chart interactions",
+      "notes": "Primary user interface - highest business value feature"
+    },
+    {
+      "number": "3.1",
+      "name": "Create Statistics Cards Component",
+      "description": "Build responsive stats cards showing total posts, active platforms, recent activity, and engagement metrics with trend indicators",
+      "parent": "3.0",
+      "status": "pending",
+      "priority": 9,
+      "dependencies": ["2.0"],
+      "files": ["components/dashboard/StatsCards.tsx", "lib/utils/formatters.ts"],
+      "docs_references": ["https://ui.shadcn.com/docs/components/card"],
+      "testing_strategy": "Test with various number formats, verify responsive layout on mobile devices",
+      "notes": "Display total posts, platforms, 24h/7d/30d activity, top performing posts with up/down trend indicators"
+    },
+    {
+      "number": "3.2",
+      "name": "Build Recent Posts Table",
+      "description": "Create sortable, paginated table of recent posts with columns for title, author, score, comments, source, and timestamp",
+      "parent": "3.0",
+      "status": "pending",
+      "priority": 8,
+      "dependencies": ["3.1"],
+      "files": ["components/dashboard/RecentPosts.tsx", "components/tables/PostsTable.tsx"],
+      "docs_references": ["https://tanstack.com/table/latest/docs/framework/react/examples/basic"],
+      "testing_strategy": "Test sorting, pagination, mobile responsiveness, and external link functionality",
+      "notes": "Use TanStack Table with sorting, pagination, clickable post URLs, responsive mobile card layout"
+    },
+    {
+      "number": "3.3",
+      "name": "Implement Trend Visualization Chart",
+      "description": "Create interactive time-series chart showing posting activity trends over time with platform filtering and zoom functionality",
+      "parent": "3.0",
+      "status": "pending",
+      "priority": 8,
+      "dependencies": ["3.2"],
+      "files": ["components/dashboard/TrendChart.tsx", "components/charts/TimeSeriesChart.tsx"],
+      "docs_references": ["https://recharts.org/en-US/examples/LineChart"],
+      "testing_strategy": "Test chart interactions, zoom/pan functionality, tooltip accuracy, mobile touch gestures",
+      "notes": "Use Recharts LineChart with zoom, pan, tooltips, responsive design, platform toggle filters"
+    },
+    {
+      "number": "3.4",
+      "name": "Build Platform Selector Component",
+      "description": "Create multi-select dropdown for filtering dashboard data by platform (Reddit, Hacker News) with source-level filtering",
+      "parent": "3.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["3.3"],
+      "files": ["components/dashboard/PlatformPicker.tsx"],
+      "docs_references": ["https://ui.shadcn.com/docs/components/select"],
+      "testing_strategy": "Test multi-selection, filter application, state persistence, mobile usability",
+      "notes": "Multi-select for platforms and sources, update all dashboard components when changed, persist in URL params"
+    },
+    {
+      "number": "3.5",
+      "name": "Create Dashboard Layout & Integration",
+      "description": "Integrate all dashboard components with proper layout, loading states, error handling, and responsive design",
+      "parent": "3.0",
+      "status": "pending",
+      "priority": 8,
+      "dependencies": ["3.4"],
+      "files": ["app/page.tsx"],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts"
+      ],
+      "testing_strategy": "Test full dashboard functionality, loading states, error scenarios, mobile layout",
+      "notes": "Arrange components in responsive grid, add loading skeletons, handle database errors gracefully"
+    },
+    {
+      "number": "4.0",
+      "name": "Posts Explorer Implementation",
+      "description": "Build comprehensive posts explorer with full-text search, advanced filtering, sorting, and infinite scroll",
+      "parent": null,
+      "status": "pending",
+      "priority": 8,
+      "dependencies": ["3.0"],
+      "files": [],
+      "docs_references": [
+        "https://tanstack.com/table/latest/docs/framework/react/examples/filters"
+      ],
+      "testing_strategy": "Test search performance, filter combinations, sorting stability, pagination",
+      "notes": "Core feature for detailed data exploration"
+    },
+    {
+      "number": "4.1",
+      "name": "Create Advanced Table Filters",
+      "description": "Build comprehensive filtering system for platform, source, date ranges, score thresholds, author search, and post status",
+      "parent": "4.0",
+      "status": "pending",
+      "priority": 8,
+      "dependencies": ["3.0"],
+      "files": ["components/tables/TableFilters.tsx", "lib/utils/filters.ts"],
+      "docs_references": [
+        "https://ui.shadcn.com/docs/components/input",
+        "https://ui.shadcn.com/docs/components/select"
+      ],
+      "testing_strategy": "Test filter combinations, performance with large datasets, mobile filter UI",
+      "notes": "Include date range picker, numeric range inputs, multi-select dropdowns, text search, filter presets"
+    },
+    {
+      "number": "4.2",
+      "name": "Implement Full-Text Search",
+      "description": "Add full-text search across post titles and content with highlighting, search suggestions, and performance optimization",
+      "parent": "4.0",
+      "status": "pending",
+      "priority": 8,
+      "dependencies": ["4.1"],
+      "files": ["components/posts/SearchInput.tsx", "lib/db/search-queries.ts"],
+      "docs_references": ["https://www.sqlite.org/fts5.html"],
+      "testing_strategy": "Test search accuracy, performance with large text datasets, highlight functionality",
+      "notes": "Use SQLite FTS if available, implement client-side search with debouncing, highlight matching text"
+    },
+    {
+      "number": "4.3",
+      "name": "Build Enhanced Posts Table",
+      "description": "Create feature-rich posts table with sorting, filtering integration, row selection, and bulk actions",
+      "parent": "4.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["4.2"],
+      "files": ["app/posts/page.tsx", "components/posts/PostsTableEnhanced.tsx"],
+      "docs_references": [
+        "https://tanstack.com/table/latest/docs/framework/react/examples/row-selection"
+      ],
+      "testing_strategy": "Test table performance with 10k+ rows, verify sorting stability, test bulk operations",
+      "notes": "Integrate all filters, add row selection, bulk export, column visibility controls, virtualization for performance"
+    },
+    {
+      "number": "4.4",
+      "name": "Add Pagination and Infinite Scroll",
+      "description": "Implement efficient pagination with infinite scroll option, virtual scrolling for performance, and mobile-optimized navigation",
+      "parent": "4.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["4.3"],
+      "files": ["components/tables/TablePagination.tsx", "lib/hooks/useInfiniteScroll.ts"],
+      "docs_references": [
+        "https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API"
+      ],
+      "testing_strategy": "Test pagination performance, infinite scroll behavior, memory usage with large datasets",
+      "notes": "Use Intersection Observer for infinite scroll, virtual scrolling for large datasets, configurable page sizes"
+    },
+    {
+      "number": "4.5",
+      "name": "Implement Export Functionality",
+      "description": "Add data export capabilities for CSV, JSON formats with filtered data export and download functionality",
+      "parent": "4.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["4.4"],
+      "files": ["lib/utils/export.ts", "components/posts/ExportDialog.tsx"],
+      "docs_references": ["https://developer.mozilla.org/en-US/docs/Web/API/Blob"],
+      "testing_strategy": "Test export with various data sizes, verify file format integrity, test download functionality",
+      "notes": "Support CSV and JSON export, include filtered data only, add export progress indicator for large datasets"
+    },
+    {
+      "number": "5.0",
+      "name": "Analytics & Visualizations",
+      "description": "Build comprehensive analytics page with interactive charts, heatmaps, trend analysis, and engagement patterns",
+      "parent": null,
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["4.0"],
+      "files": [],
+      "docs_references": ["https://recharts.org/en-US/examples", "https://d3js.org/"],
+      "testing_strategy": "Test chart interactions, data accuracy, mobile chart usability, performance with large datasets",
+      "notes": "High-value feature for data insights and analysis"
+    },
+    {
+      "number": "5.1",
+      "name": "Create Posting Time Heatmap",
+      "description": "Build interactive heatmap showing optimal posting times by day of week and hour with platform/source filtering",
+      "parent": "5.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["4.0"],
+      "files": ["components/charts/HeatMap.tsx", "app/analytics/page.tsx"],
+      "docs_references": ["https://recharts.org/en-US/examples/SimpleRadialBarChart"],
+      "testing_strategy": "Test heatmap accuracy, mobile touch interactions, color accessibility, tooltip functionality",
+      "notes": "Show best posting times, color-coded by engagement levels, filterable by platform and source"
+    },
+    {
+      "number": "5.2",
+      "name": "Build Engagement Patterns Chart",
+      "description": "Create multi-chart view showing score vs time correlations, comment patterns, and engagement trends",
+      "parent": "5.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["5.1"],
+      "files": ["components/charts/EngagementChart.tsx", "lib/utils/analytics.ts"],
+      "docs_references": ["https://recharts.org/en-US/examples/ScatterChart"],
+      "testing_strategy": "Test chart accuracy, correlation calculations, interactive tooltips, responsive design",
+      "notes": "Scatter plot of score vs time, bar chart of comments vs hour, trend lines for engagement patterns"
+    },
+    {
+      "number": "5.3",
+      "name": "Implement Top Authors Analysis",
+      "description": "Create author leaderboards with post counts, average scores, and author performance trends",
+      "parent": "5.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["5.2"],
+      "files": ["components/analytics/TopAuthors.tsx"],
+      "docs_references": ["https://ui.shadcn.com/docs/components/table"],
+      "testing_strategy": "Test author rankings accuracy, performance metrics calculation, mobile table layout",
+      "notes": "Show top authors by post count, average score, total engagement, with trend indicators"
+    },
+    {
+      "number": "5.4",
+      "name": "Create Growth Trends Visualization",
+      "description": "Build time-series charts showing posting volume growth, platform adoption, and source activity over time",
+      "parent": "5.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["5.3"],
+      "files": ["components/charts/GrowthChart.tsx"],
+      "docs_references": ["https://recharts.org/en-US/examples/AreaChart"],
+      "testing_strategy": "Test trend calculations, chart zoom/pan, data aggregation accuracy, mobile interactions",
+      "notes": "Area charts for volume growth, line charts for platform comparison, adjustable time periods"
+    },
+    {
+      "number": "5.5",
+      "name": "Add Analytics Page Layout",
+      "description": "Integrate all analytics components with responsive layout, loading states, and interactive filters",
+      "parent": "5.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["5.4"],
+      "files": ["app/analytics/page.tsx"],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts"
+      ],
+      "testing_strategy": "Test full analytics page functionality, component interactions, mobile layout optimization",
+      "notes": "Grid layout for charts, shared filters across components, export options for each visualization"
+    },
+    {
+      "number": "6.0",
+      "name": "Mobile-First Responsive Design",
+      "description": "Implement comprehensive mobile-first design with touch gestures, responsive layouts, and mobile-specific features",
+      "parent": null,
+      "status": "pending",
+      "priority": 8,
+      "dependencies": ["5.0"],
+      "files": [],
+      "docs_references": [
+        "https://tailwindcss.com/docs/responsive-design",
+        "https://developer.mozilla.org/en-US/docs/Web/API/Touch_events"
+      ],
+      "testing_strategy": "Test on various mobile devices, verify touch gestures, validate responsive breakpoints",
+      "notes": "Critical for mobile user experience and accessibility"
+    },
+    {
+      "number": "6.1",
+      "name": "Create Mobile Navigation",
+      "description": "Build mobile-optimized navigation with bottom nav bar, hamburger menu, and swipe gestures",
+      "parent": "6.0",
+      "status": "pending",
+      "priority": 8,
+      "dependencies": ["5.0"],
+      "files": ["components/layout/MobileNav.tsx", "components/layout/BottomNav.tsx"],
+      "docs_references": ["https://ui.shadcn.com/docs/components/sheet"],
+      "testing_strategy": "Test navigation on mobile devices, verify touch targets, validate accessibility",
+      "notes": "Bottom navigation for mobile, slide-out menu for secondary options, swipe gestures between pages"
+    },
+    {
+      "number": "6.2",
+      "name": "Optimize Charts for Mobile",
+      "description": "Implement touch-friendly chart interactions, mobile-specific chart layouts, and gesture controls",
+      "parent": "6.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["6.1"],
+      "files": ["components/charts/MobileChart.tsx", "lib/hooks/useTouch.ts"],
+      "docs_references": ["https://developer.mozilla.org/en-US/docs/Web/API/Touch_events"],
+      "testing_strategy": "Test pinch-to-zoom, pan gestures, tooltip behavior on touch devices",
+      "notes": "Touch-friendly chart interactions, simplified mobile chart layouts, gesture-based navigation"
+    },
+    {
+      "number": "6.3",
+      "name": "Implement Responsive Tables",
+      "description": "Create mobile-optimized table layouts with card views, collapsible columns, and touch-friendly controls",
+      "parent": "6.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["6.2"],
+      "files": ["components/tables/ResponsiveTable.tsx", "components/tables/MobileCard.tsx"],
+      "docs_references": ["https://css-tricks.com/responsive-data-tables/"],
+      "testing_strategy": "Test table usability on small screens, verify scrolling behavior, validate touch interactions",
+      "notes": "Card layout for mobile, collapsible columns, horizontal scroll for wide tables, touch-friendly controls"
+    },
+    {
+      "number": "6.4",
+      "name": "Add Mobile-Specific Features",
+      "description": "Implement pull-to-refresh, swipe actions, mobile-optimized filters, and touch-friendly buttons",
+      "parent": "6.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["6.3"],
+      "files": ["components/mobile/PullToRefresh.tsx", "components/mobile/SwipeActions.tsx"],
+      "docs_references": ["https://developer.mozilla.org/en-US/docs/Web/API/Touch_events"],
+      "testing_strategy": "Test mobile gestures, validate button sizes (44px minimum), verify mobile usability",
+      "notes": "Pull-to-refresh for data updates, swipe actions for quick operations, bottom sheets for filters"
+    },
+    {
+      "number": "7.0",
+      "name": "Compare Sources Feature",
+      "description": "Build source comparison functionality with side-by-side metrics, normalized comparisons, and visualization",
+      "parent": null,
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["6.0"],
+      "files": [],
+      "docs_references": ["https://recharts.org/en-US/examples/MultipleYAxisLineChart"],
+      "testing_strategy": "Test comparison accuracy, metric normalization, visualization clarity",
+      "notes": "Nice-to-have feature for advanced analysis"
+    },
+    {
+      "number": "7.1",
+      "name": "Create Source Selector",
+      "description": "Build multi-select component for choosing sources to compare with platform grouping and search",
+      "parent": "7.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["6.0"],
+      "files": ["components/compare/SourceSelector.tsx"],
+      "docs_references": ["https://ui.shadcn.com/docs/components/select"],
+      "testing_strategy": "Test multi-selection, search functionality, platform grouping, mobile usability",
+      "notes": "Multi-select with search, platform grouping, limit to reasonable comparison count (3-5 sources)"
+    },
+    {
+      "number": "7.2",
+      "name": "Build Comparison Charts",
+      "description": "Create side-by-side charts comparing posting patterns, engagement metrics, and growth trends",
+      "parent": "7.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["7.1"],
+      "files": ["components/compare/ComparisonCharts.tsx"],
+      "docs_references": ["https://recharts.org/en-US/examples/LineChart"],
+      "testing_strategy": "Test chart accuracy, comparison validity, responsive design, legend clarity",
+      "notes": "Normalized metrics for fair comparison, multiple chart types, clear legends and labels"
+    },
+    {
+      "number": "7.3",
+      "name": "Implement Comparison Metrics",
+      "description": "Calculate and display normalized comparison metrics with statistical analysis and insights",
+      "parent": "7.0",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": ["7.2"],
+      "files": ["lib/utils/comparison.ts", "components/compare/MetricsTable.tsx"],
+      "docs_references": ["https://en.wikipedia.org/wiki/Feature_scaling"],
+      "testing_strategy": "Test metric calculations, normalization accuracy, statistical validity",
+      "notes": "Normalize by volume, time periods, calculate relative performance, provide insights"
+    },
+    {
+      "number": "7.4",
+      "name": "Create Compare Page Layout",
+      "description": "Integrate comparison components with responsive layout and export functionality",
+      "parent": "7.0",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": ["7.3"],
+      "files": ["app/compare/page.tsx"],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts"
+      ],
+      "testing_strategy": "Test full comparison functionality, responsive layout, export options",
+      "notes": "Responsive layout for comparison views, export comparison reports, save comparison presets"
+    },
+    {
+      "number": "8.0",
+      "name": "Navigation & Layout Components",
+      "description": "Build comprehensive navigation system with header, footer, breadcrumbs, and responsive layouts",
+      "parent": null,
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["2.0"],
+      "files": [],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/routing/linking-and-navigating"
+      ],
+      "testing_strategy": "Test navigation flow, accessibility, mobile responsiveness",
+      "notes": "Essential for user navigation and site structure"
+    },
+    {
+      "number": "8.1",
+      "name": "Build Header Component",
+      "description": "Create responsive header with logo, main navigation, theme toggle, and mobile menu trigger",
+      "parent": "8.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["2.0"],
+      "files": ["components/layout/Header.tsx", "components/layout/ThemeToggle.tsx"],
+      "docs_references": ["https://ui.shadcn.com/docs/components/navigation-menu"],
+      "testing_strategy": "Test navigation links, theme toggle, mobile responsiveness, accessibility",
+      "notes": "Responsive header with logo, main nav items, theme toggle, mobile hamburger menu"
+    },
+    {
+      "number": "8.2",
+      "name": "Create Footer Component",
+      "description": "Build footer with links, attribution, version info, and responsive layout",
+      "parent": "8.0",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": ["8.1"],
+      "files": ["components/layout/Footer.tsx"],
+      "docs_references": ["https://www.w3.org/WAI/ARIA/apg/patterns/menubar/"],
+      "testing_strategy": "Test footer links, responsive layout, accessibility compliance",
+      "notes": "Links to GitHub, documentation, version info, responsive footer layout"
+    },
+    {
+      "number": "8.3",
+      "name": "Implement Theme Provider",
+      "description": "Create dark/light theme system with persistence, system preference detection, and smooth transitions",
+      "parent": "8.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["8.2"],
+      "files": ["components/providers/ThemeProvider.tsx", "lib/hooks/useTheme.ts"],
+      "docs_references": ["https://ui.shadcn.com/docs/dark-mode/next"],
+      "testing_strategy": "Test theme persistence, system preference detection, transition smoothness",
+      "notes": "Dark/light themes, persist user preference, detect system preference, smooth transitions"
+    },
+    {
+      "number": "8.4",
+      "name": "Create Root Layout",
+      "description": "Implement app router root layout with providers, global styles, and responsive shell",
+      "parent": "8.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["8.3"],
+      "files": ["app/layout.tsx", "styles/globals.css"],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts#root-layout-required"
+      ],
+      "testing_strategy": "Test layout rendering, provider initialization, global styles application",
+      "notes": "Root layout with all providers, responsive shell, global styles and font loading"
+    },
+    {
+      "number": "9.0",
+      "name": "Error Handling & Loading States",
+      "description": "Implement comprehensive error handling, loading states, error boundaries, and user feedback systems",
+      "parent": null,
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["8.0"],
+      "files": [],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/routing/error-handling"
+      ],
+      "testing_strategy": "Test error scenarios, loading states, user feedback, recovery mechanisms",
+      "notes": "Critical for production reliability and user experience"
+    },
+    {
+      "number": "9.1",
+      "name": "Create Error Boundaries",
+      "description": "Implement React error boundaries with fallback UI, error reporting, and recovery options",
+      "parent": "9.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["8.0"],
+      "files": ["components/ErrorBoundary.tsx", "app/error.tsx", "app/global-error.tsx"],
+      "docs_references": [
+        "https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary"
+      ],
+      "testing_strategy": "Test error catching, fallback UI display, error recovery mechanisms",
+      "notes": "Catch component errors, provide helpful fallback UI, offer retry mechanisms"
+    },
+    {
+      "number": "9.2",
+      "name": "Build Loading Components",
+      "description": "Create skeleton loaders, loading spinners, and progressive loading states for all components",
+      "parent": "9.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["9.1"],
+      "files": [
+        "components/ui/skeleton.tsx",
+        "components/ui/spinner.tsx",
+        "components/LoadingStates.tsx"
+      ],
+      "docs_references": ["https://ui.shadcn.com/docs/components/skeleton"],
+      "testing_strategy": "Test loading state accuracy, skeleton matching, loading timing",
+      "notes": "Skeleton loaders for tables and cards, spinner for operations, progressive loading indicators"
+    },
+    {
+      "number": "9.3",
+      "name": "Implement Toast Notifications",
+      "description": "Add toast notification system for user feedback, errors, and success messages",
+      "parent": "9.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["9.2"],
+      "files": ["components/ui/toast.tsx", "lib/hooks/useToast.ts"],
+      "docs_references": ["https://ui.shadcn.com/docs/components/toast"],
+      "testing_strategy": "Test toast positioning, timing, accessibility, mobile display",
+      "notes": "Toast notifications for success, error, warning, info messages with proper accessibility"
+    },
+    {
+      "number": "9.4",
+      "name": "Add Database Error Handling",
+      "description": "Implement specific error handling for database loading, query failures, and connection issues",
+      "parent": "9.0",
+      "status": "pending",
+      "priority": 7,
+      "dependencies": ["9.3"],
+      "files": ["lib/db/error-handling.ts", "components/DatabaseError.tsx"],
+      "docs_references": ["https://sql.js.org/examples/"],
+      "testing_strategy": "Test various database error scenarios, recovery mechanisms, user guidance",
+      "notes": "Handle missing database, corrupted files, query errors, provide clear user guidance"
+    },
+    {
+      "number": "10.0",
+      "name": "Performance Optimization",
+      "description": "Implement comprehensive performance optimizations including code splitting, lazy loading, and bundle optimization",
+      "parent": null,
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["9.0"],
+      "files": [],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/optimizing/lazy-loading"
+      ],
+      "testing_strategy": "Measure performance metrics, test on low-powered devices, validate optimization impact",
+      "notes": "Critical for production performance and user experience"
+    },
+    {
+      "number": "10.1",
+      "name": "Implement Code Splitting",
+      "description": "Add dynamic imports and lazy loading for routes and components to reduce initial bundle size",
+      "parent": "10.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["9.0"],
+      "files": ["app/loading.tsx", "lib/utils/lazy-imports.ts"],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/optimizing/lazy-loading"
+      ],
+      "testing_strategy": "Measure bundle sizes, test loading performance, verify code splitting effectiveness",
+      "notes": "Dynamic imports for heavy components, route-based code splitting, lazy load chart libraries"
+    },
+    {
+      "number": "10.2",
+      "name": "Optimize Database Queries",
+      "description": "Implement query optimization, result limiting, and efficient data processing for large datasets",
+      "parent": "10.0",
+      "status": "pending",
+      "priority": 6,
+      "dependencies": ["10.1"],
+      "files": ["lib/db/optimized-queries.ts", "lib/db/query-performance.ts"],
+      "docs_references": ["https://www.sqlite.org/optoverview.html"],
+      "testing_strategy": "Measure query performance, test with large datasets, validate optimization impact",
+      "notes": "Optimize SQL queries, implement result pagination, add query performance monitoring"
+    },
+    {
+      "number": "10.3",
+      "name": "Add Virtual Scrolling",
+      "description": "Implement virtual scrolling for large tables and lists to maintain performance with thousands of rows",
+      "parent": "10.0",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": ["10.2"],
+      "files": ["components/tables/VirtualizedTable.tsx", "lib/hooks/useVirtualizer.ts"],
+      "docs_references": ["https://tanstack.com/virtual/latest"],
+      "testing_strategy": "Test with 10k+ rows, measure memory usage, validate scroll performance",
+      "notes": "Virtual scrolling for large datasets, memory-efficient rendering, smooth scroll performance"
+    },
+    {
+      "number": "10.4",
+      "name": "Implement Image Optimization",
+      "description": "Optimize images, add lazy loading, and implement responsive image loading for better performance",
+      "parent": "10.0",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": ["10.3"],
+      "files": ["components/ui/OptimizedImage.tsx", "lib/utils/image-optimization.ts"],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/optimizing/images"
+      ],
+      "testing_strategy": "Test image loading performance, verify responsive loading, measure impact",
+      "notes": "Lazy load images, responsive image sizes, optimize thumbnail loading"
+    },
+    {
+      "number": "11.0",
+      "name": "Testing Implementation",
+      "description": "Implement comprehensive testing strategy including unit tests, integration tests, and E2E testing",
+      "parent": null,
+      "status": "pending",
+      "priority": 5,
+      "dependencies": ["10.0"],
+      "files": [],
+      "docs_references": [
+        "https://jestjs.io/docs/getting-started",
+        "https://playwright.dev/",
+        "@testing-library/react"
+      ],
+      "testing_strategy": "Achieve >80% code coverage, test critical user paths, validate component behavior",
+      "notes": "Essential for production reliability and maintenance"
+    },
+    {
+      "number": "11.1",
+      "name": "Setup Testing Framework",
+      "description": "Configure Jest, React Testing Library, and testing utilities for component and integration testing",
+      "parent": "11.0",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": ["10.0"],
+      "files": ["jest.config.js", "jest.setup.js", "__tests__/setup.ts"],
+      "docs_references": ["https://nextjs.org/docs/app/building-your-application/testing/jest"],
+      "testing_strategy": "Verify test setup runs without errors, mock database connections, configure coverage",
+      "notes": "Configure Jest for Next.js, setup React Testing Library, configure test database mocking"
+    },
+    {
+      "number": "11.2",
+      "name": "Write Unit Tests",
+      "description": "Create unit tests for utility functions, hooks, and isolated component behavior",
+      "parent": "11.0",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": ["11.1"],
+      "files": [
+        "__tests__/lib/utils.test.ts",
+        "__tests__/lib/db.test.ts",
+        "__tests__/hooks.test.ts"
+      ],
+      "docs_references": ["https://testing-library.com/docs/react-testing-library/intro/"],
+      "testing_strategy": "Test utility functions, custom hooks, database query functions, formatting utilities",
+      "notes": "Focus on utility functions, custom hooks, database queries, formatters, and filters"
+    },
+    {
+      "number": "11.3",
+      "name": "Create Component Tests",
+      "description": "Write integration tests for major components including dashboard, tables, and charts",
+      "parent": "11.0",
+      "status": "pending",
+      "priority": 5,
+      "dependencies": ["11.2"],
+      "files": [
+        "__tests__/components/dashboard.test.tsx",
+        "__tests__/components/tables.test.tsx",
+        "__tests__/components/charts.test.tsx"
+      ],
+      "docs_references": ["https://testing-library.com/docs/react-testing-library/cheatsheet/"],
+      "testing_strategy": "Test component rendering, user interactions, prop handling, error states",
+      "notes": "Test dashboard components, table functionality, chart rendering, mobile components"
+    },
+    {
+      "number": "11.4",
+      "name": "Add E2E Tests",
+      "description": "Implement end-to-end tests for critical user flows using Playwright or Cypress",
+      "parent": "11.0",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": ["11.3"],
+      "files": ["e2e/dashboard.spec.ts", "e2e/posts-explorer.spec.ts", "playwright.config.ts"],
+      "docs_references": ["https://playwright.dev/docs/intro"],
+      "testing_strategy": "Test complete user workflows, navigation, data loading, mobile interactions",
+      "notes": "Test dashboard usage, posts exploration, analytics viewing, mobile navigation flows"
+    },
+    {
+      "number": "12.0",
+      "name": "Build Configuration & Deployment",
+      "description": "Configure build process, deployment pipeline, and production optimizations for GitHub Pages",
+      "parent": null,
+      "status": "pending",
+      "priority": 4,
+      "dependencies": ["11.0"],
+      "files": [],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/deploying/static-exports"
+      ],
+      "testing_strategy": "Test build process, verify deployment, validate production performance",
+      "notes": "Essential for production deployment and maintenance"
+    },
+    {
+      "number": "12.1",
+      "name": "Configure Static Export",
+      "description": "Setup Next.js static export configuration with proper base path and asset optimization",
+      "parent": "12.0",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": ["11.0"],
+      "files": ["next.config.js", "package.json"],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/deploying/static-exports"
+      ],
+      "testing_strategy": "Test static export generation, verify all routes export correctly, test asset paths",
+      "notes": "Configure for GitHub Pages deployment, handle base path, optimize for static hosting"
+    },
+    {
+      "number": "12.2",
+      "name": "Setup GitHub Actions",
+      "description": "Create CI/CD pipeline for automated testing, building, and deployment to GitHub Pages",
+      "parent": "12.0",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": ["12.1"],
+      "files": [".github/workflows/deploy.yml", ".github/workflows/test.yml"],
+      "docs_references": ["https://docs.github.com/en/actions/quickstart"],
+      "testing_strategy": "Test CI/CD pipeline, verify deployment automation, validate build process",
+      "notes": "Automated testing, building, and deployment workflow with proper error handling"
+    },
+    {
+      "number": "12.3",
+      "name": "Add Development Scripts",
+      "description": "Create comprehensive package.json scripts for development, testing, building, and deployment",
+      "parent": "12.0",
+      "status": "pending",
+      "priority": 4,
+      "dependencies": ["12.2"],
+      "files": ["package.json", "scripts/update-db.sh"],
+      "docs_references": ["https://docs.npmjs.com/cli/v10/using-npm/scripts"],
+      "testing_strategy": "Test all scripts work correctly, verify database sync, test deployment scripts",
+      "notes": "Scripts for dev, build, test, lint, deploy, database sync, and maintenance tasks"
+    },
+    {
+      "number": "12.4",
+      "name": "Configure Production Optimizations",
+      "description": "Setup production-specific optimizations including compression, caching headers, and security",
+      "parent": "12.0",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": ["12.3"],
+      "files": ["next.config.js", "public/.htaccess"],
+      "docs_references": [
+        "https://nextjs.org/docs/app/building-your-application/deploying/production-checklist"
+      ],
+      "testing_strategy": "Test production build performance, verify compression, validate security headers",
+      "notes": "Enable compression, configure caching, add security headers, optimize for production"
+    },
+    {
+      "number": "13.0",
+      "name": "PWA Features",
+      "description": "Implement Progressive Web App features including service worker, offline support, and app installation",
+      "parent": null,
+      "status": "pending",
+      "priority": 3,
+      "dependencies": ["12.0"],
+      "files": [],
+      "docs_references": [
+        "https://web.dev/progressive-web-apps/",
+        "https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps"
+      ],
+      "testing_strategy": "Test offline functionality, app installation, service worker behavior",
+      "notes": "Enhancement for mobile app-like experience"
+    },
+    {
+      "number": "13.1",
+      "name": "Create App Manifest",
+      "description": "Create web app manifest with icons, theme colors, and installation configuration",
+      "parent": "13.0",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": ["12.0"],
+      "files": ["public/manifest.json", "public/icons/icon-192.png", "public/icons/icon-512.png"],
+      "docs_references": ["https://web.dev/add-manifest/"],
+      "testing_strategy": "Test app installation, verify icons display correctly, validate manifest",
+      "notes": "PWA manifest with proper icons, theme colors, display mode, start URL"
+    },
+    {
+      "number": "13.2",
+      "name": "Implement Service Worker",
+      "description": "Create service worker for caching, offline support, and background sync",
+      "parent": "13.0",
+      "status": "pending",
+      "priority": 3,
+      "dependencies": ["13.1"],
+      "files": ["public/sw.js", "lib/pwa/service-worker.ts"],
+      "docs_references": ["https://web.dev/service-workers/"],
+      "testing_strategy": "Test offline functionality, cache behavior, background sync, update mechanism",
+      "notes": "Cache static assets, enable offline database access, implement background sync for updates"
+    },
+    {
+      "number": "13.3",
+      "name": "Add Install Prompt",
+      "description": "Implement app installation prompt with user-friendly install experience",
+      "parent": "13.0",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": ["13.2"],
+      "files": ["components/pwa/InstallPrompt.tsx", "lib/hooks/useInstallPrompt.ts"],
+      "docs_references": ["https://web.dev/customize-install/"],
+      "testing_strategy": "Test install prompt display, user interaction, installation flow",
+      "notes": "Custom install prompt with better UX than browser default, track installation success"
+    },
+    {
+      "number": "14.0",
+      "name": "Documentation & Maintenance",
+      "description": "Create comprehensive documentation, maintenance guides, and user documentation",
+      "parent": null,
+      "status": "pending",
+      "priority": 2,
+      "dependencies": ["13.0"],
+      "files": [],
+      "docs_references": [
+        "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes"
+      ],
+      "testing_strategy": "Review documentation accuracy, validate setup instructions, test examples",
+      "notes": "Essential for project maintenance and user adoption"
+    },
+    {
+      "number": "14.1",
+      "name": "Create README Documentation",
+      "description": "Write comprehensive README with setup instructions, features overview, and usage examples",
+      "parent": "14.0",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": ["13.0"],
+      "files": ["README.md"],
+      "docs_references": [
+        "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-readmes"
+      ],
+      "testing_strategy": "Validate setup instructions work on clean environment, verify examples accuracy",
+      "notes": "Include setup guide, features overview, screenshots, usage examples, contribution guidelines"
+    },
+    {
+      "number": "14.2",
+      "name": "Add Developer Documentation",
+      "description": "Create developer documentation for architecture, API reference, and contribution guidelines",
+      "parent": "14.0",
+      "status": "pending",
+      "priority": 2,
+      "dependencies": ["14.1"],
+      "files": ["docs/ARCHITECTURE.md", "docs/API.md", "CONTRIBUTING.md"],
+      "docs_references": ["https://www.writethedocs.org/guide/writing/beginners-guide-to-docs/"],
+      "testing_strategy": "Review documentation completeness, validate code examples, test setup instructions",
+      "notes": "Architecture overview, component documentation, database schema, development workflow"
+    },
+    {
+      "number": "14.3",
+      "name": "Create User Guide",
+      "description": "Write user-facing documentation with feature explanations and usage tutorials",
+      "parent": "14.0",
+      "status": "pending",
+      "priority": 1,
+      "dependencies": ["14.2"],
+      "files": ["docs/USER_GUIDE.md", "docs/FEATURES.md"],
+      "docs_references": ["https://www.writethedocs.org/guide/writing/beginners-guide-to-docs/"],
+      "testing_strategy": "Test user guide accuracy, validate feature descriptions, verify screenshots",
+      "notes": "User guide for dashboard usage, posts exploration, analytics features, mobile usage"
+    },
+    {
+      "number": "14.4",
+      "name": "Setup Maintenance Tools",
+      "description": "Create maintenance scripts, monitoring setup, and update procedures",
+      "parent": "14.0",
+      "status": "pending",
+      "priority": 1,
+      "dependencies": ["14.3"],
+      "files": ["scripts/maintenance.sh", "scripts/health-check.js", "docs/MAINTENANCE.md"],
+      "docs_references": ["https://docs.npmjs.com/cli/v10/commands/npm-audit"],
+      "testing_strategy": "Test maintenance scripts, verify health checks, validate update procedures",
+      "notes": "Dependency updates, security auditing, performance monitoring, backup procedures"
+    }
+  ]
+}
