@@ -3,7 +3,6 @@ import {
   initializeDatabase, 
   createEmptyDatabase, 
   loadDatabaseFromData,
-  validateDatabaseSchema,
   isDatabaseInitialized,
   closeDatabase 
 } from './sql-loader'
