@@ -6,6 +6,7 @@ import { StatsCards } from '@/components/dashboard/StatsCards'
 import { TrendChart } from '@/components/dashboard/TrendChart'
 import { RecentPostsTable } from '@/components/dashboard/RecentPostsTable'
 import { PlatformSelector } from '@/components/dashboard/PlatformSelector'
+import { PlatformPicker } from '@/components/dashboard/PlatformPicker'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { createSampleDatabase } from '@/lib/db/sample-database'
@@ -89,6 +90,14 @@ function DashboardContent() {
       </div>
 
       <div className="space-y-8">
+        {/* Platform Filter Section */}
+        <PlatformPicker 
+          onSelectionChange={(selection) => {
+            console.log('Platform selection changed:', selection)
+            // This will trigger re-renders of child components through URL params
+          }}
+        />
+
         {/* Stats Cards Section */}
         <StatsCards />
 
