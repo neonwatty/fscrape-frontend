@@ -55,18 +55,34 @@ export default function PostsPage() {
         </div>
 
         <Tabs defaultValue="enhanced" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-lg grid-cols-3">
             <TabsTrigger value="enhanced">Enhanced Table</TabsTrigger>
-            <TabsTrigger value="virtualized">Virtualized (10k+ rows)</TabsTrigger>
+            <TabsTrigger value="infinite">Infinite Scroll</TabsTrigger>
+            <TabsTrigger value="virtualized">Virtualized</TabsTrigger>
           </TabsList>
           
           <TabsContent value="enhanced" className="mt-6">
             <Suspense fallback={<PostsExplorerSkeleton />}>
               <PostsTableEnhanced
                 enableVirtualization={false}
+                enableInfiniteScroll={false}
                 showFilters={true}
                 showSearch={true}
                 onSelectionChange={setSelectedPosts}
+                pageSizeOptions={[10, 20, 30, 50, 100]}
+              />
+            </Suspense>
+          </TabsContent>
+          
+          <TabsContent value="infinite" className="mt-6">
+            <Suspense fallback={<PostsExplorerSkeleton />}>
+              <PostsTableEnhanced
+                enableVirtualization={false}
+                enableInfiniteScroll={true}
+                showFilters={true}
+                showSearch={true}
+                onSelectionChange={setSelectedPosts}
+                pageSizeOptions={[20, 50, 100]}
               />
             </Suspense>
           </TabsContent>
@@ -75,9 +91,11 @@ export default function PostsPage() {
             <Suspense fallback={<PostsExplorerSkeleton />}>
               <PostsTableEnhanced
                 enableVirtualization={true}
+                enableInfiniteScroll={false}
                 showFilters={true}
                 showSearch={true}
                 onSelectionChange={setSelectedPosts}
+                pageSizeOptions={[50, 100, 200, 500]}
               />
             </Suspense>
           </TabsContent>

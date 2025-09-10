@@ -59,10 +59,6 @@ import {
   User,
   MessageSquare,
   TrendingUp,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
   Download,
   Copy,
   Trash2,
@@ -72,6 +68,8 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { VirtualizedTable } from './VirtualizedTable'
+import { TablePagination } from '@/components/tables/TablePagination'
+import { useInfiniteScroll } from '@/lib/hooks/useInfiniteScroll'
 
 // Custom filter functions
 const fuzzyFilter: FilterFn<ForumPost> = (row, columnId, value) => {
@@ -87,17 +85,21 @@ const fuzzyFilter: FilterFn<ForumPost> = (row, columnId, value) => {
 interface PostsTableEnhancedProps {
   initialPosts?: ForumPost[]
   enableVirtualization?: boolean
+  enableInfiniteScroll?: boolean
   showFilters?: boolean
   showSearch?: boolean
   onSelectionChange?: (selectedPosts: ForumPost[]) => void
+  pageSizeOptions?: number[]
 }
 
 export function PostsTableEnhanced({
   initialPosts = [],
   enableVirtualization = false,
+  enableInfiniteScroll = false,
   showFilters = true,
   showSearch = true,
   onSelectionChange,
+  pageSizeOptions = [10, 20, 30, 50, 100],
 }: PostsTableEnhancedProps) {
   const { isInitialized, database } = useDatabase()
   const [posts, setPosts] = useState<ForumPost[]>(initialPosts)
@@ -117,12 +119,14 @@ export function PostsTableEnhanced({
     pageIndex: 0,
     pageSize: 50,
   })
+  const [allPosts, setAllPosts] = useState<ForumPost[]>([])
+  const [hasMoreData, setHasMoreData] = useState(true)
 
   // Filter state
   const [filters, setFilters] = useState<PostFilters>({})
 
   // Load posts with search and filters
-  const loadPosts = useCallback(async () => {
+  const loadPosts = useCallback(async (append = false) => {
     if (!isInitialized || !database) return
     
     setLoading(true)
@@ -146,17 +150,53 @@ export function PostsTableEnhanced({
         fetchedPosts = applyFilters(fetchedPosts, filters)
       }
       
-      setPosts(fetchedPosts)
+      setAllPosts(fetchedPosts)
+      
+      // For infinite scroll, append data
+      if (enableInfiniteScroll && append) {
+        setPosts(prev => [...prev, ...fetchedPosts.slice(prev.length, prev.length + pagination.pageSize)])
+        setHasMoreData(fetchedPosts.length > posts.length + pagination.pageSize)
+      } else if (enableInfiniteScroll) {
+        // Initial load for infinite scroll
+        setPosts(fetchedPosts.slice(0, pagination.pageSize))
+        setHasMoreData(fetchedPosts.length > pagination.pageSize)
+      } else {
+        // Regular pagination
+        setPosts(fetchedPosts)
+      }
     } catch (error) {
       console.error('Error loading posts:', error)
     } finally {
       setLoading(false)
     }
-  }, [isInitialized, database, globalFilter, filters])
+  }, [isInitialized, database, globalFilter, filters, enableInfiniteScroll, pagination.pageSize, posts.length])
 
   useEffect(() => {
-    loadPosts()
-  }, [loadPosts])
+    loadPosts(false)
+  }, [globalFilter, filters]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Infinite scroll handler
+  const loadMorePosts = useCallback(() => {
+    if (enableInfiniteScroll && hasMoreData && !loading) {
+      const nextBatch = allPosts.slice(posts.length, posts.length + pagination.pageSize)
+      if (nextBatch.length > 0) {
+        setPosts(prev => [...prev, ...nextBatch])
+        setHasMoreData(allPosts.length > posts.length + nextBatch.length)
+      } else {
+        setHasMoreData(false)
+      }
+    }
+  }, [enableInfiniteScroll, hasMoreData, loading, allPosts, posts.length, pagination.pageSize])
+
+  // Setup infinite scroll
+  const { sentinelRef } = useInfiniteScroll({
+    onLoadMore: loadMorePosts,
+    hasMore: hasMoreData && enableInfiniteScroll,
+    isLoading: loading,
+    rootMargin: '200px',
+    threshold: 0.1,
+    enabled: enableInfiniteScroll,
+  })
 
   // Column definitions with selection
   const columns = useMemo<ColumnDef<ForumPost>[]>(
@@ -655,59 +695,51 @@ export function PostsTableEnhanced({
           )}
         </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between space-x-2 py-4">
-          <div className="flex-1 text-sm text-muted-foreground">
-            {hasSelection && (
-              <span>
-                {selectedCount} of {table.getFilteredRowModel().rows.length} row(s) selected.
-              </span>
+        {/* Infinite scroll sentinel or pagination */}
+        {enableInfiniteScroll ? (
+          <>
+            {hasMoreData && (
+              <div ref={sentinelRef} className="py-4 text-center">
+                {loading ? (
+                  <div className="flex items-center justify-center gap-2">
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+                    <span className="text-sm text-muted-foreground">Loading more posts...</span>
+                  </div>
+                ) : (
+                  <span className="text-sm text-muted-foreground">Scroll for more</span>
+                )}
+              </div>
             )}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.setPageIndex(0)}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronsLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.previousPage()}
-              disabled={!table.getCanPreviousPage()}
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Previous
-            </Button>
-            <span className="flex items-center gap-1">
-              <div>Page</div>
-              <strong>
-                {table.getState().pagination.pageIndex + 1} of{' '}
-                {table.getPageCount()}
-              </strong>
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.nextPage()}
-              disabled={!table.getCanNextPage()}
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => table.setPageIndex(table.getPageCount() - 1)}
-              disabled={!table.getCanNextPage()}
-            >
-              <ChevronsRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
+            {!hasMoreData && posts.length > 0 && (
+              <div className="py-4 text-center text-sm text-muted-foreground">
+                No more posts to load
+              </div>
+            )}
+            <div className="py-2 text-center text-sm text-muted-foreground">
+              Showing {posts.length} of {allPosts.length} posts
+              {hasSelection && ` • ${selectedCount} selected`}
+            </div>
+          </>
+        ) : (
+          <TablePagination
+            currentPage={table.getState().pagination.pageIndex}
+            totalPages={table.getPageCount()}
+            pageSize={table.getState().pagination.pageSize}
+            totalItems={table.getFilteredRowModel().rows.length}
+            pageSizeOptions={pageSizeOptions}
+            onPageChange={(page) => table.setPageIndex(page)}
+            onPageSizeChange={(size) => {
+              table.setPageSize(size)
+              setPagination(prev => ({ ...prev, pageSize: size }))
+            }}
+            showPageSizeSelector={true}
+            showItemCount={true}
+            showPageJump={true}
+            disabled={loading}
+            className="py-4"
+            mobileOptimized={true}
+          />
+        )}
       </CardContent>
     </Card>
   )
