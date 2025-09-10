@@ -16,6 +16,7 @@ import {
 } from '@/lib/analytics/analytics-utils'
 import { EngagementMetrics } from '@/components/analytics/EngagementMetrics'
 import { ActivityHeatmap } from '@/components/analytics/ActivityHeatmap'
+import { HeatMap } from '@/components/charts/HeatMap'
 import {
   TrendComparisonChart,
   EngagementTrendChart,
@@ -201,10 +202,22 @@ export function AnalyticsDashboard() {
         </TabsContent>
 
         <TabsContent value="activity" className="space-y-4">
+          <HeatMap
+            posts={posts.filter(p => dateRange === 'all' || p.created_utc >= (Date.now() / 1000) - (
+              dateRange === 'last7days' ? 7 * 24 * 60 * 60 :
+              dateRange === 'last30days' ? 30 * 24 * 60 * 60 :
+              90 * 24 * 60 * 60
+            ))}
+            title="Engagement Heatmap"
+            description="Discover optimal posting times based on engagement metrics"
+            showFilters={true}
+            showOptimalTimes={true}
+            defaultMetric="avgEngagement"
+          />
           <ActivityHeatmap
             data={analytics.heatmapData}
-            title="Posting Activity Patterns"
-            description="Discover when posts are most frequently published"
+            title="Posting Volume Patterns"
+            description="Raw posting frequency by day and hour"
           />
           <div className="grid gap-4 lg:grid-cols-2">
             <Card>
