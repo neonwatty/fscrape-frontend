@@ -1,28 +1,45 @@
-import { Metadata } from 'next'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'Analytics & Trends | fscrape',
-  description: 'Analyze posting patterns and engagement trends',
+import { Suspense } from 'react'
+import { DatabaseProvider } from '@/lib/db/database-context'
+import { AnalyticsDashboard } from './analytics-dashboard'
+import { Skeleton } from '@/components/ui/skeleton'
+
+function AnalyticsLoading() {
+  return (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <Skeleton className="h-8 w-48" />
+        <Skeleton className="h-4 w-64" />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {[1, 2, 3, 4].map(i => (
+          <Skeleton key={i} className="h-32" />
+        ))}
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Skeleton className="h-[400px]" />
+        <Skeleton className="h-[400px]" />
+      </div>
+    </div>
+  )
 }
 
 export default function AnalyticsPage() {
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Analytics & Trends</h1>
-        <p className="text-muted-foreground">
-          Visualize posting patterns, engagement metrics, and trending topics
-        </p>
-      </div>
-
-      <div className="grid gap-6">
-        <div className="rounded-lg border bg-card p-8 text-center">
-          <p className="text-muted-foreground">Analytics dashboard will be implemented here</p>
-          <p className="text-sm text-muted-foreground mt-2">
-            Features: Time heatmaps, growth trends, engagement patterns, top authors
+    <DatabaseProvider>
+      <div className="container mx-auto py-8 px-4 max-w-7xl">
+        <div className="mb-8">
+          <h1 className="text-3xl lg:text-4xl font-bold mb-2">Analytics & Trends</h1>
+          <p className="text-muted-foreground text-lg">
+            Visualize posting patterns, engagement metrics, and trending topics
           </p>
         </div>
+
+        <Suspense fallback={<AnalyticsLoading />}>
+          <AnalyticsDashboard />
+        </Suspense>
       </div>
-    </div>
+    </DatabaseProvider>
   )
 }
