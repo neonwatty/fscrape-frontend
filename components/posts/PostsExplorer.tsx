@@ -15,8 +15,10 @@ import {
   FilterFn,
 } from '@tanstack/react-table'
 import { useDatabase } from '@/lib/db/database-context'
-import { searchPosts, getRecentPosts } from '@/lib/db/queries'
+import { getRecentPosts } from '@/lib/db/queries'
 import { ForumPost } from '@/lib/db/types'
+import { searchPostsFTS, SearchResult } from '@/lib/db/search-queries'
+import { SearchInput } from '@/components/search/SearchInput'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
@@ -46,7 +48,6 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import {
-  Search,
   Filter,
   ArrowUpDown,
   ChevronDown,
@@ -90,7 +91,9 @@ interface PostsExplorerProps {
 export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
   const { isInitialized, database } = useDatabase()
   const [posts, setPosts] = useState<ForumPost[]>(initialPosts)
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
+  const [searchLoading, setSearchLoading] = useState(false)
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [sorting, setSorting] = useState<SortingState>([
@@ -108,18 +111,23 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
   const [scoreRange, setScoreRange] = useState<[number | undefined, number | undefined]>([undefined, undefined])
   const [_dateRange, _setDateRange] = useState<[Date | undefined, Date | undefined]>([undefined, undefined])
 
-  // Load posts
+  // Load posts with search support
   const loadPosts = useCallback(async () => {
     if (!isInitialized || !database) return
     
     setLoading(true)
     try {
       let fetchedPosts: ForumPost[] = []
+      let searchData: SearchResult[] = []
       
       if (globalFilter) {
-        fetchedPosts = searchPosts(globalFilter)
+        // Use FTS search when available
+        searchData = searchPostsFTS(globalFilter, 1000)
+        fetchedPosts = searchData
+        setSearchResults(searchData)
       } else {
         fetchedPosts = getRecentPosts(1000) // Load more posts for exploration
+        setSearchResults([])
       }
       
       // Apply platform filter
@@ -189,6 +197,11 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
         cell: ({ row }) => {
           const title = row.getValue('title') as string
           const url = row.original.url || row.original.permalink
+          
+          // Check if this row has highlighted title from search
+          const searchResult = searchResults.find(sr => sr.id === row.original.id)
+          const displayTitle = searchResult?.titleHighlighted || title
+          
           return (
             <div className="max-w-[500px]">
               <a
@@ -197,7 +210,11 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
                 rel="noopener noreferrer"
                 className="font-medium hover:text-primary transition-colors line-clamp-2"
               >
-                {title}
+                {searchResult?.titleHighlighted ? (
+                  <span dangerouslySetInnerHTML={{ __html: displayTitle }} />
+                ) : (
+                  title
+                )}
                 <ExternalLink className="inline-block ml-1 h-3 w-3" />
               </a>
             </div>
@@ -352,7 +369,7 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
         enableHiding: false,
       },
     ],
-    []
+    [searchResults]
   )
 
   // Initialize table
@@ -407,16 +424,21 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
           </div>
           
           <div className="flex flex-col gap-2 sm:flex-row">
-            {/* Global search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search posts..."
-                value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
-                className="pl-9 w-full sm:w-[300px]"
-              />
-            </div>
+            {/* Enhanced search with suggestions */}
+            <SearchInput
+              value={globalFilter}
+              onChange={setGlobalFilter}
+              onSearch={(value) => {
+                setSearchLoading(true)
+                setGlobalFilter(value)
+                setTimeout(() => setSearchLoading(false), 100)
+              }}
+              placeholder="Search posts..."
+              className="w-full sm:w-[300px]"
+              loading={searchLoading}
+              showSuggestions={true}
+              debounceMs={300}
+            />
             
             {/* Column visibility */}
             <DropdownMenu>

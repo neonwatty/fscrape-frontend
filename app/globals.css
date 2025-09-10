@@ -52,3 +52,31 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* Search highlighting styles */
+@layer components {
+  mark {
+    background-color: rgb(254 240 138 / 0.5);
+    color: inherit;
+    padding: 0 2px;
+    border-radius: 2px;
+  }
+  
+  .dark mark {
+    background-color: rgb(133 77 14 / 0.5);
+  }
+  
+  /* Posts table custom styles */
+  .posts-table mark {
+    font-weight: 600;
+  }
+  
+  /* Search input custom styles */
+  .search-suggestions mark {
+    background-color: hsl(var(--primary) / 0.2);
+  }
+  
+  .dark .search-suggestions mark {
+    background-color: hsl(var(--primary) / 0.3);
+  }
+}
