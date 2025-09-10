@@ -70,6 +70,7 @@ import { cn } from '@/lib/utils'
 import { VirtualizedTable } from './VirtualizedTable'
 import { TablePagination } from '@/components/tables/TablePagination'
 import { useInfiniteScroll } from '@/lib/hooks/useInfiniteScroll'
+import { ExportDialog } from './ExportDialog'
 
 // Custom filter functions
 const fuzzyFilter: FilterFn<ForumPost> = (row, columnId, value) => {
@@ -121,6 +122,7 @@ export function PostsTableEnhanced({
   })
   const [allPosts, setAllPosts] = useState<ForumPost[]>([])
   const [hasMoreData, setHasMoreData] = useState(true)
+  const [showExportDialog, setShowExportDialog] = useState(false)
 
   // Filter state
   const [filters, setFilters] = useState<PostFilters>({})
@@ -475,40 +477,10 @@ export function PostsTableEnhanced({
     onSelectionChange?.(selectedPosts)
   }, [rowSelection, onSelectionChange, table])
 
-  // Bulk actions
-  const handleBulkExport = useCallback(() => {
+  // Get selected posts
+  const getSelectedPosts = useCallback(() => {
     const selectedRows = table.getSelectedRowModel().flatRows
-    const selectedPosts = selectedRows.map(row => row.original)
-    
-    if (selectedPosts.length === 0) {
-      alert('No posts selected')
-      return
-    }
-
-    // Create CSV content
-    const headers = ['Title', 'Author', 'Platform', 'Source', 'Score', 'Comments', 'URL', 'Date']
-    const csvContent = [
-      headers.join(','),
-      ...selectedPosts.map(post => [
-        `"${post.title.replace(/"/g, '""')}"`,
-        `"${(post.author || 'unknown').replace(/"/g, '""')}"`,
-        post.platform,
-        post.source || post.subreddit || '',
-        post.score,
-        post.num_comments,
-        post.url || post.permalink,
-        new Date(post.created_utc * 1000).toISOString(),
-      ].join(','))
-    ].join('\n')
-
-    // Download CSV
-    const blob = new Blob([csvContent], { type: 'text/csv' })
-    const url = window.URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `posts-export-${new Date().toISOString().split('T')[0]}.csv`
-    a.click()
-    window.URL.revokeObjectURL(url)
+    return selectedRows.map(row => row.original)
   }, [table])
 
   const handleBulkDelete = useCallback(() => {
@@ -545,7 +517,7 @@ export function PostsTableEnhanced({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={handleBulkExport}
+                    onClick={() => setShowExportDialog(true)}
                   >
                     <Download className="mr-2 h-4 w-4" />
                     Export ({selectedCount})
@@ -592,6 +564,18 @@ export function PostsTableEnhanced({
               </DropdownMenu>
             </div>
           </div>
+          
+          {/* Export all button (when no selection) */}
+          {!hasSelection && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowExportDialog(true)}
+            >
+              <Download className="mr-2 h-4 w-4" />
+              Export All
+            </Button>
+          )}
 
           {/* Search and filters */}
           {(showSearch || showFilters) && (
@@ -741,6 +725,15 @@ export function PostsTableEnhanced({
           />
         )}
       </CardContent>
+      
+      {/* Export Dialog */}
+      <ExportDialog
+        open={showExportDialog}
+        onOpenChange={setShowExportDialog}
+        posts={table.getFilteredRowModel().rows.map(row => row.original)}
+        selectedPosts={hasSelection ? getSelectedPosts() : undefined}
+        title="Export Posts"
+      />
     </Card>
   )
 }
