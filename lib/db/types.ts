@@ -57,7 +57,7 @@ export interface ScrapingSession {
   posts_count: number
   success: boolean
   error_message?: string | null
-  metadata?: Record<string, any>
+  metadata?: Record<string, unknown>
 }
 
 export interface ScrapingMetric {
