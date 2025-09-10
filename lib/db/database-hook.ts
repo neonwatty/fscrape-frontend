@@ -30,7 +30,9 @@ export function useDatabaseInitializer(options: UseDatabaseOptions = {}): UseDat
     setError(null)
 
     try {
-      const db = await initializeDatabase(path || databasePath)
+      const db = await initializeDatabase(
+        path || databasePath ? { databasePath: path || databasePath } : undefined
+      )
       setDatabase(db)
       setIsInitialized(true)
     } catch (err) {

@@ -40,7 +40,7 @@ export function DatabaseProvider({ children }: { children: React.ReactNode }) {
     setError(null)
 
     try {
-      const db = await initializeDatabase(path)
+      const db = await initializeDatabase(path ? { databasePath: path } : undefined)
       setDatabase(db)
       setIsInitialized(true)
 
