@@ -14,7 +14,7 @@ export default function ComparePage() {
           Side-by-side comparison of different platforms and sources
         </p>
       </div>
-      
+
       <div className="grid gap-6">
         <div className="rounded-lg border bg-card p-8 text-center">
           <p className="text-muted-foreground">

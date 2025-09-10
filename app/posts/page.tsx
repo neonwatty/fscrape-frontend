@@ -14,11 +14,9 @@ export default function PostsPage() {
           Browse, search, and filter through all scraped forum posts
         </p>
       </div>
-      
+
       <div className="rounded-lg border bg-card p-8 text-center">
-        <p className="text-muted-foreground">
-          Posts explorer interface will be implemented here
-        </p>
+        <p className="text-muted-foreground">Posts explorer interface will be implemented here</p>
         <p className="text-sm text-muted-foreground mt-2">
           Features: Search, filters, sorting, and data table
         </p>

@@ -14,12 +14,10 @@ export default function AnalyticsPage() {
           Visualize posting patterns, engagement metrics, and trending topics
         </p>
       </div>
-      
+
       <div className="grid gap-6">
         <div className="rounded-lg border bg-card p-8 text-center">
-          <p className="text-muted-foreground">
-            Analytics dashboard will be implemented here
-          </p>
+          <p className="text-muted-foreground">Analytics dashboard will be implemented here</p>
           <p className="text-sm text-muted-foreground mt-2">
             Features: Time heatmaps, growth trends, engagement patterns, top authors
           </p>

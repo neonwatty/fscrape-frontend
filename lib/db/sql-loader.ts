@@ -35,7 +35,9 @@ export async function initializeDatabase(databasePath?: string): Promise<Databas
     return db
   } catch (error) {
     console.error('Failed to initialize database:', error)
-    throw new Error(`Database initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    throw new Error(
+      `Database initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
   }
 }
 
@@ -63,13 +65,13 @@ export function executeQuery<T = any>(sql: string, params: any[] = []): T[] {
   const database = getDatabase()
   const stmt = database.prepare(sql)
   stmt.bind(params)
-  
+
   const results: T[] = []
   while (stmt.step()) {
     const row = stmt.getAsObject()
     results.push(row as T)
   }
-  
+
   stmt.free()
   return results
 }
@@ -90,11 +92,11 @@ export function getDatabaseStats() {
     const totalPosts = executeQueryFirst<{ count: number }>(
       'SELECT COUNT(*) as count FROM forum_posts'
     )
-    
+
     const platforms = executeQuery<{ platform: string; count: number }>(
       'SELECT platform, COUNT(*) as count FROM forum_posts GROUP BY platform'
     )
-    
+
     const lastScraped = executeQueryFirst<{ last_scraped: string }>(
       'SELECT MAX(scraped_at) as last_scraped FROM forum_posts'
     )

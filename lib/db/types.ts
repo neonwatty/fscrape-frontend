@@ -7,21 +7,21 @@ export interface ForumPost {
   author: string | null
   created_utc: number
   scraped_at: string
-  
+
   // Platform fields
   platform: 'reddit' | 'hackernews' | string
   source: string // subreddit or category
-  
+
   // Content fields
   content: string | null
   url: string | null
   permalink: string
-  
+
   // Engagement metrics
   score: number
   num_comments: number
   upvote_ratio?: number
-  
+
   // Reddit specific
   subreddit?: string
   link_flair_text?: string | null
@@ -36,13 +36,13 @@ export interface ForumPost {
   edited?: boolean | number
   author_flair_text?: string | null
   removed_by_category?: string | null
-  
+
   // Additional metadata
   domain?: string | null
   thumbnail?: string | null
   gilded?: number
   total_awards_received?: number
-  
+
   // Status flags
   deleted?: boolean
   removed?: boolean

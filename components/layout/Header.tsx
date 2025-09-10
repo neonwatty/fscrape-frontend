@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -29,9 +29,7 @@ export function Header() {
                   href={item.href}
                   className={cn(
                     'text-sm font-medium transition-colors hover:text-primary',
-                    pathname === item.href
-                      ? 'text-foreground'
-                      : 'text-muted-foreground'
+                    pathname === item.href ? 'text-foreground' : 'text-muted-foreground'
                   )}
                 >
                   {item.name}
@@ -40,9 +38,7 @@ export function Header() {
             </nav>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground">
-              Data Explorer v1.0
-            </span>
+            <span className="text-sm text-muted-foreground">Data Explorer v1.0</span>
           </div>
         </div>
       </div>

@@ -102,10 +102,7 @@ export function getPosts(filters: PostFilters = {}): ForumPost[] {
 
 // Get post by ID
 export function getPostById(id: string): ForumPost | null {
-  return executeQueryFirst<ForumPost>(
-    'SELECT * FROM forum_posts WHERE id = ?',
-    [id]
-  )
+  return executeQueryFirst<ForumPost>('SELECT * FROM forum_posts WHERE id = ?', [id])
 }
 
 // Get platform statistics
@@ -126,9 +123,10 @@ export function getPlatformStats(): PlatformStats[] {
 // Get posts count by time period
 export function getPostsTimeSeries(days: number = 30): TimeSeriesData[] {
   const now = Math.floor(Date.now() / 1000)
-  const timeAgo = now - (days * 86400)
+  const timeAgo = now - days * 86400
 
-  return executeQuery<TimeSeriesData>(`
+  return executeQuery<TimeSeriesData>(
+    `
     SELECT 
       DATE(created_utc, 'unixepoch') as date,
       COUNT(*) as count,
@@ -138,12 +136,15 @@ export function getPostsTimeSeries(days: number = 30): TimeSeriesData[] {
     WHERE created_utc >= ?
     GROUP BY DATE(created_utc, 'unixepoch')
     ORDER BY date DESC
-  `, [timeAgo])
+  `,
+    [timeAgo]
+  )
 }
 
 // Get top authors
 export function getTopAuthors(limit: number = 10): AuthorStats[] {
-  return executeQuery<AuthorStats>(`
+  return executeQuery<AuthorStats>(
+    `
     SELECT 
       author,
       COUNT(*) as postCount,
@@ -155,15 +156,18 @@ export function getTopAuthors(limit: number = 10): AuthorStats[] {
     GROUP BY author
     ORDER BY totalScore DESC
     LIMIT ?
-  `, [limit])
+  `,
+    [limit]
+  )
 }
 
 // Get posts by hour heatmap data
 export function getPostingHeatmap(days: number = 30) {
   const now = Math.floor(Date.now() / 1000)
-  const timeAgo = now - (days * 86400)
+  const timeAgo = now - days * 86400
 
-  return executeQuery<{ hour: number; dayOfWeek: number; count: number }>(`
+  return executeQuery<{ hour: number; dayOfWeek: number; count: number }>(
+    `
     SELECT 
       CAST(strftime('%H', created_utc, 'unixepoch') AS INTEGER) as hour,
       CAST(strftime('%w', created_utc, 'unixepoch') AS INTEGER) as dayOfWeek,
@@ -172,17 +176,22 @@ export function getPostingHeatmap(days: number = 30) {
     WHERE created_utc >= ?
     GROUP BY hour, dayOfWeek
     ORDER BY dayOfWeek, hour
-  `, [timeAgo])
+  `,
+    [timeAgo]
+  )
 }
 
 // Search posts
 export function searchPosts(query: string, limit: number = 50): ForumPost[] {
-  return executeQuery<ForumPost>(`
+  return executeQuery<ForumPost>(
+    `
     SELECT * FROM forum_posts
     WHERE title LIKE ? OR content LIKE ?
     ORDER BY score DESC
     LIMIT ?
-  `, [`%${query}%`, `%${query}%`, limit])
+  `,
+    [`%${query}%`, `%${query}%`, limit]
+  )
 }
 
 // Get unique sources (subreddits, HN categories, etc.)
@@ -197,9 +206,15 @@ export function getUniqueSources(): { platform: string; source: string; count: n
 
 // Get database summary
 export function getDatabaseSummary() {
-  const totalPosts = executeQueryFirst<{ count: number }>('SELECT COUNT(*) as count FROM forum_posts')
-  const totalAuthors = executeQueryFirst<{ count: number }>('SELECT COUNT(DISTINCT author) as count FROM forum_posts WHERE author IS NOT NULL')
-  const dateRange = executeQueryFirst<{ minDate: number; maxDate: number }>('SELECT MIN(created_utc) as minDate, MAX(created_utc) as maxDate FROM forum_posts')
+  const totalPosts = executeQueryFirst<{ count: number }>(
+    'SELECT COUNT(*) as count FROM forum_posts'
+  )
+  const totalAuthors = executeQueryFirst<{ count: number }>(
+    'SELECT COUNT(DISTINCT author) as count FROM forum_posts WHERE author IS NOT NULL'
+  )
+  const dateRange = executeQueryFirst<{ minDate: number; maxDate: number }>(
+    'SELECT MIN(created_utc) as minDate, MAX(created_utc) as maxDate FROM forum_posts'
+  )
   const platforms = getPlatformStats()
 
   return {
