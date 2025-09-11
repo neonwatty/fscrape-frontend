@@ -6,6 +6,7 @@ import { FadeTransition } from '@/components/layout/PageTransition'
 import { ThemeProvider, ThemeScript } from '@/components/providers/ThemeProvider'
 import { ErrorBoundary } from '@/components/providers/ErrorBoundary'
 import { AnalyticsProvider } from '@/components/providers/AnalyticsProvider'
+import { InstallPrompt } from '@/components/pwa/InstallPrompt'
 import './globals.css'
 
 // Font loading with optimization
@@ -112,6 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           <ErrorBoundary>
             <AnalyticsProvider>
+              <InstallPrompt />
               <div className="flex flex-col min-h-screen">
                 <Header />
                 
