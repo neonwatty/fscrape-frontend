@@ -1,12 +1,24 @@
 'use client'
 
 import { Suspense, useState } from 'react'
+import dynamic from 'next/dynamic'
 import { DatabaseProvider } from '@/lib/db/database-context'
-import { PostsTableEnhanced } from '@/components/posts/PostsTableEnhanced'
 import { ForumPost } from '@/lib/db/types'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { TableLoading } from '@/app/loading'
+
+// Lazy load the heavy PostsTableEnhanced component
+const PostsTableEnhanced = dynamic(
+  () => import('@/components/posts/PostsTableEnhanced').then(mod => ({ 
+    default: mod.PostsTableEnhanced 
+  })),
+  { 
+    loading: () => <TableLoading rows={10} />,
+    ssr: false // Disable SSR for this heavy component
+  }
+)
 
 function PostsExplorerSkeleton() {
   return (
