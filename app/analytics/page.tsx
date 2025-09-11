@@ -5,18 +5,39 @@ import { DatabaseProvider, useDatabase } from '@/lib/db/database-context'
 import { getRecentPosts } from '@/lib/db/queries'
 import { ForumPost } from '@/lib/db/types'
 
-// Import all analytics components
-import { HeatMap } from '@/components/charts/HeatMap'
-import { EngagementChart } from '@/components/charts/EngagementChart'
-import { GrowthChart } from '@/components/charts/GrowthChart'
-import { TopAuthors } from '@/components/analytics/TopAuthors'
-import { EngagementMetrics } from '@/components/analytics/EngagementMetrics'
+// Dynamic imports for analytics components
+import dynamic from 'next/dynamic'
+import { Skeleton } from '@/components/ui/skeleton'
+
+const HeatMap = dynamic(
+  () => import('@/components/charts/HeatMap').then(mod => ({ default: mod.HeatMap })),
+  { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
+)
+
+const EngagementChart = dynamic(
+  () => import('@/components/charts/EngagementChart').then(mod => ({ default: mod.EngagementChart })),
+  { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
+)
+
+const GrowthChart = dynamic(
+  () => import('@/components/charts/GrowthChart').then(mod => ({ default: mod.GrowthChart })),
+  { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
+)
+
+const TopAuthors = dynamic(
+  () => import('@/components/analytics/TopAuthors').then(mod => ({ default: mod.TopAuthors })),
+  { loading: () => <Skeleton className="h-96 w-full" />, ssr: false }
+)
+
+const EngagementMetrics = dynamic(
+  () => import('@/components/analytics/EngagementMetrics').then(mod => ({ default: mod.EngagementMetrics })),
+  { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
+)
 
 // UI components
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Skeleton } from '@/components/ui/skeleton'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import {

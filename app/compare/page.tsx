@@ -1,12 +1,46 @@
 'use client'
 
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { SourceSelector, Source } from '@/components/compare/SourceSelector'
-import { ComparisonChart, ComparisonData } from '@/components/compare/ComparisonChart'
-import { ComparisonCharts, TimeSeriesData } from '@/components/compare/ComparisonCharts'
-import { MetricsCard, MetricData } from '@/components/compare/MetricsCard'
-import { MetricsTable } from '@/components/compare/MetricsTable'
-import { NormalizedView, NormalizedMetric } from '@/components/compare/NormalizedView'
+import dynamic from 'next/dynamic'
+import { Skeleton } from '@/components/ui/skeleton'
+
+// Types exports
+import type { Source } from '@/components/compare/SourceSelector'
+import type { ComparisonData } from '@/components/compare/ComparisonChart'
+import type { TimeSeriesData } from '@/components/compare/ComparisonCharts'
+import type { MetricData } from '@/components/compare/MetricsCard'
+import type { NormalizedMetric } from '@/components/compare/NormalizedView'
+
+// Dynamic imports for comparison components
+const SourceSelector = dynamic(
+  () => import('@/components/compare/SourceSelector').then(mod => ({ default: mod.SourceSelector })),
+  { loading: () => <Skeleton className="h-20 w-full" />, ssr: false }
+)
+
+const ComparisonChart = dynamic(
+  () => import('@/components/compare/ComparisonChart').then(mod => ({ default: mod.ComparisonChart })),
+  { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
+)
+
+const ComparisonCharts = dynamic(
+  () => import('@/components/compare/ComparisonCharts').then(mod => ({ default: mod.ComparisonCharts })),
+  { loading: () => <Skeleton className="h-96 w-full" />, ssr: false }
+)
+
+const MetricsCard = dynamic(
+  () => import('@/components/compare/MetricsCard').then(mod => ({ default: mod.MetricsCard })),
+  { loading: () => <Skeleton className="h-32 w-full" />, ssr: false }
+)
+
+const MetricsTable = dynamic(
+  () => import('@/components/compare/MetricsTable').then(mod => ({ default: mod.MetricsTable })),
+  { loading: () => <Skeleton className="h-96 w-full" />, ssr: false }
+)
+
+const NormalizedView = dynamic(
+  () => import('@/components/compare/NormalizedView').then(mod => ({ default: mod.NormalizedView })),
+  { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
+)
 import { 
   BarChart3, 
   LineChart, 
