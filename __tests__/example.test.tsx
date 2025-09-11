@@ -1,4 +1,5 @@
 import { render, screen, createMockPost } from './setup.tsx'
+import { describe, it, expect, vi } from 'vitest'
 
 describe('Jest Setup Verification', () => {
   it('should run a basic test', () => {
@@ -19,7 +20,7 @@ describe('Jest Setup Verification', () => {
   })
 
   it('should mock fetch correctly', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ data: 'test' }),
     } as Response)

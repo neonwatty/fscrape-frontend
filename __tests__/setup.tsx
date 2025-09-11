@@ -2,6 +2,7 @@ import { render as rtlRender, RenderOptions } from '@testing-library/react'
 import { ReactElement, ReactNode } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider } from 'next-themes'
+import { vi, expect } from 'vitest'
 
 // Create a custom render function that includes providers
 function AllTheProviders({ children }: { children: ReactNode }) {
@@ -34,11 +35,11 @@ export * from '@testing-library/react'
 
 // Mock database utilities
 export const mockDatabase = {
-  query: jest.fn(),
-  exec: jest.fn(),
-  run: jest.fn(),
-  prepare: jest.fn(),
-  close: jest.fn(),
+  query: vi.fn(),
+  exec: vi.fn(),
+  run: vi.fn(),
+  prepare: vi.fn(),
+  close: vi.fn(),
 }
 
 // Mock post data factory
@@ -106,7 +107,7 @@ export const waitForLoadingToFinish = async () => {
 
 // Mock fetch responses
 export const mockFetch = (data: any, status = 200) => {
-  global.fetch = jest.fn().mockResolvedValue({
+  global.fetch = vi.fn().mockResolvedValue({
     ok: status >= 200 && status < 300,
     status,
     json: async () => data,
@@ -117,15 +118,15 @@ export const mockFetch = (data: any, status = 200) => {
 // Database test utilities
 export const setupTestDatabase = () => {
   const mockDb = {
-    run: jest.fn().mockResolvedValue({ changes: 1 }),
-    exec: jest.fn().mockResolvedValue([]),
-    prepare: jest.fn().mockReturnValue({
-      bind: jest.fn().mockReturnThis(),
-      step: jest.fn().mockReturnValue(true),
-      getAsObject: jest.fn().mockReturnValue({}),
-      free: jest.fn(),
+    run: vi.fn().mockResolvedValue({ changes: 1 }),
+    exec: vi.fn().mockResolvedValue([]),
+    prepare: vi.fn().mockReturnValue({
+      bind: vi.fn().mockReturnThis(),
+      step: vi.fn().mockReturnValue(true),
+      getAsObject: vi.fn().mockReturnValue({}),
+      free: vi.fn(),
     }),
-    close: jest.fn(),
+    close: vi.fn(),
   }
 
   return mockDb
@@ -133,6 +134,6 @@ export const setupTestDatabase = () => {
 
 // Reset all mocks
 export const resetAllMocks = () => {
-  jest.clearAllMocks()
-  jest.resetModules()
+  vi.clearAllMocks()
+  vi.resetModules()
 }
