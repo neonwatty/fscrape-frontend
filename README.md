@@ -424,9 +424,11 @@ This project is licensed under the ISC License. See [LICENSE](LICENSE) file for 
 ## 🔗 Links
 
 - [Live Demo](https://neonwatty.github.io/fscrape-frontend)
-- [Documentation](./docs)
+- [User Guide](./docs/USER_GUIDE.md)
+- [Features Overview](./docs/FEATURES.md)
+- [API Documentation](./docs/API.md)
+- [Architecture Overview](./docs/ARCHITECTURE.md)
 - [Contributing Guide](CONTRIBUTING.md)
-- [Architecture Overview](ARCHITECTURE.md)
 - [Deployment Guide](DEPLOYMENT.md)
 - [Issues](https://github.com/neonwatty/fscrape-frontend/issues)
 
