@@ -4,6 +4,12 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip tests before deployment'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -14,35 +20,86 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  NODE_VERSION: '20'
+
 jobs:
   build:
+    name: Build and Test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
         
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
+      
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.npm
+            node_modules
+            .next/cache
+          key: ${{ runner.os }}-deps-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-deps-
           
       - name: Install dependencies
         run: npm ci
         
       - name: Run type check
+        if: ${{ github.event.inputs.skip_tests != 'true' }}
         run: npm run type-check
+        continue-on-error: false
         
       - name: Run linter
+        if: ${{ github.event.inputs.skip_tests != 'true' }}
         run: npm run lint
+        continue-on-error: false
         
       - name: Run tests
+        if: ${{ github.event.inputs.skip_tests != 'true' }}
         run: npm run test:run
+        continue-on-error: false
         
       - name: Build application
-        run: npm run build
+        run: |
+          echo "🏗️ Building application for production..."
+          npm run build:prod
+          echo "✅ Build completed successfully"
         env:
           NODE_ENV: production
+          NEXT_PUBLIC_BASE_PATH: /fscrape-frontend
+          NEXT_PUBLIC_ASSET_PREFIX: /fscrape-frontend
+          
+      - name: Validate export
+        run: |
+          echo "🔍 Validating static export..."
+          node scripts/validate-export.js --github-pages
+          echo "✅ Export validation passed"
+          
+      - name: Generate deployment info
+        run: |
+          echo "📊 Deployment Information"
+          echo "========================"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Time: $(date -u +'%Y-%m-%d %H:%M:%S UTC')"
+          echo ""
+          echo "Build Size:"
+          du -sh out/
+          echo ""
+          echo "Files count:"
+          find out -type f | wc -l
           
       - name: Setup Pages
         uses: actions/configure-pages@v5
