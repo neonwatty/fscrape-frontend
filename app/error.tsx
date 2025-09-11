@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
-import { AlertCircle, RefreshCw, Home, Bug } from 'lucide-react'
+import { useEffect, useState } from 'react'
+import { AlertCircle, RefreshCw, Home, Bug, Copy, CheckCircle } from 'lucide-react'
 import Link from 'next/link'
 
 export default function Error({
@@ -11,6 +11,10 @@ export default function Error({
   error: Error & { digest?: string }
   reset: () => void
 }) {
+  const [copied, setCopied] = useState(false)
+  const [retryCount, setRetryCount] = useState(0)
+  const maxRetries = 3
+
   useEffect(() => {
     // Log the error to an error reporting service
     console.error('Application error:', error)
@@ -18,11 +22,34 @@ export default function Error({
     // Send error to monitoring service in production
     if (process.env.NODE_ENV === 'production') {
       // Example: Send to Sentry, LogRocket, etc.
-      // errorReporter.captureException(error)
+      // errorReporter.captureException(error, {
+      //   extra: {
+      //     retryCount,
+      //     digest: error.digest,
+      //   }
+      // })
     }
-  }, [error])
+  }, [error, retryCount])
 
   const isDevelopment = process.env.NODE_ENV === 'development'
+
+  const handleRetry = () => {
+    if (retryCount < maxRetries) {
+      setRetryCount(prev => prev + 1)
+      reset()
+    }
+  }
+
+  const copyErrorDetails = async () => {
+    const errorDetails = `Error: ${error.message}\nDigest: ${error.digest || 'N/A'}\n${isDevelopment ? `Stack: ${error.stack}` : ''}`
+    try {
+      await navigator.clipboard.writeText(errorDetails)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy error details:', err)
+    }
+  }
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center p-4">
@@ -45,12 +72,34 @@ export default function Error({
             </div>
           </div>
 
+          {/* Retry Limit Warning */}
+          {retryCount >= maxRetries && (
+            <div className="p-3 bg-warning/10 border border-warning/20 rounded-md">
+              <p className="text-sm text-warning-foreground">
+                Maximum retry attempts reached. Please refresh the page or contact support.
+              </p>
+            </div>
+          )}
+
           {/* Error Details (Development Only) */}
           {isDevelopment && error && (
             <div className="p-4 bg-muted/50 rounded-md space-y-2">
-              <div className="flex items-center gap-2 text-sm font-medium">
-                <Bug className="h-4 w-4" />
-                <span>Error Details (Development Only)</span>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm font-medium">
+                  <Bug className="h-4 w-4" />
+                  <span>Error Details (Development Only)</span>
+                </div>
+                <button
+                  onClick={copyErrorDetails}
+                  className="p-1.5 hover:bg-muted rounded transition-colors"
+                  title="Copy error details"
+                >
+                  {copied ? (
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  ) : (
+                    <Copy className="h-4 w-4 text-muted-foreground" />
+                  )}
+                </button>
               </div>
               <div className="space-y-1">
                 <p className="text-xs font-mono text-muted-foreground break-all">
@@ -59,6 +108,11 @@ export default function Error({
                 {error.digest && (
                   <p className="text-xs text-muted-foreground">
                     Digest: {error.digest}
+                  </p>
+                )}
+                {retryCount > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    Retry attempts: {retryCount}/{maxRetries}
                   </p>
                 )}
               </div>
@@ -78,11 +132,12 @@ export default function Error({
           {/* Actions */}
           <div className="flex flex-col sm:flex-row gap-3">
             <button
-              onClick={() => reset()}
-              className="flex-1 inline-flex items-center justify-center px-4 py-2.5 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium"
+              onClick={handleRetry}
+              disabled={retryCount >= maxRetries}
+              className="flex-1 inline-flex items-center justify-center px-4 py-2.5 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
-              Try Again
+              {retryCount >= maxRetries ? 'Max Retries Reached' : 'Try Again'}
             </button>
             <Link
               href="/"
