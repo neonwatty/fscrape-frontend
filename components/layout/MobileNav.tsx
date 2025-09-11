@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -13,6 +13,7 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { Menu, X, Home, FileText, BarChart3, GitCompare } from 'lucide-react'
+import { useTouchGestures } from '@/lib/hooks/useTouchGestures'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
@@ -24,6 +25,41 @@ const navigation = [
 export function MobileNav() {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
+  const sheetRef = useRef<HTMLDivElement>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
+  
+  // Update active index based on current pathname
+  useEffect(() => {
+    const index = navigation.findIndex(item => item.href === pathname)
+    if (index !== -1) {
+      setActiveIndex(index)
+    }
+  }, [pathname])
+  
+  // Add swipe gestures to sheet content
+  useTouchGestures(sheetRef, {
+    onSwipeLeft: () => {
+      // Close the sheet on swipe left
+      setOpen(false)
+    },
+    onSwipeDown: () => {
+      const nextIndex = Math.min(activeIndex + 1, navigation.length - 1)
+      if (nextIndex !== activeIndex) {
+        router.push(navigation[nextIndex].href)
+        setOpen(false)
+      }
+    },
+    onSwipeUp: () => {
+      const prevIndex = Math.max(activeIndex - 1, 0)
+      if (prevIndex !== activeIndex) {
+        router.push(navigation[prevIndex].href)
+        setOpen(false)
+      }
+    },
+    threshold: 50,
+    velocity: 0.3,
+  })
   
   // Close menu when route changes
   useEffect(() => {
@@ -57,7 +93,7 @@ export function MobileNav() {
             <X className={cn("absolute h-5 w-5 transition-all", !open && "rotate-90 opacity-0")} />
           </Button>
         </SheetTrigger>
-        <SheetContent side="left" className="w-[280px] sm:w-[350px]">
+        <SheetContent ref={sheetRef} side="left" className="w-[280px] sm:w-[350px]">
           <SheetHeader>
             <SheetTitle className="text-left">Navigation</SheetTitle>
           </SheetHeader>
