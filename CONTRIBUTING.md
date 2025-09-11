@@ -14,6 +14,9 @@ Thank you for your interest in contributing to Forum Scraper Frontend! We welcom
 - [Commit Guidelines](#commit-guidelines)
 - [Pull Request Process](#pull-request-process)
 - [Reporting Issues](#reporting-issues)
+- [Project Architecture](#project-architecture)
+- [Database Development](#database-development)
+- [Performance Guidelines](#performance-guidelines)
 
 ## 📜 Code of Conduct
 
@@ -286,13 +289,133 @@ Include:
 - Alternative solutions considered
 - Mockups/examples (if applicable)
 
+## 🏗️ Project Architecture
+
+### Directory Structure
+```
+fscrape-frontend/
+├── app/                # Next.js App Router pages
+├── components/         # React components
+│   ├── ui/            # Base UI components
+│   └── [feature]/     # Feature-specific components
+├── lib/               # Core utilities
+│   ├── db/            # Database layer
+│   ├── hooks/         # Custom React hooks
+│   └── utils/         # Utility functions
+├── public/            # Static assets
+├── __tests__/         # Unit tests
+└── e2e/               # E2E tests
+```
+
+### Key Files
+- `next.config.js` - Next.js configuration
+- `tailwind.config.js` - Tailwind CSS configuration
+- `tsconfig.json` - TypeScript configuration
+- `vitest.config.ts` - Test configuration
+- `.env.local` - Local environment variables
+
+## 💾 Database Development
+
+### Working with SQL.js
+
+The application uses SQL.js for client-side database operations:
+
+```typescript
+// Example: Adding a new query
+export async function getTopPosts(
+  db: Database,
+  limit: number = 10
+): Promise<Post[]> {
+  const query = `
+    SELECT * FROM posts 
+    ORDER BY score DESC 
+    LIMIT ?
+  `;
+  return executeQuery<Post>(db, query, [limit]);
+}
+```
+
+### Database Schema Changes
+
+When modifying the database schema:
+
+1. Update the schema in `scripts/create-schema.sql`
+2. Update TypeScript types in `lib/db/types.ts`
+3. Run migration script: `npm run db:migrate`
+4. Update tests and documentation
+
+### Query Optimization
+
+- Always use indexes for frequently queried columns
+- Use EXPLAIN QUERY PLAN to analyze queries
+- Implement query caching for expensive operations
+- Consider pagination for large result sets
+
+## ⚡ Performance Guidelines
+
+### Code Splitting
+
+```typescript
+// Use dynamic imports for heavy components
+const HeavyChart = dynamic(
+  () => import('@/components/charts/HeavyChart'),
+  { 
+    loading: () => <ChartSkeleton />,
+    ssr: false 
+  }
+);
+```
+
+### Virtualization
+
+For lists with many items:
+
+```typescript
+import { useVirtualizer } from '@/lib/hooks/useVirtualizer';
+
+function LargeList({ items }) {
+  const virtualizer = useVirtualizer({
+    items,
+    itemHeight: 80,
+    overscan: 5
+  });
+  
+  // Render only visible items
+}
+```
+
+### Image Optimization
+
+```typescript
+import Image from 'next/image';
+
+// Always use Next.js Image component
+<Image
+  src="/image.jpg"
+  alt="Description"
+  width={800}
+  height={600}
+  loading="lazy"
+  placeholder="blur"
+/>
+```
+
+### Bundle Size
+
+- Monitor bundle size with `npm run build:analyze`
+- Use tree shaking effectively
+- Lazy load non-critical features
+- Minimize dependencies
+
 ## 📚 Additional Resources
 
-- [Project Architecture](ARCHITECTURE.md)
+- [Project Architecture](./docs/ARCHITECTURE.md)
+- [API Documentation](./docs/API.md)
 - [Deployment Guide](DEPLOYMENT.md)
-- [API Documentation](docs/API.md)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [TypeScript Documentation](https://www.typescriptlang.org/docs)
+- [SQL.js Documentation](https://sql.js.org)
+- [Tailwind CSS Documentation](https://tailwindcss.com/docs)
 
 ## 🎉 Recognition
 
