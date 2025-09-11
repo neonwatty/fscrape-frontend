@@ -17,7 +17,7 @@
     "format:check": "prettier --check .",
     "check-all": "npm run type-check && npm run lint && npm run format:check",
     "prebuild": "npm run check-all",
-    "postbuild": "echo 'Build completed successfully!'",
+    "postbuild": "cp .nojekyll out/ 2>/dev/null || true && echo 'Build completed successfully!'",
     "analyze": "ANALYZE=true next build",
     "test": "vitest",
     "test:ui": "vitest --ui",
@@ -30,7 +30,9 @@
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:debug": "playwright test --debug",
     "test:all": "npm run test:run && npm run test:e2e",
-    "ci": "npm run check-all && npm run test:all"
+    "ci": "npm run check-all && npm run test:all",
+    "validate:export": "npm run build && node scripts/validate-export.js",
+    "preview:static": "npm run build && npx serve out -p 3001"
   },
   "repository": {
     "type": "git",

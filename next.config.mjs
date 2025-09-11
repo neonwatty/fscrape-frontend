@@ -4,9 +4,17 @@ const require = createRequire(import.meta.url)
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
+  
+  // Static export configuration
+  trailingSlash: true,
+  distDir: '.next',
+  
+  // Image optimization for static export
   images: {
     unoptimized: true,
   },
+  
+  // GitHub Pages deployment paths
   basePath: process.env.NODE_ENV === 'production' ? '/fscrape-frontend' : '',
   assetPrefix: process.env.NODE_ENV === 'production' ? '/fscrape-frontend' : '',
   
