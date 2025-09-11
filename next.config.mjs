@@ -9,6 +9,12 @@ const nextConfig = {
   trailingSlash: true,
   distDir: '.next',
   
+  // Production optimizations
+  productionBrowserSourceMaps: false,
+  poweredByHeader: false,
+  compress: true,
+  generateEtags: true,
+  
   // Image optimization for static export
   images: {
     unoptimized: true,
@@ -41,6 +47,63 @@ const nextConfig = {
     } : false,
   },
   
+  // Security headers for production
+  async headers() {
+    if (process.env.NODE_ENV !== 'production') {
+      return []
+    }
+    
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+          {
+            key: 'Strict-Transport-Security',
+            value: 'max-age=63072000; includeSubDomains; preload'
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'SAMEORIGIN'
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff'
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block'
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin'
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()'
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: `
+              default-src 'self';
+              script-src 'self' 'unsafe-eval' 'unsafe-inline';
+              style-src 'self' 'unsafe-inline';
+              img-src 'self' data: https:;
+              font-src 'self' data:;
+              connect-src 'self';
+              frame-ancestors 'none';
+              base-uri 'self';
+              form-action 'self';
+            `.replace(/\s{2,}/g, ' ').trim()
+          }
+        ]
+      }
+    ]
+  },
+  
   webpack: (config, { isServer, dev }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -53,6 +116,37 @@ const nextConfig = {
     
     // Production optimizations
     if (!dev) {
+      // Enable minification and tree shaking
+      config.optimization.minimize = true
+      config.optimization.minimizer = config.optimization.minimizer || []
+      
+      // Add Terser plugin for better minification if available
+      try {
+        const TerserPlugin = require('terser-webpack-plugin')
+        config.optimization.minimizer.push(
+          new TerserPlugin({
+            terserOptions: {
+              compress: {
+                drop_console: process.env.NODE_ENV === 'production',
+                drop_debugger: true,
+                pure_funcs: ['console.log', 'console.info'],
+                passes: 2,
+              },
+              mangle: {
+                safari10: true,
+              },
+              format: {
+                comments: false,
+              },
+            },
+            extractComments: false,
+          })
+        )
+      } catch (e) {
+        // Terser plugin not available, use default minification
+        console.log('Using default minification (terser-webpack-plugin not installed)')
+      }
+      
       // Split chunks more aggressively
       config.optimization = {
         ...config.optimization,
