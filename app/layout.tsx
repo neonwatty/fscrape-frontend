@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Header } from '@/components/layout/Header'
 import { BottomNav } from '@/components/layout/BottomNav'
 import { FadeTransition } from '@/components/layout/PageTransition'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -29,15 +30,22 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body className="antialiased touch-manipulation">
-        <Header />
-        <main className="min-h-screen bg-background pb-20 md:pb-0">
-          <FadeTransition>
-            {children}
-          </FadeTransition>
-        </main>
-        <BottomNav />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Header />
+          <main className="min-h-screen bg-background pb-20 md:pb-0">
+            <FadeTransition>
+              {children}
+            </FadeTransition>
+          </main>
+          <BottomNav />
+        </ThemeProvider>
       </body>
     </html>
   )
