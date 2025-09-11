@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "build:prod": "NODE_ENV=production next build",
     "start": "next start",
     "export": "next build",
     "serve": "npx serve@latest out",
@@ -15,6 +16,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "check-all": "npm run type-check && npm run lint && npm run format:check",
+    "prebuild": "npm run check-all",
+    "postbuild": "echo 'Build completed successfully!'",
+    "analyze": "ANALYZE=true next build",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
@@ -24,7 +28,9 @@
     "jest:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:e2e:debug": "playwright test --debug"
+    "test:e2e:debug": "playwright test --debug",
+    "test:all": "npm run test:run && npm run test:e2e",
+    "ci": "npm run check-all && npm run test:all"
   },
   "repository": {
     "type": "git",

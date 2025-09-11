@@ -22,7 +22,8 @@ const nextConfig = {
   
   // Experimental features for performance
   experimental: {
-    optimizePackageImports: ['recharts', 'react-window', 'date-fns'],
+    optimizePackageImports: ['recharts', 'react-window', 'date-fns', '@radix-ui/react-*'],
+    webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'TTFB'],
   },
   
   // Compiler options
