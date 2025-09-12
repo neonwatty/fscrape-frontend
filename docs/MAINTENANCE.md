@@ -5,6 +5,7 @@
 This guide provides comprehensive instructions for maintaining the Forum Scraper Frontend application, including routine maintenance tasks, monitoring procedures, troubleshooting, and update processes.
 
 ## Table of Contents
+
 - [Quick Start](#quick-start)
 - [Automated Maintenance](#automated-maintenance)
 - [Manual Maintenance Tasks](#manual-maintenance-tasks)
@@ -66,6 +67,7 @@ Add to crontab (`crontab -e`):
 #### Using Task Scheduler (Windows)
 
 Create scheduled tasks for:
+
 1. Daily health checks
 2. Weekly maintenance
 3. Monthly security audits
@@ -78,8 +80,8 @@ name: Scheduled Maintenance
 
 on:
   schedule:
-    - cron: '0 2 * * *'  # Daily at 2 AM UTC
-  workflow_dispatch:     # Manual trigger
+    - cron: '0 2 * * *' # Daily at 2 AM UTC
+  workflow_dispatch: # Manual trigger
 
 jobs:
   health-check:
@@ -91,7 +93,7 @@ jobs:
           node-version: '18'
       - run: npm ci
       - run: node scripts/health-check.js
-      
+
   security-audit:
     runs-on: ubuntu-latest
     steps:
@@ -104,11 +106,13 @@ jobs:
 ### Daily Tasks
 
 #### 1. Health Check
+
 ```bash
 node scripts/health-check.js
 ```
 
 **What it checks:**
+
 - System requirements
 - Dependencies integrity
 - File structure
@@ -117,6 +121,7 @@ node scripts/health-check.js
 - Build status
 
 #### 2. Log Review
+
 ```bash
 # Check error logs
 tail -f logs/error.log
@@ -131,6 +136,7 @@ cat logs/build_*.log
 ### Weekly Tasks
 
 #### 1. Dependency Updates
+
 ```bash
 # Check for updates
 npm run deps:check
@@ -143,6 +149,7 @@ npm run test:all
 ```
 
 #### 2. Cache Cleanup
+
 ```bash
 # Clean all caches
 npm run clean:cache
@@ -155,6 +162,7 @@ rm -rf .next
 ```
 
 #### 3. Database Maintenance
+
 ```bash
 # Validate database
 npm run db:validate
@@ -169,6 +177,7 @@ npm run db:update
 ### Monthly Tasks
 
 #### 1. Full System Audit
+
 ```bash
 # Run complete maintenance
 ./scripts/maintenance.sh
@@ -176,6 +185,7 @@ npm run db:update
 ```
 
 #### 2. Performance Review
+
 ```bash
 # Build and analyze bundle
 npm run build:analyze
@@ -188,6 +198,7 @@ du -sh .next out
 ```
 
 #### 3. Security Audit
+
 ```bash
 # Full security audit
 npm audit
@@ -210,6 +221,7 @@ node scripts/health-check.js
 ```
 
 **Output includes:**
+
 - ✅ Passed checks (green)
 - ⚠️ Warnings (yellow)
 - ❌ Failed checks (red)
@@ -218,26 +230,29 @@ node scripts/health-check.js
 ### Key Metrics to Monitor
 
 #### System Metrics
-| Metric | Healthy | Warning | Critical |
-|--------|---------|---------|----------|
-| Node.js Version | ≥18.0.0 | ≥16.0.0 | <16.0.0 |
-| Free Memory | >1GB | >500MB | <500MB |
-| Disk Space | >1GB | >500MB | <500MB |
-| CPU Usage | <70% | <85% | >85% |
+
+| Metric          | Healthy | Warning | Critical |
+| --------------- | ------- | ------- | -------- |
+| Node.js Version | ≥18.0.0 | ≥16.0.0 | <16.0.0  |
+| Free Memory     | >1GB    | >500MB  | <500MB   |
+| Disk Space      | >1GB    | >500MB  | <500MB   |
+| CPU Usage       | <70%    | <85%    | >85%     |
 
 #### Application Metrics
-| Metric | Target | Action if Exceeded |
-|--------|--------|-------------------|
-| Build Size | <10MB | Optimize bundles |
-| Page Load Time | <3s | Check performance |
-| Memory Usage | <500MB | Check for leaks |
-| Error Rate | <1% | Review error logs |
+
+| Metric         | Target | Action if Exceeded |
+| -------------- | ------ | ------------------ |
+| Build Size     | <10MB  | Optimize bundles   |
+| Page Load Time | <3s    | Check performance  |
+| Memory Usage   | <500MB | Check for leaks    |
+| Error Rate     | <1%    | Review error logs  |
 
 ### Monitoring Tools Integration
 
 #### Setting Up Monitoring
 
 1. **Application Monitoring**
+
 ```javascript
 // lib/monitoring.js
 export function initMonitoring() {
@@ -248,16 +263,13 @@ export function initMonitoring() {
 ```
 
 2. **Error Tracking**
+
 ```javascript
 // app/layout.tsx
 import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 export default function RootLayout({ children }) {
-  return (
-    <ErrorBoundary>
-      {children}
-    </ErrorBoundary>
-  )
+  return <ErrorBoundary>{children}</ErrorBoundary>
 }
 ```
 
@@ -279,6 +291,7 @@ npm view [package-name] versions
 ### Updating Dependencies
 
 #### Safe Updates (Patch/Minor)
+
 ```bash
 # Update within semver ranges
 npm update
@@ -288,6 +301,7 @@ npm update [package-name]
 ```
 
 #### Major Updates
+
 ```bash
 # Check breaking changes first
 npx npm-check-updates -u
@@ -307,6 +321,7 @@ npm run test:all
    - Plan quarterly for major updates
 
 2. **Testing After Updates**
+
    ```bash
    # Always run after updates
    npm run test:all
@@ -315,11 +330,12 @@ npm run test:all
    ```
 
 3. **Rollback Plan**
+
    ```bash
    # Before updates
    cp package.json package.json.backup
    cp package-lock.json package-lock.json.backup
-   
+
    # To rollback
    mv package.json.backup package.json
    mv package-lock.json.backup package-lock.json
@@ -331,6 +347,7 @@ npm run test:all
 ### Regular Security Checks
 
 #### Weekly Security Audit
+
 ```bash
 # Basic audit
 npm audit
@@ -363,10 +380,11 @@ npm install [package-name]@latest
    - Review security advisories regularly
 
 2. **Code Security**
+
    ```bash
    # ESLint security rules
    npm install --save-dev eslint-plugin-security
-   
+
    # Add to .eslintrc
    {
      "plugins": ["security"],
@@ -384,6 +402,7 @@ npm install [package-name]@latest
 ### Performance Metrics
 
 #### Build Performance
+
 ```bash
 # Measure build time
 time npm run build
@@ -398,6 +417,7 @@ ls -lh .next/static/chunks/
 #### Runtime Performance
 
 1. **Lighthouse Audit**
+
 ```bash
 # Install Lighthouse
 npm install -g lighthouse
@@ -407,6 +427,7 @@ lighthouse http://localhost:3000 --output html --output-path ./lighthouse-report
 ```
 
 2. **Web Vitals Monitoring**
+
 ```javascript
 // lib/web-vitals.js
 export function reportWebVitals(metric) {
@@ -418,6 +439,7 @@ export function reportWebVitals(metric) {
 ### Performance Optimization
 
 #### Quick Wins
+
 ```bash
 # Optimize images
 npm run optimize:images
@@ -430,6 +452,7 @@ npm install compression
 ```
 
 #### Advanced Optimization
+
 1. Code splitting
 2. Lazy loading
 3. Resource hints
@@ -440,6 +463,7 @@ npm install compression
 ### Automated Backups
 
 #### Daily Backup Script
+
 ```bash
 #!/bin/bash
 # backup-daily.sh
@@ -461,6 +485,7 @@ find "$BACKUP_DIR" -mtime +7 -delete
 ### Manual Backup
 
 #### Full Backup
+
 ```bash
 # Create backup directory
 mkdir -p backups/$(date +%Y%m%d)
@@ -477,6 +502,7 @@ tar -tzf backups/$(date +%Y%m%d)/full-backup.tar.gz | head
 ```
 
 #### Selective Backup
+
 ```bash
 # Backup source code only
 tar -czf code-backup.tar.gz app components lib
@@ -495,6 +521,7 @@ tar -czf data-backup.tar.gz public/data
 ### Restore Procedures
 
 #### From Full Backup
+
 ```bash
 # Extract backup
 tar -xzf backups/20240101/full-backup.tar.gz
@@ -507,6 +534,7 @@ npm run build
 ```
 
 #### From Selective Backup
+
 ```bash
 # Restore code
 tar -xzf code-backup.tar.gz
@@ -525,12 +553,14 @@ tar -xzf data-backup.tar.gz
 #### Build Failures
 
 **Problem**: Build fails with memory error
+
 ```bash
 # Solution: Increase Node memory
 NODE_OPTIONS="--max-old-space-size=4096" npm run build
 ```
 
 **Problem**: Module not found errors
+
 ```bash
 # Solution: Clean install
 rm -rf node_modules package-lock.json
@@ -540,6 +570,7 @@ npm install
 #### Dependency Issues
 
 **Problem**: Peer dependency conflicts
+
 ```bash
 # Solution: Use legacy deps
 npm install --legacy-peer-deps
@@ -549,6 +580,7 @@ npm install --force
 ```
 
 **Problem**: Package vulnerabilities
+
 ```bash
 # Solution: Update and audit
 npm update
@@ -558,6 +590,7 @@ npm audit fix
 #### Performance Issues
 
 **Problem**: Slow build times
+
 ```bash
 # Solution: Clear caches
 npm run clean:cache
@@ -568,6 +601,7 @@ npm run dev:turbo
 ```
 
 **Problem**: Large bundle size
+
 ```bash
 # Solution: Analyze and optimize
 npm run build:analyze
@@ -578,6 +612,7 @@ npm run build:analyze
 ### Debug Mode
 
 #### Enable Debug Logging
+
 ```bash
 # Set debug environment
 DEBUG=* npm run dev
@@ -587,6 +622,7 @@ DEBUG=next:* npm run dev
 ```
 
 #### Verbose Output
+
 ```bash
 # npm with verbose
 npm install --verbose
@@ -600,6 +636,7 @@ npm run build -- --debug
 ### Critical Failure Recovery
 
 #### 1. Immediate Actions
+
 ```bash
 # Stop all processes
 pkill -f node
@@ -612,6 +649,7 @@ tail -n 100 logs/error.log
 ```
 
 #### 2. Rollback Procedure
+
 ```bash
 # Revert to last known good commit
 git log --oneline -10
@@ -626,6 +664,7 @@ npm ci
 ```
 
 #### 3. Data Recovery
+
 ```bash
 # Restore database from backup
 cp backups/db/backup.db public/data/
@@ -637,18 +676,21 @@ npm run db:validate
 ### Disaster Recovery Plan
 
 #### Level 1: Application Issues
+
 1. Run health check
 2. Review logs
 3. Restart application
 4. Clear caches if needed
 
 #### Level 2: Dependency Issues
+
 1. Backup current state
 2. Clean node_modules
 3. Reinstall dependencies
 4. Run tests
 
 #### Level 3: Data Corruption
+
 1. Stop application
 2. Backup corrupted data
 3. Restore from last backup
@@ -656,6 +698,7 @@ npm run db:validate
 5. Run integrity checks
 
 #### Level 4: Complete Failure
+
 1. Document current state
 2. Restore from full backup
 3. Rebuild application
@@ -665,12 +708,14 @@ npm run db:validate
 ## Maintenance Checklist
 
 ### Daily
+
 - [ ] Run health check
 - [ ] Check error logs
 - [ ] Monitor performance metrics
 - [ ] Verify backups completed
 
 ### Weekly
+
 - [ ] Update dependencies
 - [ ] Run security audit
 - [ ] Clean caches
@@ -678,6 +723,7 @@ npm run db:validate
 - [ ] Review monitoring alerts
 
 ### Monthly
+
 - [ ] Full system maintenance
 - [ ] Performance audit
 - [ ] Security review
@@ -685,6 +731,7 @@ npm run db:validate
 - [ ] Test disaster recovery
 
 ### Quarterly
+
 - [ ] Major dependency updates
 - [ ] Architecture review
 - [ ] Security penetration testing
@@ -711,6 +758,7 @@ npm run db:validate
 ### Maintenance Logs
 
 All maintenance activities are logged to:
+
 - `logs/maintenance_*.log` - Maintenance script output
 - `logs/health-check-*.json` - Health check reports
 - `logs/audit_*.json` - Security audit results

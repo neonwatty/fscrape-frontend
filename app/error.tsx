@@ -18,7 +18,7 @@ export default function Error({
   useEffect(() => {
     // Log the error to an error reporting service
     console.error('Application error:', error)
-    
+
     // Send error to monitoring service in production
     if (process.env.NODE_ENV === 'production') {
       // Example: Send to Sentry, LogRocket, etc.
@@ -35,7 +35,7 @@ export default function Error({
 
   const handleRetry = () => {
     if (retryCount < maxRetries) {
-      setRetryCount(prev => prev + 1)
+      setRetryCount((prev) => prev + 1)
       reset()
     }
   }
@@ -63,11 +63,10 @@ export default function Error({
               </div>
             </div>
             <div className="flex-1">
-              <h1 className="text-xl font-semibold text-foreground">
-                Something went wrong
-              </h1>
+              <h1 className="text-xl font-semibold text-foreground">Something went wrong</h1>
               <p className="text-sm text-muted-foreground mt-1">
-                An unexpected error occurred while processing your request. The error has been logged and we&apos;ll look into it.
+                An unexpected error occurred while processing your request. The error has been
+                logged and we&apos;ll look into it.
               </p>
             </div>
           </div>
@@ -102,13 +101,9 @@ export default function Error({
                 </button>
               </div>
               <div className="space-y-1">
-                <p className="text-xs font-mono text-muted-foreground break-all">
-                  {error.message}
-                </p>
+                <p className="text-xs font-mono text-muted-foreground break-all">{error.message}</p>
                 {error.digest && (
-                  <p className="text-xs text-muted-foreground">
-                    Digest: {error.digest}
-                  </p>
+                  <p className="text-xs text-muted-foreground">Digest: {error.digest}</p>
                 )}
                 {retryCount > 0 && (
                   <p className="text-xs text-muted-foreground">

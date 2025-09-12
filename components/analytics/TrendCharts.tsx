@@ -18,7 +18,12 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { TrendData, PlatformMetrics, AuthorMetrics, TimeSeriesDataPoint } from '@/lib/analytics/analytics-utils'
+import {
+  TrendData,
+  PlatformMetrics,
+  AuthorMetrics,
+  TimeSeriesDataPoint,
+} from '@/lib/analytics/analytics-utils'
 import { formatLargeNumber } from '@/lib/utils/formatters'
 
 // Color palette
@@ -40,11 +45,11 @@ interface TrendComparisonChartProps {
   className?: string
 }
 
-export function TrendComparisonChart({ 
-  data, 
+export function TrendComparisonChart({
+  data,
   title = 'Platform Trends',
   description = 'Posts over time by platform',
-  className 
+  className,
 }: TrendComparisonChartProps) {
   return (
     <Card className={className}>
@@ -56,18 +61,14 @@ export function TrendComparisonChart({
         <ResponsiveContainer width="100%" height={300}>
           <AreaChart data={data}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey="date" 
-              className="text-xs"
-              tick={{ fill: 'currentColor' }}
-            />
-            <YAxis 
+            <XAxis dataKey="date" className="text-xs" tick={{ fill: 'currentColor' }} />
+            <YAxis
               className="text-xs"
               tick={{ fill: 'currentColor' }}
               tickFormatter={(value) => formatLargeNumber(value)}
             />
-            <Tooltip 
-              contentStyle={{ 
+            <Tooltip
+              contentStyle={{
                 backgroundColor: 'hsl(var(--background))',
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '6px',
@@ -107,11 +108,11 @@ interface EngagementTrendChartProps {
   className?: string
 }
 
-export function EngagementTrendChart({ 
-  data, 
+export function EngagementTrendChart({
+  data,
   title = 'Engagement Trends',
   description = 'Score and comments over time',
-  className 
+  className,
 }: EngagementTrendChartProps) {
   return (
     <Card className={className}>
@@ -123,18 +124,14 @@ export function EngagementTrendChart({
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={data}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey="date" 
-              className="text-xs"
-              tick={{ fill: 'currentColor' }}
-            />
-            <YAxis 
+            <XAxis dataKey="date" className="text-xs" tick={{ fill: 'currentColor' }} />
+            <YAxis
               className="text-xs"
               tick={{ fill: 'currentColor' }}
               tickFormatter={(value) => formatLargeNumber(value)}
             />
-            <Tooltip 
-              contentStyle={{ 
+            <Tooltip
+              contentStyle={{
                 backgroundColor: 'hsl(var(--background))',
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '6px',
@@ -181,19 +178,25 @@ interface PlatformDistributionChartProps {
   className?: string
 }
 
-export function PlatformDistributionChart({ 
-  data, 
+export function PlatformDistributionChart({
+  data,
   title = 'Platform Distribution',
   description = 'Posts by platform',
-  className 
+  className,
 }: PlatformDistributionChartProps) {
-  const pieData = data.map(d => ({
+  const pieData = data.map((d) => ({
     name: d.platform,
     value: d.posts,
     percentage: d.percentage,
   }))
 
-  const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ payload: { name: string; value: number; percentage: number } }> }) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+  }: {
+    active?: boolean
+    payload?: Array<{ payload: { name: string; value: number; percentage: number } }>
+  }) => {
     if (active && payload && payload[0]) {
       const data = payload[0].payload
       return (
@@ -221,30 +224,31 @@ export function PlatformDistributionChart({
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={(entry: { percentage: number }) => `${entry.percentage.toFixed(0)}%`}
+              label={(entry: any) => `${entry.percentage?.toFixed(0) || 0}%`}
               outerRadius={80}
               fill="#8884d8"
               dataKey="value"
             >
               {pieData.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
-                  fill={entry.name === 'reddit' ? COLORS.reddit : COLORS.hackernews} 
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.name === 'reddit' ? COLORS.reddit : COLORS.hackernews}
                 />
               ))}
             </Pie>
             <Tooltip content={<CustomTooltip />} />
           </PieChart>
         </ResponsiveContainer>
-        
+
         {/* Legend */}
         <div className="flex justify-center gap-6 mt-4">
           {data.map((platform) => (
             <div key={platform.platform} className="flex items-center gap-2">
-              <div 
-                className="w-3 h-3 rounded-full" 
-                style={{ 
-                  backgroundColor: platform.platform === 'reddit' ? COLORS.reddit : COLORS.hackernews 
+              <div
+                className="w-3 h-3 rounded-full"
+                style={{
+                  backgroundColor:
+                    platform.platform === 'reddit' ? COLORS.reddit : COLORS.hackernews,
                 }}
               />
               <span className="text-sm capitalize">{platform.platform}</span>
@@ -266,13 +270,13 @@ interface TopAuthorsChartProps {
   className?: string
 }
 
-export function TopAuthorsChart({ 
-  data, 
+export function TopAuthorsChart({
+  data,
   title = 'Top Authors',
   description = 'Most active contributors',
-  className 
+  className,
 }: TopAuthorsChartProps) {
-  const chartData = data.slice(0, 10).map(author => ({
+  const chartData = data.slice(0, 10).map((author) => ({
     name: author.author.length > 15 ? author.author.substring(0, 15) + '...' : author.author,
     posts: author.posts,
     score: author.totalScore,
@@ -289,21 +293,21 @@ export function TopAuthorsChart({
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={chartData} layout="horizontal">
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
+            <XAxis
               type="number"
               className="text-xs"
               tick={{ fill: 'currentColor' }}
               tickFormatter={(value) => formatLargeNumber(value)}
             />
-            <YAxis 
-              dataKey="name" 
+            <YAxis
+              dataKey="name"
               type="category"
               className="text-xs"
               tick={{ fill: 'currentColor' }}
               width={100}
             />
-            <Tooltip 
-              contentStyle={{ 
+            <Tooltip
+              contentStyle={{
                 backgroundColor: 'hsl(var(--background))',
                 border: '1px solid hsl(var(--border))',
                 borderRadius: '6px',
@@ -311,7 +315,7 @@ export function TopAuthorsChart({
               labelStyle={{ color: 'hsl(var(--foreground))' }}
               formatter={(value: number, name: string) => [
                 formatLargeNumber(value),
-                name === 'score' ? 'Total Score' : 'Posts'
+                name === 'score' ? 'Total Score' : 'Posts',
               ]}
             />
             <Legend />
@@ -331,11 +335,11 @@ interface MiniTrendChartProps {
   className?: string
 }
 
-export function MiniTrendChart({ 
-  data, 
+export function MiniTrendChart({
+  data,
   dataKey,
   color = COLORS.primary,
-  className 
+  className,
 }: MiniTrendChartProps) {
   return (
     <div className={className}>

@@ -1,6 +1,7 @@
 # Architecture Overview
 
 ## Table of Contents
+
 - [Project Structure](#project-structure)
 - [Technology Stack](#technology-stack)
 - [Application Architecture](#application-architecture)
@@ -45,6 +46,7 @@ fscrape-frontend/
 ## Technology Stack
 
 ### Core Technologies
+
 - **Framework**: Next.js 15 with App Router
 - **Language**: TypeScript 5.9
 - **Styling**: Tailwind CSS 4.1
@@ -52,6 +54,7 @@ fscrape-frontend/
 - **Database**: SQL.js (in-browser SQLite)
 
 ### UI Libraries
+
 - **Component Library**: Radix UI + shadcn/ui
 - **Charts**: Recharts 3.2
 - **Icons**: Lucide React
@@ -59,6 +62,7 @@ fscrape-frontend/
 - **Virtualization**: React Window + TanStack Virtual
 
 ### Development Tools
+
 - **Testing**: Vitest + React Testing Library + Playwright
 - **Linting**: ESLint + Prettier
 - **Build**: Turbopack (development) / Webpack (production)
@@ -71,30 +75,30 @@ fscrape-frontend/
 ```mermaid
 graph TB
     User[User Browser]
-    
+
     subgraph "Frontend Application"
         AppRouter[App Router]
         Components[React Components]
         Hooks[Custom Hooks]
         Utils[Utilities]
-        
+
         subgraph "Data Layer"
             SQLjs[SQL.js Engine]
             Cache[Query Cache]
             Queries[Query Module]
         end
-        
+
         subgraph "State Management"
             Zustand[Zustand Store]
             Context[React Context]
         end
     end
-    
+
     subgraph "External Services"
         GHPages[GitHub Pages CDN]
         ServiceWorker[Service Worker]
     end
-    
+
     User --> AppRouter
     AppRouter --> Components
     Components --> Hooks
@@ -108,6 +112,7 @@ graph TB
 ```
 
 ### Key Design Principles
+
 1. **Static First**: Fully static site generation for optimal performance
 2. **Client-Side Database**: SQL.js for in-browser data processing
 3. **Progressive Enhancement**: Core functionality works without JavaScript
@@ -117,28 +122,30 @@ graph TB
 ## Data Flow
 
 ### Data Loading Process
+
 ```typescript
 // 1. Database initialization
 const db = await initSqlJs({
-  locateFile: file => `/sql-js/${file}`
-});
+  locateFile: (file) => `/sql-js/${file}`,
+})
 
 // 2. Load database file
-const buffer = await fetch('/data/forum.db').then(r => r.arrayBuffer());
-const database = new db.Database(new Uint8Array(buffer));
+const buffer = await fetch('/data/forum.db').then((r) => r.arrayBuffer())
+const database = new db.Database(new Uint8Array(buffer))
 
 // 3. Query execution with caching
 const posts = await cachedQuery(
   'SELECT * FROM posts WHERE platform = ?',
   ['reddit'],
   { ttl: 60000 } // 1 minute cache
-);
+)
 
 // 4. State update
-useStore.setState({ posts });
+useStore.setState({ posts })
 ```
 
 ### Caching Strategy
+
 - **Query Cache**: 60-second TTL for database queries
 - **Component Cache**: React.memo for expensive components
 - **Browser Cache**: Service Worker for static assets
@@ -147,6 +154,7 @@ useStore.setState({ posts });
 ## Component Architecture
 
 ### Component Hierarchy
+
 ```
 App
 ├── Layout (Providers, Theme, Navigation)
@@ -169,6 +177,7 @@ App
 ```
 
 ### Component Design Patterns
+
 - **Compound Components**: Complex UI with flexible composition
 - **Render Props**: Sharing logic between components
 - **Custom Hooks**: Encapsulating business logic
@@ -177,6 +186,7 @@ App
 ## Database Layer
 
 ### Schema Design
+
 ```sql
 -- Posts table
 CREATE TABLE posts (
@@ -207,6 +217,7 @@ CREATE TABLE metadata (
 ```
 
 ### Query Optimization
+
 - **Index Usage**: Covering indexes for common queries
 - **Query Planning**: EXPLAIN QUERY PLAN analysis
 - **Batch Operations**: Bulk inserts and updates
@@ -215,18 +226,21 @@ CREATE TABLE metadata (
 ## Performance Optimizations
 
 ### Build-Time Optimizations
+
 - **Static Generation**: Pre-rendering at build time
 - **Image Optimization**: Next.js Image component
 - **Tree Shaking**: Removing unused code
 - **Minification**: Terser for JavaScript, CSS minification
 
 ### Runtime Optimizations
+
 - **Code Splitting**: Route-based and component-based
 - **Lazy Loading**: Dynamic imports with React.lazy
 - **Virtualization**: Large lists with react-window
 - **Web Workers**: Offloading heavy computations
 
 ### Metrics Targets
+
 - **Lighthouse Score**: 95+ across all metrics
 - **First Contentful Paint**: < 1.5s
 - **Time to Interactive**: < 3.5s
@@ -235,6 +249,7 @@ CREATE TABLE metadata (
 ## Security Architecture
 
 ### Security Measures
+
 - **Content Security Policy**: Restrictive CSP headers
 - **Input Validation**: Schema validation for all inputs
 - **XSS Prevention**: React's built-in escaping
@@ -242,25 +257,25 @@ CREATE TABLE metadata (
 - **HTTPS Only**: Enforced via GitHub Pages
 
 ### Data Protection
+
 ```typescript
 // Input sanitization example
 export function sanitizeInput(input: string): string {
   return input
     .replace(/[<>]/g, '') // Remove HTML tags
     .trim()
-    .slice(0, MAX_INPUT_LENGTH);
+    .slice(0, MAX_INPUT_LENGTH)
 }
 
 // SQL parameterization
-const safeQuery = db.prepare(
-  'SELECT * FROM posts WHERE id = ?'
-);
-safeQuery.bind([sanitizedId]);
+const safeQuery = db.prepare('SELECT * FROM posts WHERE id = ?')
+safeQuery.bind([sanitizedId])
 ```
 
 ## Deployment Architecture
 
 ### GitHub Pages Deployment
+
 ```yaml
 # .github/workflows/deploy.yml
 - Build static site with Next.js
@@ -271,6 +286,7 @@ safeQuery.bind([sanitizedId]);
 ```
 
 ### Environment Configuration
+
 ```bash
 # Production
 NODE_ENV=production
@@ -284,6 +300,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 ```
 
 ### Monitoring and Analytics
+
 - **Error Tracking**: Console error boundaries
 - **Performance Monitoring**: Web Vitals API
 - **User Analytics**: Privacy-focused analytics
@@ -292,6 +309,7 @@ NEXT_PUBLIC_API_URL=http://localhost:3000
 ## Development Workflow
 
 ### Local Development
+
 ```bash
 # Install dependencies
 npm install
@@ -304,12 +322,14 @@ npm run test:watch
 ```
 
 ### Code Quality Pipeline
+
 1. **Pre-commit**: Linting and formatting
 2. **Pre-push**: Type checking and tests
 3. **Pull Request**: Full CI pipeline
 4. **Merge**: Automatic deployment
 
 ### Debugging Tools
+
 - React DevTools
 - Redux DevTools (for Zustand)
 - Chrome DevTools Performance tab
@@ -318,12 +338,14 @@ npm run test:watch
 ## Future Considerations
 
 ### Scalability Plans
+
 - **API Backend**: Migrate from static DB to API
 - **Real-time Updates**: WebSocket integration
 - **Internationalization**: i18n support
 - **Multi-tenancy**: Organization support
 
 ### Technical Debt
+
 - Migrate from Pages to App Router (completed)
 - Update to React 19 (completed)
 - Implement React Server Components

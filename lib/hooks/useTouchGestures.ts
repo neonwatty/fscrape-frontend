@@ -37,29 +37,35 @@ export function useTouchGestures<T extends HTMLElement = HTMLElement>(
   const touchStart = useRef<TouchPosition | null>(null)
   const touchEnd = useRef<TouchPosition | null>(null)
 
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    if (!enabled) return
-    
-    const touch = e.touches[0]
-    touchStart.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-      time: Date.now()
-    }
-    touchEnd.current = null
-    setIsSwiping(true)
-  }, [enabled])
+  const handleTouchStart = useCallback(
+    (e: TouchEvent) => {
+      if (!enabled) return
 
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!enabled || !touchStart.current) return
-    
-    const touch = e.touches[0]
-    touchEnd.current = {
-      x: touch.clientX,
-      y: touch.clientY,
-      time: Date.now()
-    }
-  }, [enabled])
+      const touch = e.touches[0]
+      touchStart.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+        time: Date.now(),
+      }
+      touchEnd.current = null
+      setIsSwiping(true)
+    },
+    [enabled]
+  )
+
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (!enabled || !touchStart.current) return
+
+      const touch = e.touches[0]
+      touchEnd.current = {
+        x: touch.clientX,
+        y: touch.clientY,
+        time: Date.now(),
+      }
+    },
+    [enabled]
+  )
 
   const handleTouchEnd = useCallback(() => {
     if (!enabled || !touchStart.current || !touchEnd.current) {
@@ -70,18 +76,18 @@ export function useTouchGestures<T extends HTMLElement = HTMLElement>(
     const deltaX = touchEnd.current.x - touchStart.current.x
     const deltaY = touchEnd.current.y - touchStart.current.y
     const deltaTime = touchEnd.current.time - touchStart.current.time
-    
+
     const absX = Math.abs(deltaX)
     const absY = Math.abs(deltaY)
-    
+
     // Calculate velocity
     const velocityX = absX / deltaTime
     const velocityY = absY / deltaTime
-    
+
     // Determine if it's a valid swipe
-    const isValidSwipe = (absX > threshold || absY > threshold) && 
-                        (velocityX > velocity || velocityY > velocity)
-    
+    const isValidSwipe =
+      (absX > threshold || absY > threshold) && (velocityX > velocity || velocityY > velocity)
+
     if (isValidSwipe) {
       // Horizontal swipe
       if (absX > absY) {
@@ -100,7 +106,7 @@ export function useTouchGestures<T extends HTMLElement = HTMLElement>(
         }
       }
     }
-    
+
     // Reset
     touchStart.current = null
     touchEnd.current = null
@@ -144,35 +150,41 @@ export function usePinchZoom<T extends HTMLElement = HTMLElement>(
 
   const getDistance = (touches: TouchList) => {
     if (touches.length < 2) return 0
-    
+
     const dx = touches[0].clientX - touches[1].clientX
     const dy = touches[0].clientY - touches[1].clientY
     return Math.sqrt(dx * dx + dy * dy)
   }
 
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    if (!enabled || e.touches.length !== 2) return
-    
-    initialDistance.current = getDistance(e.touches)
-  }, [enabled])
+  const handleTouchStart = useCallback(
+    (e: TouchEvent) => {
+      if (!enabled || e.touches.length !== 2) return
 
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!enabled || e.touches.length !== 2 || !initialDistance.current) return
-    
-    e.preventDefault()
-    const currentDistance = getDistance(e.touches)
-    const newScale = Math.min(
-      Math.max((currentDistance / initialDistance.current) * currentScale.current, minScale),
-      maxScale
-    )
-    
-    setScale(newScale)
-    onZoom?.(newScale)
-  }, [enabled, minScale, maxScale, onZoom])
+      initialDistance.current = getDistance(e.touches)
+    },
+    [enabled]
+  )
+
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (!enabled || e.touches.length !== 2 || !initialDistance.current) return
+
+      e.preventDefault()
+      const currentDistance = getDistance(e.touches)
+      const newScale = Math.min(
+        Math.max((currentDistance / initialDistance.current) * currentScale.current, minScale),
+        maxScale
+      )
+
+      setScale(newScale)
+      onZoom?.(newScale)
+    },
+    [enabled, minScale, maxScale, onZoom]
+  )
 
   const handleTouchEnd = useCallback(() => {
     if (!enabled) return
-    
+
     currentScale.current = scale
     initialDistance.current = null
   }, [enabled, scale])
@@ -192,7 +204,13 @@ export function usePinchZoom<T extends HTMLElement = HTMLElement>(
     }
   }, [elementRef, enabled, handleTouchStart, handleTouchMove, handleTouchEnd])
 
-  return { scale, resetScale: () => { setScale(1); currentScale.current = 1 } }
+  return {
+    scale,
+    resetScale: () => {
+      setScale(1)
+      currentScale.current = 1
+    },
+  }
 }
 
 // Hook for long press detection
@@ -209,7 +227,7 @@ export function useLongPress(
 
   const start = useCallback(() => {
     if (!enabled) return
-    
+
     setIsLongPressing(true)
     timeoutRef.current = setTimeout(() => {
       callback()
@@ -240,6 +258,6 @@ export function useLongPress(
     onMouseDown: enabled ? start : undefined,
     onMouseUp: enabled ? stop : undefined,
     onMouseLeave: enabled ? stop : undefined,
-    isLongPressing
+    isLongPressing,
   }
 }

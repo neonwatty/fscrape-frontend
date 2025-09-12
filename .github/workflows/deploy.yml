@@ -21,26 +21,26 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  NODE_VERSION: '20'
+  NODE_VERSION: '22'
 
 jobs:
   build:
     name: Build and Test
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
-      
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -51,25 +51,25 @@ jobs:
           key: ${{ runner.os }}-deps-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-deps-
-          
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run type check
         if: ${{ github.event.inputs.skip_tests != 'true' }}
         run: npm run type-check
         continue-on-error: false
-        
+
       - name: Run linter
         if: ${{ github.event.inputs.skip_tests != 'true' }}
         run: npm run lint
         continue-on-error: false
-        
+
       - name: Run tests
         if: ${{ github.event.inputs.skip_tests != 'true' }}
         run: npm run test:run
         continue-on-error: false
-        
+
       - name: Build application
         run: |
           echo "🏗️ Building application for production..."
@@ -79,13 +79,13 @@ jobs:
           NODE_ENV: production
           NEXT_PUBLIC_BASE_PATH: /fscrape-frontend
           NEXT_PUBLIC_ASSET_PREFIX: /fscrape-frontend
-          
+
       - name: Validate export
         run: |
           echo "🔍 Validating static export..."
           node scripts/validate-export.js --github-pages
           echo "✅ Export validation passed"
-          
+
       - name: Generate deployment info
         run: |
           echo "📊 Deployment Information"
@@ -100,10 +100,10 @@ jobs:
           echo ""
           echo "Files count:"
           find out -type f | wc -l
-          
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
-        
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:

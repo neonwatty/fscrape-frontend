@@ -86,6 +86,7 @@ npm run dev
 ## 🔄 Development Workflow
 
 1. **Create a feature branch**:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -97,16 +98,17 @@ npm run dev
    - Update documentation as needed
 
 3. **Test your changes**:
+
    ```bash
    # Run all tests
    npm run test:all
-   
+
    # Type checking
    npm run type-check
-   
+
    # Linting
    npm run lint
-   
+
    # Format code
    npm run format
    ```
@@ -114,6 +116,7 @@ npm run dev
 4. **Commit your changes** (see [Commit Guidelines](#commit-guidelines))
 
 5. **Push to your fork**:
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -168,12 +171,12 @@ components/
 describe('ComponentName', () => {
   it('should render correctly with default props', () => {
     // Test implementation
-  });
-  
+  })
+
   it('should handle user interaction', () => {
     // Test implementation
-  });
-});
+  })
+})
 ```
 
 ### E2E Tests
@@ -239,25 +242,31 @@ test(analytics): add unit tests for chart components
    - Breaking changes (if any)
 
 4. **PR Template**:
+
    ```markdown
    ## Description
+
    Brief description of changes
-   
+
    ## Type of Change
+
    - [ ] Bug fix
    - [ ] New feature
    - [ ] Breaking change
    - [ ] Documentation update
-   
+
    ## Testing
+
    - [ ] Unit tests pass
    - [ ] E2E tests pass
    - [ ] Manual testing completed
-   
+
    ## Screenshots
+
    (if applicable)
-   
+
    ## Checklist
+
    - [ ] Code follows project style
    - [ ] Self-review completed
    - [ ] Documentation updated
@@ -275,6 +284,7 @@ test(analytics): add unit tests for chart components
 ### Bug Reports
 
 Include:
+
 - Clear, descriptive title
 - Steps to reproduce
 - Expected vs actual behavior
@@ -284,6 +294,7 @@ Include:
 ### Feature Requests
 
 Include:
+
 - Use case description
 - Proposed solution
 - Alternative solutions considered
@@ -292,6 +303,7 @@ Include:
 ## 🏗️ Project Architecture
 
 ### Directory Structure
+
 ```
 fscrape-frontend/
 ├── app/                # Next.js App Router pages
@@ -308,6 +320,7 @@ fscrape-frontend/
 ```
 
 ### Key Files
+
 - `next.config.js` - Next.js configuration
 - `tailwind.config.js` - Tailwind CSS configuration
 - `tsconfig.json` - TypeScript configuration
@@ -322,16 +335,13 @@ The application uses SQL.js for client-side database operations:
 
 ```typescript
 // Example: Adding a new query
-export async function getTopPosts(
-  db: Database,
-  limit: number = 10
-): Promise<Post[]> {
+export async function getTopPosts(db: Database, limit: number = 10): Promise<Post[]> {
   const query = `
     SELECT * FROM posts 
     ORDER BY score DESC 
     LIMIT ?
-  `;
-  return executeQuery<Post>(db, query, [limit]);
+  `
+  return executeQuery<Post>(db, query, [limit])
 }
 ```
 
@@ -359,9 +369,9 @@ When modifying the database schema:
 // Use dynamic imports for heavy components
 const HeavyChart = dynamic(
   () => import('@/components/charts/HeavyChart'),
-  { 
+  {
     loading: () => <ChartSkeleton />,
-    ssr: false 
+    ssr: false
   }
 );
 ```
@@ -371,15 +381,15 @@ const HeavyChart = dynamic(
 For lists with many items:
 
 ```typescript
-import { useVirtualizer } from '@/lib/hooks/useVirtualizer';
+import { useVirtualizer } from '@/lib/hooks/useVirtualizer'
 
 function LargeList({ items }) {
   const virtualizer = useVirtualizer({
     items,
     itemHeight: 80,
-    overscan: 5
-  });
-  
+    overscan: 5,
+  })
+
   // Render only visible items
 }
 ```
@@ -420,6 +430,7 @@ import Image from 'next/image';
 ## 🎉 Recognition
 
 Contributors will be recognized in:
+
 - [CONTRIBUTORS.md](CONTRIBUTORS.md)
 - GitHub contributors page
 - Release notes

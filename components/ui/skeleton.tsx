@@ -30,12 +30,7 @@ export function Skeleton({
 
   return (
     <div
-      className={cn(
-        'bg-muted',
-        animationClass,
-        variantClass,
-        className
-      )}
+      className={cn('bg-muted', animationClass, variantClass, className)}
       style={{
         width: width,
         height: height,

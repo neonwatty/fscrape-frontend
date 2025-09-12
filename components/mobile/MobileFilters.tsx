@@ -10,7 +10,7 @@ import { Badge } from '@/components/ui/badge'
 interface FilterOption {
   id: string
   label: string
-  value: any
+  value: unknown
   icon?: ReactNode
   count?: number
 }
@@ -25,8 +25,8 @@ interface FilterGroup {
 
 interface MobileFiltersProps {
   groups: FilterGroup[]
-  values: Record<string, any>
-  onChange: (values: Record<string, any>) => void
+  values: Record<string, unknown>
+  onChange: (values: Record<string, unknown>) => void
   onReset?: () => void
   triggerLabel?: string
   triggerIcon?: ReactNode
@@ -45,11 +45,10 @@ export function MobileFilters({
   const [isOpen, setIsOpen] = useState(false)
   const [activeGroup, setActiveGroup] = useState<string | null>(null)
   const [tempValues, setTempValues] = useState(values)
-  
+
   // Count active filters
-  const activeFilterCount = Object.values(values).filter(v => 
-    v !== null && v !== undefined && v !== '' && 
-    (Array.isArray(v) ? v.length > 0 : true)
+  const activeFilterCount = Object.values(values).filter(
+    (v) => v !== null && v !== undefined && v !== '' && (Array.isArray(v) ? v.length > 0 : true)
   ).length
 
   // Update temp values when values prop changes
@@ -63,22 +62,25 @@ export function MobileFilters({
   }
 
   const handleReset = () => {
-    const resetValues = Object.keys(tempValues).reduce((acc, key) => {
-      const group = groups.find(g => g.id === key)
-      if (group?.type === 'multiple') {
-        acc[key] = []
-      } else {
-        acc[key] = null
-      }
-      return acc
-    }, {} as Record<string, any>)
-    
+    const resetValues = Object.keys(tempValues).reduce(
+      (acc, key) => {
+        const group = groups.find((g) => g.id === key)
+        if (group?.type === 'multiple') {
+          acc[key] = []
+        } else {
+          acc[key] = null
+        }
+        return acc
+      },
+      {} as Record<string, unknown>
+    )
+
     setTempValues(resetValues)
     onReset?.()
   }
 
-  const handleGroupChange = (groupId: string, value: any) => {
-    setTempValues(prev => ({
+  const handleGroupChange = (groupId: string, value: unknown) => {
+    setTempValues((prev) => ({
       ...prev,
       [groupId]: value,
     }))
@@ -123,7 +125,7 @@ export function MobileFilters({
               drag="y"
               dragConstraints={{ top: 0 }}
               dragElastic={0.2}
-              onDragEnd={(e: any, info: PanInfo) => {
+              onDragEnd={(e: unknown, info: PanInfo) => {
                 if (info.velocity.y > 500 || info.offset.y > 100) {
                   setIsOpen(false)
                 }
@@ -169,9 +171,11 @@ export function MobileFilters({
                   <div className="p-4 space-y-2">
                     {groups.map((group) => {
                       const value = tempValues[group.id]
-                      const hasValue = value !== null && value !== undefined && 
+                      const hasValue =
+                        value !== null &&
+                        value !== undefined &&
                         (Array.isArray(value) ? value.length > 0 : value !== '')
-                      
+
                       return (
                         <button
                           key={group.id}
@@ -182,12 +186,11 @@ export function MobileFilters({
                             <div className="font-medium">{group.label}</div>
                             {hasValue && (
                               <div className="text-sm text-muted-foreground mt-1">
-                                {Array.isArray(value) 
+                                {Array.isArray(value)
                                   ? `${value.length} selected`
-                                  : typeof value === 'object' && value.label
-                                  ? value.label
-                                  : String(value)
-                                }
+                                  : typeof value === 'object' && value !== null && 'label' in value
+                                    ? (value as { label: string }).label
+                                    : String(value)}
                               </div>
                             )}
                           </div>
@@ -206,47 +209,45 @@ export function MobileFilters({
                       <ChevronRight className="h-4 w-4 rotate-180" />
                       Back to filters
                     </button>
-                    
+
                     {(() => {
-                      const group = groups.find(g => g.id === activeGroup)
+                      const group = groups.find((g) => g.id === activeGroup)
                       if (!group) return null
-                      
+
                       if (group.customComponent) {
                         return group.customComponent
                       }
-                      
+
                       const currentValue = tempValues[group.id]
-                      
+
                       return (
                         <div className="space-y-2">
                           <h3 className="font-medium mb-4">{group.label}</h3>
-                          
+
                           {group.options?.map((option) => {
-                            const isSelected = group.type === 'multiple'
-                              ? currentValue?.includes(option.value)
-                              : currentValue === option.value
-                            
+                            const isSelected =
+                              group.type === 'multiple'
+                                ? (currentValue as unknown[])?.includes(option.value)
+                                : currentValue === option.value
+
                             return (
                               <button
                                 key={option.id}
                                 onClick={() => {
                                   if (group.type === 'multiple') {
-                                    const current = currentValue || []
+                                    const current = (currentValue as unknown[]) || []
                                     const updated = isSelected
-                                      ? current.filter((v: any) => v !== option.value)
+                                      ? current.filter((v: unknown) => v !== option.value)
                                       : [...current, option.value]
                                     handleGroupChange(group.id, updated)
                                   } else {
-                                    handleGroupChange(
-                                      group.id,
-                                      isSelected ? null : option.value
-                                    )
+                                    handleGroupChange(group.id, isSelected ? null : option.value)
                                     setActiveGroup(null)
                                   }
                                 }}
                                 className={cn(
                                   'w-full flex items-center justify-between p-4 rounded-lg transition-colors min-h-[56px] touch-manipulation',
-                                  isSelected 
+                                  isSelected
                                     ? 'bg-primary/10 border-2 border-primary'
                                     : 'bg-card hover:bg-accent border-2 border-transparent'
                                 )}
@@ -260,9 +261,7 @@ export function MobileFilters({
                                     </Badge>
                                   )}
                                 </div>
-                                {isSelected && (
-                                  <Check className="h-5 w-5 text-primary" />
-                                )}
+                                {isSelected && <Check className="h-5 w-5 text-primary" />}
                               </button>
                             )
                           })}
@@ -297,10 +296,10 @@ interface QuickFiltersProps {
   filters: Array<{
     id: string
     label: string
-    value: any
+    value: unknown
     active?: boolean
   }>
-  onToggle: (id: string, value: any) => void
+  onToggle: (id: string, value: unknown) => void
   className?: string
 }
 

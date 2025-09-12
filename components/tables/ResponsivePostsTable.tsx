@@ -69,15 +69,16 @@ export function ResponsivePostsTable({
 
     // Search filter
     if (searchTerm) {
-      filtered = filtered.filter(post =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (post.author && post.author.toLowerCase().includes(searchTerm.toLowerCase()))
+      filtered = filtered.filter(
+        (post) =>
+          post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          (post.author && post.author.toLowerCase().includes(searchTerm.toLowerCase()))
       )
     }
 
     // Platform filter
     if (selectedPlatform !== 'all') {
-      filtered = filtered.filter(post => post.platform === selectedPlatform)
+      filtered = filtered.filter((post) => post.platform === selectedPlatform)
     }
 
     // Sort
@@ -102,14 +103,11 @@ export function ResponsivePostsTable({
 
   // Pagination
   const totalPages = Math.ceil(processedPosts.length / pageSize)
-  const paginatedPosts = processedPosts.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  )
+  const paginatedPosts = processedPosts.slice((currentPage - 1) * pageSize, currentPage * pageSize)
 
   // Get unique platforms
   const platforms = useMemo(() => {
-    const uniquePlatforms = new Set(posts.map(p => p.platform))
+    const uniquePlatforms = new Set(posts.map((p) => p.platform))
     return Array.from(uniquePlatforms)
   }, [posts])
 
@@ -125,7 +123,9 @@ export function ResponsivePostsTable({
             <User className="h-3 w-3" />
             <span>{post.author || 'Unknown'}</span>
             <Clock className="h-3 w-3 ml-2" />
-            <span>{formatDistanceToNow(new Date(post.created_utc * 1000), { addSuffix: true })}</span>
+            <span>
+              {formatDistanceToNow(new Date(post.created_utc * 1000), { addSuffix: true })}
+            </span>
           </div>
         </div>
       ),
@@ -151,9 +151,7 @@ export function ResponsivePostsTable({
           Score
         </div>
       ),
-      accessor: (post) => (
-        <span className="font-medium">{formatLargeNumber(post.score)}</span>
-      ),
+      accessor: (post) => <span className="font-medium">{formatLargeNumber(post.score)}</span>,
       priority: 'essential',
       align: 'right',
       sortable: true,
@@ -235,7 +233,10 @@ export function ResponsivePostsTable({
 
         {/* Sort controls */}
         <div className="flex items-center gap-2 flex-1">
-          <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+          <Select
+            value={sortBy}
+            onValueChange={(value) => setSortBy(value as 'date' | 'score' | 'comments')}
+          >
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -274,9 +275,7 @@ export function ResponsivePostsTable({
           <SheetContent>
             <SheetHeader>
               <SheetTitle>Filter Posts</SheetTitle>
-              <SheetDescription>
-                Refine your search with these filters
-              </SheetDescription>
+              <SheetDescription>Refine your search with these filters</SheetDescription>
             </SheetHeader>
             <div className="space-y-6 mt-6">
               {/* Search */}
@@ -299,7 +298,7 @@ export function ResponsivePostsTable({
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Platforms</SelectItem>
-                    {platforms.map(platform => (
+                    {platforms.map((platform) => (
                       <SelectItem key={platform} value={platform}>
                         {platform}
                       </SelectItem>
@@ -349,10 +348,7 @@ export function ResponsivePostsTable({
           emptyMessage="No posts found"
         />
       ) : (
-        <SwipeableCard
-          onSwipeLeft={handleSwipeLeft}
-          onSwipeRight={handleSwipeRight}
-        >
+        <SwipeableCard onSwipeLeft={handleSwipeLeft} onSwipeRight={handleSwipeRight}>
           <MobileCardGrid columns={compactMode ? 2 : 1}>
             {paginatedPosts.map((post) => (
               <MobileCard
@@ -392,7 +388,9 @@ export function ResponsivePostsTable({
                   {
                     label: 'Open',
                     icon: <ExternalLink className="h-4 w-4" />,
-                    onClick: () => { if (post.url) window.open(post.url, '_blank') },
+                    onClick: () => {
+                      if (post.url) window.open(post.url, '_blank')
+                    },
                   },
                 ]}
                 onClick={() => onPostClick?.(post)}

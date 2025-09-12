@@ -19,7 +19,7 @@ const mockPosts: ForumPost[] = [
     num_comments: 25,
     created_utc: 1704067200,
     url: 'https://reddit.com/1',
-    link_flair_text: 'Tutorial'
+    link_flair_text: 'Tutorial',
   },
   {
     id: '2',
@@ -30,7 +30,7 @@ const mockPosts: ForumPost[] = [
     score: 300,
     num_comments: 75,
     created_utc: 1704070800,
-    url: 'https://news.ycombinator.com/2'
+    url: 'https://news.ycombinator.com/2',
   },
   {
     id: '3',
@@ -42,8 +42,8 @@ const mockPosts: ForumPost[] = [
     num_comments: 120,
     created_utc: 1704074400,
     url: 'https://reddit.com/3',
-    link_flair_text: 'Discussion'
-  }
+    link_flair_text: 'Discussion',
+  },
 ]
 
 // Test wrapper
@@ -51,14 +51,12 @@ const createWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
-      mutations: { retry: false }
-    }
+      mutations: { retry: false },
+    },
   })
 
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>
-      {children}
-    </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
 }
 
@@ -68,7 +66,7 @@ describe('Table Components', () => {
     // Mock window.matchMedia for responsive behavior
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
-      value: vi.fn().mockImplementation(query => ({
+      value: vi.fn().mockImplementation((query) => ({
         matches: false,
         media: query,
         onchange: null,
@@ -92,7 +90,7 @@ describe('Table Components', () => {
     const testData: TestData[] = [
       { id: '1', name: 'Item 1', value: 100, status: 'active' },
       { id: '2', name: 'Item 2', value: 200, status: 'pending' },
-      { id: '3', name: 'Item 3', value: 150, status: 'active' }
+      { id: '3', name: 'Item 3', value: 150, status: 'active' },
     ]
 
     const columns: ColumnDefinition<TestData>[] = [
@@ -100,32 +98,25 @@ describe('Table Components', () => {
         key: 'name',
         header: 'Name',
         accessor: (item) => item.name,
-        priority: 'essential'
+        priority: 'essential',
       },
       {
         key: 'value',
         header: 'Value',
         accessor: (item) => item.value,
         priority: 'important',
-        sortable: true
+        sortable: true,
       },
       {
         key: 'status',
         header: 'Status',
-        accessor: (item) => (
-          <span className={`status-${item.status}`}>{item.status}</span>
-        ),
-        priority: 'optional'
-      }
+        accessor: (item) => <span className={`status-${item.status}`}>{item.status}</span>,
+        priority: 'optional',
+      },
     ]
 
     it('should render table with data', () => {
-      render(
-        <ResponsiveTable
-          data={testData}
-          columns={columns}
-        />
-      )
+      render(<ResponsiveTable data={testData} columns={columns} />)
 
       expect(screen.getByText('Item 1')).toBeInTheDocument()
       expect(screen.getByText('Item 2')).toBeInTheDocument()
@@ -134,12 +125,7 @@ describe('Table Components', () => {
     })
 
     it('should render column headers', () => {
-      render(
-        <ResponsiveTable
-          data={testData}
-          columns={columns}
-        />
-      )
+      render(<ResponsiveTable data={testData} columns={columns} />)
 
       expect(screen.getByText('Name')).toBeInTheDocument()
       expect(screen.getByText('Value')).toBeInTheDocument()
@@ -147,24 +133,13 @@ describe('Table Components', () => {
     })
 
     it('should handle empty data', () => {
-      render(
-        <ResponsiveTable
-          data={[]}
-          columns={columns}
-          emptyMessage="No items found"
-        />
-      )
+      render(<ResponsiveTable data={[]} columns={columns} emptyMessage="No items found" />)
 
       expect(screen.getByText('No items found')).toBeInTheDocument()
     })
 
     it.skip('should handle column visibility toggle', () => {
-      render(
-        <ResponsiveTable
-          data={testData}
-          columns={columns}
-        />
-      )
+      render(<ResponsiveTable data={testData} columns={columns} />)
 
       // Find column visibility toggle button
       const toggleButton = screen.getByRole('button', { name: /columns/i })
@@ -176,21 +151,15 @@ describe('Table Components', () => {
 
       // Toggle status column
       fireEvent.click(statusCheckbox)
-      
+
       // Status column should be hidden
       expect(screen.queryByText('Status')).not.toBeInTheDocument()
     })
 
     it('should handle row click events', () => {
       const onRowClick = vi.fn()
-      
-      render(
-        <ResponsiveTable
-          data={testData}
-          columns={columns}
-          onRowClick={onRowClick}
-        />
-      )
+
+      render(<ResponsiveTable data={testData} columns={columns} onRowClick={onRowClick} />)
 
       const firstRow = screen.getByText('Item 1').closest('tr')
       fireEvent.click(firstRow!)
@@ -200,11 +169,7 @@ describe('Table Components', () => {
 
     it.skip('should apply striped styling', () => {
       const { container } = render(
-        <ResponsiveTable
-          data={testData}
-          columns={columns}
-          striped={true}
-        />
+        <ResponsiveTable data={testData} columns={columns} striped={true} />
       )
 
       const rows = container.querySelectorAll('tbody tr')
@@ -212,12 +177,7 @@ describe('Table Components', () => {
     })
 
     it('should handle sorting for sortable columns', () => {
-      render(
-        <ResponsiveTable
-          data={testData}
-          columns={columns}
-        />
-      )
+      render(<ResponsiveTable data={testData} columns={columns} />)
 
       const valueHeader = screen.getByText('Value')
       fireEvent.click(valueHeader)
@@ -225,7 +185,7 @@ describe('Table Components', () => {
       // Check if data is sorted
       const values = screen.getAllByText(/^\d+$/)
       expect(values[0]).toHaveTextContent('100')
-      
+
       // Click again for descending
       fireEvent.click(valueHeader)
       const valuesDesc = screen.getAllByText(/^\d+$/)
@@ -238,12 +198,7 @@ describe('Table Components', () => {
       window.dispatchEvent(new Event('resize'))
 
       render(
-        <ResponsiveTable
-          data={testData}
-          columns={columns}
-          mobileBreakpoint={768}
-          cardView={true}
-        />
+        <ResponsiveTable data={testData} columns={columns} mobileBreakpoint={768} cardView={true} />
       )
 
       // In mobile view, should show card layout
@@ -254,10 +209,7 @@ describe('Table Components', () => {
 
   describe.skip('PostsTable', () => {
     it('should render posts table with data', () => {
-      render(
-        <PostsTable posts={mockPosts} />,
-        { wrapper: createWrapper() }
-      )
+      render(<PostsTable posts={mockPosts} />, { wrapper: createWrapper() })
 
       expect(screen.getByText('Understanding React Testing')).toBeInTheDocument()
       expect(screen.getByText('Advanced TypeScript Patterns')).toBeInTheDocument()
@@ -265,10 +217,7 @@ describe('Table Components', () => {
     })
 
     it('should display post metadata correctly', () => {
-      render(
-        <PostsTable posts={mockPosts} />,
-        { wrapper: createWrapper() }
-      )
+      render(<PostsTable posts={mockPosts} />, { wrapper: createWrapper() })
 
       // Check scores
       expect(screen.getByText('150')).toBeInTheDocument()
@@ -281,28 +230,21 @@ describe('Table Components', () => {
     })
 
     it('should display platform badges', () => {
-      render(
-        <PostsTable posts={mockPosts} />,
-        { wrapper: createWrapper() }
-      )
+      render(<PostsTable posts={mockPosts} />, { wrapper: createWrapper() })
 
       const redditBadges = screen.getAllByText(/reddit/i)
       const hnBadges = screen.getAllByText(/hackernews|HN/i)
-      
+
       expect(redditBadges.length).toBeGreaterThan(0)
       expect(hnBadges.length).toBeGreaterThan(0)
     })
 
     it('should handle post click for navigation', () => {
       const onPostClick = vi.fn()
-      
-      render(
-        <PostsTable 
-          posts={mockPosts}
-          onPostClick={onPostClick}
-        />,
-        { wrapper: createWrapper() }
-      )
+
+      render(<PostsTable posts={mockPosts} onPostClick={onPostClick} />, {
+        wrapper: createWrapper(),
+      })
 
       const firstPost = screen.getByText('Understanding React Testing')
       fireEvent.click(firstPost)
@@ -311,25 +253,15 @@ describe('Table Components', () => {
     })
 
     it('should show loading state', () => {
-      render(
-        <PostsTable 
-          posts={[]}
-          loading={true}
-        />,
-        { wrapper: createWrapper() }
-      )
+      render(<PostsTable posts={[]} loading={true} />, { wrapper: createWrapper() })
 
       expect(screen.getByText(/loading/i)).toBeInTheDocument()
     })
 
     it('should handle empty posts', () => {
-      render(
-        <PostsTable 
-          posts={[]}
-          emptyMessage="No posts available"
-        />,
-        { wrapper: createWrapper() }
-      )
+      render(<PostsTable posts={[]} emptyMessage="No posts available" />, {
+        wrapper: createWrapper(),
+      })
 
       expect(screen.getByText('No posts available')).toBeInTheDocument()
     })
@@ -338,13 +270,13 @@ describe('Table Components', () => {
   describe.skip('TableFilters', () => {
     it('should render filter controls', () => {
       const onFiltersChange = vi.fn()
-      
+
       render(
         <TableFilters
           filters={{}}
           onFiltersChange={onFiltersChange}
           filterOptions={{
-            platforms: ['reddit', 'hackernews']
+            platforms: ['reddit', 'hackernews'],
           }}
         />
       )
@@ -355,13 +287,13 @@ describe('Table Components', () => {
 
     it('should handle search input', async () => {
       const onFiltersChange = vi.fn()
-      
+
       render(
         <TableFilters
           filters={{}}
           onFiltersChange={onFiltersChange}
           filterOptions={{
-            platforms: ['reddit', 'hackernews']
+            platforms: ['reddit', 'hackernews'],
           }}
         />
       )
@@ -372,7 +304,7 @@ describe('Table Components', () => {
       await waitFor(() => {
         expect(onFiltersChange).toHaveBeenCalledWith(
           expect.objectContaining({
-            searchTerm: 'react'
+            searchTerm: 'react',
           })
         )
       })
@@ -380,13 +312,13 @@ describe('Table Components', () => {
 
     it('should handle platform filter', () => {
       const onFiltersChange = vi.fn()
-      
+
       render(
         <TableFilters
           filters={{}}
           onFiltersChange={onFiltersChange}
           filterOptions={{
-            platforms: ['reddit', 'hackernews']
+            platforms: ['reddit', 'hackernews'],
           }}
         />
       )
@@ -396,20 +328,20 @@ describe('Table Components', () => {
 
       expect(onFiltersChange).toHaveBeenCalledWith(
         expect.objectContaining({
-          platform: 'reddit'
+          platform: 'reddit',
         })
       )
     })
 
     it('should handle date range filter', () => {
       const onFiltersChange = vi.fn()
-      
+
       render(
         <TableFilters
           filters={{}}
           onFiltersChange={onFiltersChange}
           filterOptions={{
-            platforms: ['reddit', 'hackernews']
+            platforms: ['reddit', 'hackernews'],
           }}
         />
       )
@@ -422,7 +354,7 @@ describe('Table Components', () => {
 
       expect(onFiltersChange).toHaveBeenCalledWith(
         expect.objectContaining({
-          timeRange: 'week'
+          timeRange: 'week',
         })
       )
     })
@@ -433,11 +365,11 @@ describe('Table Components', () => {
           filters={{
             platform: 'reddit',
             searchTerm: 'test',
-            scoreMin: 100
+            scoreMin: 100,
           }}
           onFiltersChange={vi.fn()}
           filterOptions={{
-            platforms: ['reddit', 'hackernews']
+            platforms: ['reddit', 'hackernews'],
           }}
         />
       )
@@ -448,16 +380,16 @@ describe('Table Components', () => {
 
     it('should handle clear filters', () => {
       const onFiltersChange = vi.fn()
-      
+
       render(
         <TableFilters
           filters={{
             platform: 'reddit',
-            searchTerm: 'test'
+            searchTerm: 'test',
           }}
           onFiltersChange={onFiltersChange}
           filterOptions={{
-            platforms: ['reddit', 'hackernews']
+            platforms: ['reddit', 'hackernews'],
           }}
         />
       )
@@ -471,13 +403,7 @@ describe('Table Components', () => {
 
   describe.skip('TablePagination', () => {
     it('should render pagination controls', () => {
-      render(
-        <TablePagination
-          currentPage={1}
-          totalPages={5}
-          onPageChange={vi.fn()}
-        />
-      )
+      render(<TablePagination currentPage={1} totalPages={5} onPageChange={vi.fn()} />)
 
       expect(screen.getByText('1')).toBeInTheDocument()
       expect(screen.getByRole('button', { name: /next/i })).toBeInTheDocument()
@@ -486,14 +412,8 @@ describe('Table Components', () => {
 
     it('should handle page navigation', () => {
       const onPageChange = vi.fn()
-      
-      render(
-        <TablePagination
-          currentPage={2}
-          totalPages={5}
-          onPageChange={onPageChange}
-        />
-      )
+
+      render(<TablePagination currentPage={2} totalPages={5} onPageChange={onPageChange} />)
 
       const nextButton = screen.getByRole('button', { name: /next/i })
       fireEvent.click(nextButton)
@@ -508,45 +428,29 @@ describe('Table Components', () => {
 
     it('should disable navigation at boundaries', () => {
       const onPageChange = vi.fn()
-      
+
       const { rerender } = render(
-        <TablePagination
-          currentPage={1}
-          totalPages={5}
-          onPageChange={onPageChange}
-        />
+        <TablePagination currentPage={1} totalPages={5} onPageChange={onPageChange} />
       )
 
       const prevButton = screen.getByRole('button', { name: /previous/i })
       expect(prevButton).toBeDisabled()
 
-      rerender(
-        <TablePagination
-          currentPage={5}
-          totalPages={5}
-          onPageChange={onPageChange}
-        />
-      )
+      rerender(<TablePagination currentPage={5} totalPages={5} onPageChange={onPageChange} />)
 
       const nextButton = screen.getByRole('button', { name: /next/i })
       expect(nextButton).toBeDisabled()
     })
 
     it('should show page numbers', () => {
-      render(
-        <TablePagination
-          currentPage={3}
-          totalPages={5}
-          onPageChange={vi.fn()}
-        />
-      )
+      render(<TablePagination currentPage={3} totalPages={5} onPageChange={vi.fn()} />)
 
       expect(screen.getByText('Page 3 of 5')).toBeInTheDocument()
     })
 
     it('should handle items per page change', () => {
       const onItemsPerPageChange = vi.fn()
-      
+
       render(
         <TablePagination
           currentPage={1}

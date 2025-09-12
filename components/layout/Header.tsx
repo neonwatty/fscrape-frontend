@@ -5,15 +5,7 @@ import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { MobileNav } from './MobileNav'
 import { ThemeToggle } from './ThemeToggle'
-import { 
-  Home, 
-  FileText, 
-  BarChart3, 
-  GitCompare,
-  Search,
-  Bell,
-  Settings
-} from 'lucide-react'
+import { Home, FileText, BarChart3, GitCompare, Search, Bell, Settings } from 'lucide-react'
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
@@ -38,10 +30,10 @@ export function Header() {
           <div className="flex items-center gap-4 sm:gap-8">
             {/* Mobile Menu */}
             <MobileNav />
-            
+
             {/* Logo */}
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="flex items-center gap-2 text-lg sm:text-xl font-bold hover:opacity-80 transition-opacity"
             >
               <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center text-primary-foreground text-sm font-bold">
@@ -49,13 +41,13 @@ export function Header() {
               </div>
               <span className="hidden sm:inline">fscrape</span>
             </Link>
-            
+
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-1">
               {navigation.map((item) => {
                 const Icon = item.icon
                 const active = isActive(item.href)
-                
+
                 return (
                   <Link
                     key={item.name}

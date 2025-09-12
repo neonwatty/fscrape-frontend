@@ -1,11 +1,11 @@
 import { Database } from 'sql.js'
 
 export async function createSampleDatabase(): Promise<Database> {
-  const SQL = await (window as Window & { initSqlJs: (config: { locateFile: (file: string) => string }) => Promise<typeof import('sql.js')> }).initSqlJs({
+  const SQL = await (window as any).initSqlJs({
     locateFile: (file: string) => `/sql-js/${file}`,
   })
 
-  const db = new SQL.Database()
+  const db = new (SQL as any).Database()
 
   // Create tables matching the expected schema
   db.run(`
@@ -146,15 +146,8 @@ export async function createSampleDatabase(): Promise<Database> {
   `)
 
   authors.forEach((author, index) => {
-    const timestamp = Date.now() / 1000 - (86400 * (index + 1))
-    insertAuthor.run([
-      author.username,
-      author.posts,
-      author.score,
-      timestamp,
-      timestamp,
-      'reddit',
-    ])
+    const timestamp = Date.now() / 1000 - 86400 * (index + 1)
+    insertAuthor.run([author.username, author.posts, author.score, timestamp, timestamp, 'reddit'])
   })
 
   insertAuthor.free()

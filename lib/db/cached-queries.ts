@@ -28,14 +28,12 @@ const TTL_CONFIG = {
 /**
  * Cached version of getPosts
  */
-export const getCachedPosts = withCache(
-  (filters?: PostFilters) => queries.getPosts(filters),
-  {
-    cache: queryCache,
-    ttl: TTL_CONFIG.posts,
-    keyGenerator: (filters) => generateCacheKey('getPosts', filters as Record<string, unknown> || {}),
-  }
-)
+export const getCachedPosts = withCache((filters?: PostFilters) => queries.getPosts(filters), {
+  cache: queryCache,
+  ttl: TTL_CONFIG.posts,
+  keyGenerator: (filters) =>
+    generateCacheKey('getPosts', (filters as Record<string, unknown>) || {}),
+})
 
 /**
  * Cached version of getRecentPosts
@@ -52,14 +50,11 @@ export const getCachedRecentPosts = withCache(
 /**
  * Cached version of getPlatformStats
  */
-export const getCachedPlatformStats = withCache(
-  () => queries.getPlatformStats(),
-  {
-    cache: queryCache,
-    ttl: TTL_CONFIG.stats,
-    keyGenerator: () => generateCacheKey('getPlatformStats'),
-  }
-)
+export const getCachedPlatformStats = withCache(() => queries.getPlatformStats(), {
+  cache: queryCache,
+  ttl: TTL_CONFIG.stats,
+  keyGenerator: () => generateCacheKey('getPlatformStats'),
+})
 
 /**
  * Cached version of getPostsTimeSeries
@@ -76,14 +71,11 @@ export const getCachedPostsTimeSeries = withCache(
 /**
  * Cached version of getTopAuthors
  */
-export const getCachedTopAuthors = withCache(
-  (limit: number = 10) => queries.getTopAuthors(limit),
-  {
-    cache: queryCache,
-    ttl: TTL_CONFIG.stats,
-    keyGenerator: (limit) => generateCacheKey('getTopAuthors', { limit }),
-  }
-)
+export const getCachedTopAuthors = withCache((limit: number = 10) => queries.getTopAuthors(limit), {
+  cache: queryCache,
+  ttl: TTL_CONFIG.stats,
+  keyGenerator: (limit) => generateCacheKey('getTopAuthors', { limit }),
+})
 
 /**
  * Cached version of searchPosts
@@ -112,14 +104,11 @@ export const getCachedTrendingPosts = withCache(
 /**
  * Cached version of getDatabaseSummary
  */
-export const getCachedDatabaseSummary = withCache(
-  () => queries.getDatabaseSummary(),
-  {
-    cache: queryCache,
-    ttl: TTL_CONFIG.stats,
-    keyGenerator: () => generateCacheKey('getDatabaseSummary'),
-  }
-)
+export const getCachedDatabaseSummary = withCache(() => queries.getDatabaseSummary(), {
+  cache: queryCache,
+  ttl: TTL_CONFIG.stats,
+  keyGenerator: () => generateCacheKey('getDatabaseSummary'),
+})
 
 /**
  * Invalidate cache for specific query type
@@ -129,9 +118,9 @@ export function invalidateCache(queryType?: string): void {
     queryCache.clear()
     return
   }
-  
+
   const keys = queryCache.keys()
-  keys.forEach(key => {
+  keys.forEach((key) => {
     if (key.startsWith(queryType)) {
       queryCache.delete(key)
     }
@@ -164,7 +153,7 @@ export function invalidateStatsCaches(): void {
 export function getCacheStatistics() {
   const stats = queryCache.getStats()
   const sizeInfo = queryCache.getSizeInfo()
-  
+
   return {
     ...stats,
     hitRatePercentage: (stats.hitRate * 100).toFixed(2) + '%',
@@ -187,7 +176,7 @@ export async function preloadCommonQueries(): Promise<void> {
       Promise.resolve(getCachedDatabaseSummary()),
       Promise.resolve(getCachedTrendingPosts(5)),
     ])
-    
+
     console.log('Common queries preloaded into cache')
   } catch (error) {
     console.error('Failed to preload queries:', error)

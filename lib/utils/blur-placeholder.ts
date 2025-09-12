@@ -25,9 +25,7 @@ export function shimmer(w: number, h: number): string {
  * Convert shimmer to base64 data URL
  */
 export function toBase64(str: string): string {
-  return typeof window === 'undefined'
-    ? Buffer.from(str).toString('base64')
-    : window.btoa(str)
+  return typeof window === 'undefined' ? Buffer.from(str).toString('base64') : window.btoa(str)
 }
 
 /**
@@ -40,16 +38,17 @@ export function generateBlurPlaceholder(width = 40, height = 40): string {
 /**
  * Create gradient placeholder
  */
-export function createGradientPlaceholder(
-  colors: string[] = ['#f0f0f0', '#e0e0e0']
-): string {
+export function createGradientPlaceholder(colors: string[] = ['#f0f0f0', '#e0e0e0']): string {
   const svg = `
     <svg width="40" height="40" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="gradient" x1="0%" y1="0%" x2="0%" y2="100%">
-          ${colors.map((color, i) => 
-            `<stop offset="${(i * 100) / (colors.length - 1)}%" style="stop-color:${color}" />`
-          ).join('')}
+          ${colors
+            .map(
+              (color, i) =>
+                `<stop offset="${(i * 100) / (colors.length - 1)}%" style="stop-color:${color}" />`
+            )
+            .join('')}
         </linearGradient>
       </defs>
       <rect width="40" height="40" fill="url(#gradient)" />
@@ -73,9 +72,7 @@ export function createSolidPlaceholder(color = '#f0f0f0'): string {
 /**
  * Generate placeholder based on dominant color
  */
-export async function generateDominantColorPlaceholder(
-  imageSrc: string
-): Promise<string> {
+export async function generateDominantColorPlaceholder(imageSrc: string): Promise<string> {
   if (typeof window === 'undefined') {
     return createSolidPlaceholder()
   }
@@ -83,11 +80,11 @@ export async function generateDominantColorPlaceholder(
   return new Promise((resolve) => {
     const img = new window.Image()
     img.crossOrigin = 'anonymous'
-    
+
     img.onload = () => {
       const canvas = document.createElement('canvas')
       const ctx = canvas.getContext('2d')
-      
+
       if (!ctx) {
         resolve(createSolidPlaceholder())
         return
@@ -95,9 +92,9 @@ export async function generateDominantColorPlaceholder(
 
       canvas.width = 1
       canvas.height = 1
-      
+
       ctx.drawImage(img, 0, 0, 1, 1)
-      
+
       try {
         const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data
         const color = `rgb(${r}, ${g}, ${b})`
@@ -106,11 +103,11 @@ export async function generateDominantColorPlaceholder(
         resolve(createSolidPlaceholder())
       }
     }
-    
+
     img.onerror = () => {
       resolve(createSolidPlaceholder())
     }
-    
+
     img.src = imageSrc
   })
 }
@@ -150,7 +147,7 @@ export async function getBlurPlaceholder(
 ): Promise<string> {
   const cacheKey = `${src}-${type}`
   const cached = placeholderCache.get(cacheKey)
-  
+
   if (cached) return cached
 
   let placeholder: string

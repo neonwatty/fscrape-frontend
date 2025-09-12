@@ -1,7 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { 
-  cn,
-} from '@/lib/utils'
+import { cn } from '@/lib/utils'
 import {
   applyFilters,
   getFilterOptions,
@@ -10,7 +8,7 @@ import {
   filtersFromURLParams,
   getActiveFilterCount,
   clearFilters,
-  defaultFilterPresets
+  defaultFilterPresets,
 } from '@/lib/utils/filters'
 import type { ForumPost, PostFilters } from '@/lib/db/types'
 
@@ -20,7 +18,7 @@ describe('cn utility', () => {
   })
 
   it('should handle conditional classes', () => {
-    expect(cn('base', { 'active': true, 'disabled': false })).toBe('base active')
+    expect(cn('base', { active: true, disabled: false })).toBe('base active')
   })
 
   it('should override tailwind classes properly', () => {
@@ -53,7 +51,7 @@ describe('Filter utilities', () => {
         num_comments: 10,
         created_utc: Date.now() / 1000 - 3600, // 1 hour ago
         url: 'https://reddit.com/1',
-        link_flair_text: 'Discussion'
+        link_flair_text: 'Discussion',
       },
       {
         id: '2',
@@ -65,7 +63,7 @@ describe('Filter utilities', () => {
         score: 500,
         num_comments: 50,
         created_utc: Date.now() / 1000 - 86400, // 1 day ago
-        url: 'https://news.ycombinator.com/2'
+        url: 'https://news.ycombinator.com/2',
       },
       {
         id: '3',
@@ -78,8 +76,8 @@ describe('Filter utilities', () => {
         num_comments: 5,
         created_utc: Date.now() / 1000 - 604800, // 1 week ago
         url: 'https://reddit.com/3',
-        link_flair_text: 'Help'
-      }
+        link_flair_text: 'Help',
+      },
     ] as ForumPost[]
   })
 
@@ -92,7 +90,7 @@ describe('Filter utilities', () => {
     it('should filter by platform', () => {
       const result = applyFilters(mockPosts, { platform: 'reddit' })
       expect(result).toHaveLength(2)
-      expect(result.every(p => p.platform === 'reddit')).toBe(true)
+      expect(result.every((p) => p.platform === 'reddit')).toBe(true)
     })
 
     it('should filter by source', () => {
@@ -121,27 +119,27 @@ describe('Filter utilities', () => {
     it('should filter by minimum score', () => {
       const result = applyFilters(mockPosts, { scoreMin: 100 })
       expect(result).toHaveLength(2)
-      expect(result.every(p => p.score >= 100)).toBe(true)
+      expect(result.every((p) => p.score >= 100)).toBe(true)
     })
 
     it('should filter by maximum score', () => {
       const result = applyFilters(mockPosts, { scoreMax: 100 })
       expect(result).toHaveLength(2)
-      expect(result.every(p => p.score <= 100)).toBe(true)
+      expect(result.every((p) => p.score <= 100)).toBe(true)
     })
 
     it('should filter by minimum comments', () => {
       const result = applyFilters(mockPosts, { commentsMin: 10 })
       expect(result).toHaveLength(2)
-      expect(result.every(p => p.num_comments >= 10)).toBe(true)
+      expect(result.every((p) => p.num_comments >= 10)).toBe(true)
     })
 
     it('should filter by time range - day', () => {
       const result = applyFilters(mockPosts, { timeRange: 'day' })
       // Should include posts from last 24 hours (post 1 and 2)
       expect(result).toHaveLength(2)
-      expect(result.some(p => p.id === '1')).toBe(true)
-      expect(result.some(p => p.id === '2')).toBe(true)
+      expect(result.some((p) => p.id === '1')).toBe(true)
+      expect(result.some((p) => p.id === '2')).toBe(true)
     })
 
     it('should filter by time range - week', () => {
@@ -159,7 +157,7 @@ describe('Filter utilities', () => {
     it('should apply multiple filters', () => {
       const result = applyFilters(mockPosts, {
         platform: 'reddit',
-        scoreMin: 60
+        scoreMin: 60,
       })
       expect(result).toHaveLength(1)
       expect(result[0].id).toBe('1')
@@ -168,7 +166,7 @@ describe('Filter utilities', () => {
     it('should sort by score descending', () => {
       const result = applyFilters(mockPosts, {
         sortBy: 'score',
-        sortOrder: 'desc'
+        sortOrder: 'desc',
       })
       expect(result[0].score).toBe(500)
       expect(result[1].score).toBe(100)
@@ -178,7 +176,7 @@ describe('Filter utilities', () => {
     it('should sort by score ascending', () => {
       const result = applyFilters(mockPosts, {
         sortBy: 'score',
-        sortOrder: 'asc'
+        sortOrder: 'asc',
       })
       expect(result[0].score).toBe(50)
       expect(result[1].score).toBe(100)
@@ -188,7 +186,7 @@ describe('Filter utilities', () => {
     it('should apply pagination with limit and offset', () => {
       const result = applyFilters(mockPosts, {
         limit: 2,
-        offset: 1
+        offset: 1,
       })
       expect(result).toHaveLength(2)
       expect(result[0].id).toBe('2')
@@ -199,7 +197,7 @@ describe('Filter utilities', () => {
   describe('getFilterOptions', () => {
     it('should extract unique filter options from posts', () => {
       const options = getFilterOptions(mockPosts)
-      
+
       expect(options.platforms).toEqual(['hackernews', 'reddit'])
       expect(options.sources).toContain('r/programming')
       expect(options.sources).toContain('HN')
@@ -211,7 +209,7 @@ describe('Filter utilities', () => {
 
     it('should return empty arrays for empty posts', () => {
       const options = getFilterOptions([])
-      
+
       expect(options.platforms).toEqual([])
       expect(options.sources).toEqual([])
       expect(options.authors).toEqual([])
@@ -225,11 +223,11 @@ describe('Filter utilities', () => {
         scoreMin: -10,
         scoreMax: -5,
         commentsMin: -1,
-        commentsMax: -2
+        commentsMax: -2,
       }
-      
+
       const validated = validateFilters(filters)
-      
+
       expect(validated.scoreMin).toBe(0)
       expect(validated.scoreMax).toBe(0)
       expect(validated.commentsMin).toBe(0)
@@ -241,11 +239,11 @@ describe('Filter utilities', () => {
         scoreMin: 100,
         scoreMax: 50,
         commentsMin: 20,
-        commentsMax: 10
+        commentsMax: 10,
       }
-      
+
       const validated = validateFilters(filters)
-      
+
       expect(validated.scoreMin).toBe(50)
       expect(validated.scoreMax).toBe(100)
       expect(validated.commentsMin).toBe(10)
@@ -255,25 +253,25 @@ describe('Filter utilities', () => {
     it('should swap date values if reversed', () => {
       const date1 = new Date('2024-01-01')
       const date2 = new Date('2024-01-10')
-      
+
       const filters: PostFilters = {
         dateFrom: date2,
-        dateTo: date1
+        dateTo: date1,
       }
-      
+
       const validated = validateFilters(filters)
-      
+
       expect(validated.dateFrom).toEqual(date1)
       expect(validated.dateTo).toEqual(date2)
     })
 
     it('should add default sort order when sortBy is specified', () => {
       const filters: PostFilters = {
-        sortBy: 'score'
+        sortBy: 'score',
       }
-      
+
       const validated = validateFilters(filters)
-      
+
       expect(validated.sortOrder).toBe('desc')
     })
   })
@@ -284,11 +282,11 @@ describe('Filter utilities', () => {
         platform: 'reddit',
         scoreMin: 100,
         sortBy: 'score',
-        sortOrder: 'desc'
+        sortOrder: 'desc',
       }
-      
+
       const params = filtersToURLParams(filters)
-      
+
       expect(params.get('platform')).toBe('reddit')
       expect(params.get('scoreMin')).toBe('100')
       expect(params.get('sortBy')).toBe('score')
@@ -298,11 +296,11 @@ describe('Filter utilities', () => {
     it('should handle date conversion', () => {
       const date = new Date('2024-01-01T00:00:00Z')
       const filters: PostFilters = {
-        dateFrom: date
+        dateFrom: date,
       }
-      
+
       const params = filtersToURLParams(filters)
-      
+
       expect(params.get('dateFrom')).toBe(date.toISOString())
     })
 
@@ -311,11 +309,11 @@ describe('Filter utilities', () => {
         platform: 'reddit',
         source: undefined,
         author: null as any,
-        scoreMin: 0
+        scoreMin: 0,
       }
-      
+
       const params = filtersToURLParams(filters)
-      
+
       expect(params.has('platform')).toBe(true)
       expect(params.has('source')).toBe(false)
       expect(params.has('author')).toBe(false)
@@ -329,11 +327,11 @@ describe('Filter utilities', () => {
         platform: 'reddit',
         source: 'r/programming',
         sortBy: 'score',
-        sortOrder: 'desc'
+        sortOrder: 'desc',
       })
-      
+
       const filters = filtersFromURLParams(params)
-      
+
       expect(filters.platform).toBe('reddit')
       expect(filters.source).toBe('r/programming')
       expect(filters.sortBy).toBe('score')
@@ -345,11 +343,11 @@ describe('Filter utilities', () => {
         scoreMin: '100',
         scoreMax: '500',
         limit: '10',
-        offset: '20'
+        offset: '20',
       })
-      
+
       const filters = filtersFromURLParams(params)
-      
+
       expect(filters.scoreMin).toBe(100)
       expect(filters.scoreMax).toBe(500)
       expect(filters.limit).toBe(10)
@@ -359,21 +357,21 @@ describe('Filter utilities', () => {
     it('should parse date fields from URL params', () => {
       const date = new Date('2024-01-01T00:00:00Z')
       const params = new URLSearchParams({
-        dateFrom: date.toISOString()
+        dateFrom: date.toISOString(),
       })
-      
+
       const filters = filtersFromURLParams(params)
-      
+
       expect(filters.dateFrom).toEqual(date)
     })
 
     it('should ignore invalid number values', () => {
       const params = new URLSearchParams({
-        scoreMin: 'not-a-number'
+        scoreMin: 'not-a-number',
       })
-      
+
       const filters = filtersFromURLParams(params)
-      
+
       expect(filters.scoreMin).toBeUndefined()
     })
 
@@ -381,11 +379,11 @@ describe('Filter utilities', () => {
       const params = new URLSearchParams({
         scoreMin: '100',
         scoreMax: '50', // Invalid: min > max
-        sortBy: 'score'
+        sortBy: 'score',
       })
-      
+
       const filters = filtersFromURLParams(params)
-      
+
       expect(filters.scoreMin).toBe(50) // Should be swapped
       expect(filters.scoreMax).toBe(100)
       expect(filters.sortOrder).toBe('desc') // Default added
@@ -400,11 +398,11 @@ describe('Filter utilities', () => {
         sortBy: 'score',
         sortOrder: 'desc',
         limit: 10,
-        offset: 0
+        offset: 0,
       }
-      
+
       const count = getActiveFilterCount(filters)
-      
+
       expect(count).toBe(2) // platform and scoreMin
     })
 
@@ -414,11 +412,11 @@ describe('Filter utilities', () => {
         source: '',
         author: undefined,
         scoreMin: 0,
-        timeRange: 'all'
+        timeRange: 'all',
       }
-      
+
       const count = getActiveFilterCount(filters)
-      
+
       expect(count).toBe(1) // Only scoreMin
     })
   })
@@ -432,16 +430,16 @@ describe('Filter utilities', () => {
         sortBy: 'score',
         sortOrder: 'desc',
         limit: 10,
-        offset: 20
+        offset: 20,
       }
-      
+
       const cleared = clearFilters(filters)
-      
+
       expect(cleared).toEqual({
         sortBy: 'score',
         sortOrder: 'desc',
         limit: 10,
-        offset: 20
+        offset: 20,
       })
     })
   })
@@ -449,13 +447,13 @@ describe('Filter utilities', () => {
   describe('defaultFilterPresets', () => {
     it('should have valid preset configurations', () => {
       expect(defaultFilterPresets).toHaveLength(5)
-      
-      const trending = defaultFilterPresets.find(p => p.id === 'trending')
+
+      const trending = defaultFilterPresets.find((p) => p.id === 'trending')
       expect(trending).toBeDefined()
       expect(trending?.filters.timeRange).toBe('week')
       expect(trending?.filters.scoreMin).toBe(100)
-      
-      const recent = defaultFilterPresets.find(p => p.id === 'recent')
+
+      const recent = defaultFilterPresets.find((p) => p.id === 'recent')
       expect(recent).toBeDefined()
       expect(recent?.filters.timeRange).toBe('day')
       expect(recent?.filters.sortBy).toBe('created_utc')

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
 import { Check, X, ChevronDown, Search, Hash, Globe, MessageSquare } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -27,26 +27,26 @@ interface SourceSelectorProps {
 
 // Platform icons and colors
 const platformConfig: Record<string, { icon: React.ReactNode; color: string; label: string }> = {
-  'Reddit': { 
-    icon: <Hash className="h-4 w-4" />, 
+  Reddit: {
+    icon: <Hash className="h-4 w-4" />,
     color: '#FF4500',
-    label: 'Reddit Communities'
+    label: 'Reddit Communities',
   },
-  'HackerNews': { 
-    icon: <Globe className="h-4 w-4" />, 
+  HackerNews: {
+    icon: <Globe className="h-4 w-4" />,
     color: '#FF6600',
-    label: 'Hacker News'
+    label: 'Hacker News',
   },
-  'Twitter': { 
-    icon: <MessageSquare className="h-4 w-4" />, 
+  Twitter: {
+    icon: <MessageSquare className="h-4 w-4" />,
     color: '#1DA1F2',
-    label: 'Twitter'
+    label: 'Twitter',
   },
-  'Default': { 
-    icon: <Globe className="h-4 w-4" />, 
+  Default: {
+    icon: <Globe className="h-4 w-4" />,
     color: '#6B7280',
-    label: 'Other Sources'
-  }
+    label: 'Other Sources',
+  },
 }
 
 export function SourceSelector({
@@ -55,7 +55,7 @@ export function SourceSelector({
   onSourcesChange,
   maxSources = 5,
   className,
-  enablePlatformGrouping = true
+  enablePlatformGrouping = true,
 }: SourceSelectorProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
@@ -64,32 +64,37 @@ export function SourceSelector({
   // Enhanced filtering with fuzzy search
   const filteredSources = useMemo(() => {
     if (!searchTerm) return sources
-    
+
     const term = searchTerm.toLowerCase()
-    return sources.filter(source => {
+    return sources.filter((source) => {
       const nameMatch = source.name.toLowerCase().includes(term)
       const platformMatch = source.platform.toLowerCase().includes(term)
       // Fuzzy match for common abbreviations
-      const fuzzyMatch = term.split('').every(char => 
-        source.name.toLowerCase().includes(char) || 
-        source.platform.toLowerCase().includes(char)
-      )
+      const fuzzyMatch = term
+        .split('')
+        .every(
+          (char) =>
+            source.name.toLowerCase().includes(char) || source.platform.toLowerCase().includes(char)
+        )
       return nameMatch || platformMatch || (term.length > 2 && fuzzyMatch)
     })
   }, [sources, searchTerm])
 
   // Group sources by platform
   const groupedSources = useMemo(() => {
-    if (!enablePlatformGrouping) return { 'All': filteredSources }
-    
-    return filteredSources.reduce((groups, source) => {
-      const platform = source.platform || 'Other'
-      if (!groups[platform]) {
-        groups[platform] = []
-      }
-      groups[platform].push(source)
-      return groups
-    }, {} as Record<string, Source[]>)
+    if (!enablePlatformGrouping) return { All: filteredSources }
+
+    return filteredSources.reduce(
+      (groups, source) => {
+        const platform = source.platform || 'Other'
+        if (!groups[platform]) {
+          groups[platform] = []
+        }
+        groups[platform].push(source)
+        return groups
+      },
+      {} as Record<string, Source[]>
+    )
   }, [filteredSources, enablePlatformGrouping])
 
   // Sort platforms by source count
@@ -99,26 +104,29 @@ export function SourceSelector({
       const priorityOrder = ['Reddit', 'HackerNews', 'Twitter']
       const aIndex = priorityOrder.indexOf(a)
       const bIndex = priorityOrder.indexOf(b)
-      
+
       if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex
       if (aIndex !== -1) return -1
       if (bIndex !== -1) return 1
-      
+
       // Then sort by count
       return groupedSources[b].length - groupedSources[a].length
     })
   }, [groupedSources])
 
-  const toggleSource = (sourceId: string) => {
-    if (selectedSources.includes(sourceId)) {
-      onSourcesChange(selectedSources.filter(id => id !== sourceId))
-    } else if (selectedSources.length < maxSources) {
-      onSourcesChange([...selectedSources, sourceId])
-    }
-  }
+  const toggleSource = useCallback(
+    (sourceId: string) => {
+      if (selectedSources.includes(sourceId)) {
+        onSourcesChange(selectedSources.filter((id) => id !== sourceId))
+      } else if (selectedSources.length < maxSources) {
+        onSourcesChange([...selectedSources, sourceId])
+      }
+    },
+    [selectedSources, onSourcesChange, maxSources]
+  )
 
   const removeSource = (sourceId: string) => {
-    onSourcesChange(selectedSources.filter(id => id !== sourceId))
+    onSourcesChange(selectedSources.filter((id) => id !== sourceId))
   }
 
   const clearAll = () => {
@@ -128,10 +136,10 @@ export function SourceSelector({
 
   const selectAll = () => {
     const availableSources = filteredSources.slice(0, maxSources)
-    onSourcesChange(availableSources.map(s => s.id))
+    onSourcesChange(availableSources.map((s) => s.id))
   }
 
-  const selectedSourceObjects = sources.filter(s => selectedSources.includes(s.id))
+  const selectedSourceObjects = sources.filter((s) => selectedSources.includes(s.id))
 
   const getPlatformConfig = (platform: string) => {
     return platformConfig[platform] || platformConfig['Default']
@@ -142,20 +150,16 @@ export function SourceSelector({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (!isOpen) return
 
-      const flatSources = sortedPlatforms.flatMap(platform => groupedSources[platform])
-      
+      const flatSources = sortedPlatforms.flatMap((platform) => groupedSources[platform])
+
       switch (event.key) {
         case 'ArrowDown':
           event.preventDefault()
-          setHighlightedIndex(prev => 
-            prev < flatSources.length - 1 ? prev + 1 : 0
-          )
+          setHighlightedIndex((prev) => (prev < flatSources.length - 1 ? prev + 1 : 0))
           break
         case 'ArrowUp':
           event.preventDefault()
-          setHighlightedIndex(prev => 
-            prev > 0 ? prev - 1 : flatSources.length - 1
-          )
+          setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : flatSources.length - 1))
           break
         case 'Enter':
           event.preventDefault()
@@ -172,7 +176,7 @@ export function SourceSelector({
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, highlightedIndex, sortedPlatforms, groupedSources])
+  }, [isOpen, highlightedIndex, sortedPlatforms, groupedSources, toggleSource])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -205,11 +209,11 @@ export function SourceSelector({
             </button>
           )}
         </div>
-        
+
         {/* Selected sources pills with platform indicators */}
         {selectedSourceObjects.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-2">
-            {selectedSourceObjects.map(source => {
+            {selectedSourceObjects.map((source) => {
               const config = getPlatformConfig(source.platform)
               return (
                 <div
@@ -217,7 +221,7 @@ export function SourceSelector({
                   className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-sm group"
                   style={{
                     backgroundColor: source.color ? `${source.color}20` : `${config.color}20`,
-                    borderLeft: `3px solid ${source.color || config.color}`
+                    borderLeft: `3px solid ${source.color || config.color}`,
                   }}
                 >
                   {config.icon}
@@ -255,12 +259,7 @@ export function SourceSelector({
                 ? 'Select sources...'
                 : `${selectedSources.length} source${selectedSources.length > 1 ? 's' : ''} selected`}
             </span>
-            <ChevronDown
-              className={cn(
-                'h-4 w-4 transition-transform',
-                isOpen && 'rotate-180'
-              )}
-            />
+            <ChevronDown className={cn('h-4 w-4 transition-transform', isOpen && 'rotate-180')} />
           </button>
 
           {isOpen && (
@@ -284,7 +283,8 @@ export function SourceSelector({
                       onClick={selectAll}
                       className="text-xs text-primary hover:text-primary/80 transition-colors"
                     >
-                      Select all visible ({Math.min(filteredSources.length, maxSources - selectedSources.length)})
+                      Select all visible (
+                      {Math.min(filteredSources.length, maxSources - selectedSources.length)})
                     </button>
                   </div>
                 )}
@@ -318,9 +318,10 @@ export function SourceSelector({
                         {platformSources.map((source, index) => {
                           const isSelected = selectedSources.includes(source.id)
                           const isDisabled = !isSelected && selectedSources.length >= maxSources
-                          const flatIndex = sortedPlatforms
-                            .slice(0, sortedPlatforms.indexOf(platform))
-                            .reduce((acc, p) => acc + (groupedSources[p]?.length || 0), 0) + index
+                          const flatIndex =
+                            sortedPlatforms
+                              .slice(0, sortedPlatforms.indexOf(platform))
+                              .reduce((acc, p) => acc + (groupedSources[p]?.length || 0), 0) + index
                           const isHighlighted = flatIndex === highlightedIndex
 
                           return (
@@ -347,9 +348,9 @@ export function SourceSelector({
                                   <span className="font-medium text-sm">{source.name}</span>
                                 </div>
                                 <div className="text-xs text-muted-foreground mt-1">
-                                  {source.postCount.toLocaleString()} posts • 
-                                  {' '}{new Date(source.dateRange.start).toLocaleDateString()} - 
-                                  {' '}{new Date(source.dateRange.end).toLocaleDateString()}
+                                  {source.postCount.toLocaleString()} posts •{' '}
+                                  {new Date(source.dateRange.start).toLocaleDateString()} -{' '}
+                                  {new Date(source.dateRange.end).toLocaleDateString()}
                                 </div>
                               </div>
                               {isSelected && (
@@ -391,9 +392,7 @@ export function SourceSelector({
                               style={{ backgroundColor: source.color || config.color }}
                             />
                             <span className="font-medium text-sm">{source.name}</span>
-                            <span className="text-xs text-muted-foreground">
-                              {source.platform}
-                            </span>
+                            <span className="text-xs text-muted-foreground">{source.platform}</span>
                           </div>
                           <div className="text-xs text-muted-foreground mt-1">
                             {source.postCount.toLocaleString()} posts
@@ -414,7 +413,8 @@ export function SourceSelector({
                   <span className="text-orange-600">Maximum {maxSources} sources reached</span>
                 ) : (
                   <span>
-                    {filteredSources.length} source{filteredSources.length !== 1 ? 's' : ''} available
+                    {filteredSources.length} source{filteredSources.length !== 1 ? 's' : ''}{' '}
+                    available
                   </span>
                 )}
               </div>

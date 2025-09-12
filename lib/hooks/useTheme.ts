@@ -49,14 +49,8 @@ interface UseThemeReturn {
  * Extends next-themes with additional utilities
  */
 export function useTheme(): UseThemeReturn {
-  const {
-    theme,
-    setTheme: setNextTheme,
-    systemTheme,
-    themes,
-    resolvedTheme,
-  } = useNextTheme()
-  
+  const { theme, setTheme: setNextTheme, systemTheme, themes, resolvedTheme } = useNextTheme()
+
   const [mounted, setMounted] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [themeColors, setThemeColors] = useState<ThemeColors | null>(null)
@@ -73,7 +67,7 @@ export function useTheme(): UseThemeReturn {
     const extractColors = () => {
       const root = document.documentElement
       const computedStyle = getComputedStyle(root)
-      
+
       const getColor = (varName: string) => {
         const hslValue = computedStyle.getPropertyValue(`--${varName}`).trim()
         return hslValue ? `hsl(${hslValue})` : ''
@@ -123,15 +117,18 @@ export function useTheme(): UseThemeReturn {
     return () => observer.disconnect()
   }, [mounted, resolvedTheme])
 
-  const setTheme = useCallback((newTheme: Theme) => {
-    setIsLoading(true)
-    setNextTheme(newTheme)
-    
-    // Simulate loading for smooth transition
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 150)
-  }, [setNextTheme])
+  const setTheme = useCallback(
+    (newTheme: Theme) => {
+      setIsLoading(true)
+      setNextTheme(newTheme)
+
+      // Simulate loading for smooth transition
+      setTimeout(() => {
+        setIsLoading(false)
+      }, 150)
+    },
+    [setNextTheme]
+  )
 
   const toggleTheme = useCallback(() => {
     const newTheme = resolvedTheme === 'dark' ? 'light' : 'dark'
@@ -171,16 +168,22 @@ export function useTheme(): UseThemeReturn {
  */
 export function useThemeStyles() {
   const { resolvedTheme, mounted } = useTheme()
-  
-  const getThemeStyles = useCallback((lightStyles: any, darkStyles: any) => {
-    if (!mounted) return {}
-    return resolvedTheme === 'dark' ? darkStyles : lightStyles
-  }, [mounted, resolvedTheme])
 
-  const getThemeValue = useCallback(<T,>(lightValue: T, darkValue: T): T => {
-    if (!mounted) return lightValue
-    return resolvedTheme === 'dark' ? darkValue : lightValue
-  }, [mounted, resolvedTheme])
+  const getThemeStyles = useCallback(
+    (lightStyles: Record<string, unknown>, darkStyles: Record<string, unknown>) => {
+      if (!mounted) return {}
+      return resolvedTheme === 'dark' ? darkStyles : lightStyles
+    },
+    [mounted, resolvedTheme]
+  )
+
+  const getThemeValue = useCallback(
+    <T>(lightValue: T, darkValue: T): T => {
+      if (!mounted) return lightValue
+      return resolvedTheme === 'dark' ? darkValue : lightValue
+    },
+    [mounted, resolvedTheme]
+  )
 
   return {
     getThemeStyles,

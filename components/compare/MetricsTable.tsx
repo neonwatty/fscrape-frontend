@@ -20,7 +20,7 @@ import {
   ChevronUp,
   BarChart3,
   Activity,
-  Percent
+  Percent,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Source } from './SourceSelector'
@@ -31,7 +31,7 @@ import {
   generateInsights,
   calculateRelativePerformance,
   normalizeByTimePeriod,
-  isHigherBetter
+  isHigherBetter,
 } from '@/lib/utils/comparison'
 
 interface MetricsTableProps {
@@ -53,7 +53,7 @@ const formatters: Record<string, (value: number) => string> = {
   sentiment: (v) => v.toFixed(2),
   growth: (v) => `${v > 0 ? '+' : ''}${v.toFixed(1)}%`,
   percentage: (v) => `${v.toFixed(1)}%`,
-  default: (v) => v.toLocaleString()
+  default: (v) => v.toLocaleString(),
 }
 
 export function MetricsTable({
@@ -65,7 +65,7 @@ export function MetricsTable({
   compactMode = false,
   className,
   timePeriodDays = 30,
-  baselineSourceId
+  baselineSourceId,
 }: MetricsTableProps) {
   const [expandedMetrics, setExpandedMetrics] = useState<Set<string>>(new Set())
   const [selectedMetric, setSelectedMetric] = useState<string | null>(null)
@@ -78,27 +78,21 @@ export function MetricsTable({
     if (timePeriodDays && timePeriodDays !== 30) {
       for (const [metric, values] of Object.entries(normalizedData)) {
         for (const [sourceId, value] of Object.entries(values)) {
-          normalizedData[metric][sourceId] = normalizeByTimePeriod(
-            value,
-            timePeriodDays,
-            'monthly'
-          )
+          normalizedData[metric][sourceId] = normalizeByTimePeriod(value, timePeriodDays, 'monthly')
         }
       }
     }
-    
+
     return compareMetrics(sources, normalizedData, normalizationMethod)
   }, [sources, metricsData, normalizationMethod, timePeriodDays])
 
   // Calculate statistics for each metric
   const statistics = useMemo(() => {
     if (!showStatistics) return {}
-    
+
     const stats: Record<string, StatisticalSummary> = {}
     for (const metric of processedMetrics) {
-      stats[metric.name] = calculateStatistics(
-        metric.values.map(v => v.rawValue)
-      )
+      stats[metric.name] = calculateStatistics(metric.values.map((v) => v.rawValue))
     }
     return stats
   }, [processedMetrics, showStatistics])
@@ -112,7 +106,7 @@ export function MetricsTable({
   // Calculate relative performance if baseline is set
   const relativePerformance = useMemo(() => {
     if (!baselineSourceId) return {}
-    
+
     const performance: Record<string, Record<string, number>> = {}
     for (const source of sources) {
       if (source.id !== baselineSourceId) {
@@ -160,8 +154,8 @@ export function MetricsTable({
     return [...processedMetrics].sort((a, b) => {
       // Sort by selected source's performance
       if (selectedMetric) {
-        const aValue = a.values.find(v => v.sourceId === selectedMetric)
-        const bValue = b.values.find(v => v.sourceId === selectedMetric)
+        const aValue = a.values.find((v) => v.sourceId === selectedMetric)
+        const bValue = b.values.find((v) => v.sourceId === selectedMetric)
         if (aValue && bValue) {
           switch (sortBy) {
             case 'raw':
@@ -185,7 +179,7 @@ export function MetricsTable({
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">Normalization:</span>
           <div className="flex gap-1">
-            {(['none', 'minmax', 'zscore', 'robust'] as const).map(method => (
+            {(['none', 'minmax', 'zscore', 'robust'] as const).map((method) => (
               <button
                 key={method}
                 className={cn(
@@ -194,11 +188,17 @@ export function MetricsTable({
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-secondary hover:bg-secondary/80'
                 )}
-                onClick={() => {/* Update normalization method */}}
+                onClick={() => {
+                  /* Update normalization method */
+                }}
               >
-                {method === 'minmax' ? 'Min-Max' : 
-                 method === 'zscore' ? 'Z-Score' :
-                 method === 'robust' ? 'Robust' : 'None'}
+                {method === 'minmax'
+                  ? 'Min-Max'
+                  : method === 'zscore'
+                    ? 'Z-Score'
+                    : method === 'robust'
+                      ? 'Robust'
+                      : 'None'}
               </button>
             ))}
           </div>
@@ -207,7 +207,7 @@ export function MetricsTable({
         <div className="flex items-center gap-2">
           <span className="text-sm font-medium">Sort by:</span>
           <div className="flex gap-1">
-            {(['normalized', 'raw', 'rank'] as const).map(sort => (
+            {(['normalized', 'raw', 'rank'] as const).map((sort) => (
               <button
                 key={sort}
                 className={cn(
@@ -231,17 +231,15 @@ export function MetricsTable({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[200px]">Metric</TableHead>
-              {sources.map(source => (
-                <TableHead 
+              {sources.map((source) => (
+                <TableHead
                   key={source.id}
                   className={cn(
                     'text-center cursor-pointer hover:bg-accent/50',
                     source.id === baselineSourceId && 'bg-primary/5',
                     selectedMetric === source.id && 'bg-accent'
                   )}
-                  onClick={() => setSelectedMetric(
-                    selectedMetric === source.id ? null : source.id
-                  )}
+                  onClick={() => setSelectedMetric(selectedMetric === source.id ? null : source.id)}
                 >
                   <div className="flex flex-col items-center gap-1">
                     <span className="font-medium">{source.name}</span>
@@ -255,15 +253,15 @@ export function MetricsTable({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {sortedMetrics.map(metric => {
+            {sortedMetrics.map((metric) => {
               const isExpanded = expandedMetrics.has(metric.name)
               const stats = statistics[metric.name]
               const _higherBetter = isHigherBetter(metric.name)
               const formatter = getFormatter(metric.name)
-              
+
               return (
                 <>
-                  <TableRow 
+                  <TableRow
                     key={metric.name}
                     className={cn(
                       'cursor-pointer hover:bg-accent/50',
@@ -281,40 +279,35 @@ export function MetricsTable({
                         {metric.label}
                       </div>
                     </TableCell>
-                    
-                    {sources.map(source => {
-                      const value = metric.values.find(v => v.sourceId === source.id)
+
+                    {sources.map((source) => {
+                      const value = metric.values.find((v) => v.sourceId === source.id)
                       const relPerf = relativePerformance[source.id]?.[metric.name]
-                      
+
                       return (
-                        <TableCell 
-                          key={source.id}
-                          className="text-center"
-                        >
+                        <TableCell key={source.id} className="text-center">
                           <div className="space-y-1">
-                            <div className={cn(
-                              'font-medium',
-                              getValueColor(value?.percentile)
-                            )}>
+                            <div className={cn('font-medium', getValueColor(value?.percentile))}>
                               {value ? formatter(value.rawValue) : '-'}
                             </div>
-                            
+
                             {!compactMode && value && (
                               <div className="text-xs text-muted-foreground">
                                 {normalizationMethod !== 'none' && (
-                                  <div>
-                                    Norm: {(value.normalizedValue || 0).toFixed(2)}
-                                  </div>
+                                  <div>Norm: {(value.normalizedValue || 0).toFixed(2)}</div>
                                 )}
                                 <div className="flex items-center justify-center gap-1">
                                   <span>Rank #{value.rank}</span>
                                   {relPerf !== undefined && (
                                     <>
                                       <span>•</span>
-                                      <span className={cn(
-                                        relPerf > 0 ? 'text-green-600' : 'text-red-600'
-                                      )}>
-                                        {relPerf > 0 ? '+' : ''}{relPerf.toFixed(1)}%
+                                      <span
+                                        className={cn(
+                                          relPerf > 0 ? 'text-green-600' : 'text-red-600'
+                                        )}
+                                      >
+                                        {relPerf > 0 ? '+' : ''}
+                                        {relPerf.toFixed(1)}%
                                       </span>
                                     </>
                                   )}
@@ -325,7 +318,7 @@ export function MetricsTable({
                         </TableCell>
                       )
                     })}
-                    
+
                     {showStatistics && stats && (
                       <TableCell className="text-center">
                         <div className="text-xs space-y-1">
@@ -336,7 +329,7 @@ export function MetricsTable({
                       </TableCell>
                     )}
                   </TableRow>
-                  
+
                   {/* Expanded details */}
                   {isExpanded && (
                     <TableRow>
@@ -364,18 +357,22 @@ export function MetricsTable({
                               {stats.skewness !== undefined && (
                                 <div>
                                   <span className="text-muted-foreground">Skewness:</span>
-                                  <span className="ml-2 font-medium">{stats.skewness.toFixed(2)}</span>
+                                  <span className="ml-2 font-medium">
+                                    {stats.skewness.toFixed(2)}
+                                  </span>
                                 </div>
                               )}
                               {stats.kurtosis !== undefined && (
                                 <div>
                                   <span className="text-muted-foreground">Kurtosis:</span>
-                                  <span className="ml-2 font-medium">{stats.kurtosis.toFixed(2)}</span>
+                                  <span className="ml-2 font-medium">
+                                    {stats.kurtosis.toFixed(2)}
+                                  </span>
                                 </div>
                               )}
                             </div>
                           )}
-                          
+
                           {/* Visual bar chart */}
                           <div className="space-y-2">
                             <div className="flex items-center gap-2 text-sm font-medium">
@@ -383,7 +380,7 @@ export function MetricsTable({
                               Normalized Comparison
                             </div>
                             <div className="space-y-1">
-                              {metric.values.map(value => {
+                              {metric.values.map((value) => {
                                 const width = (value.normalizedValue || 0) * 100
                                 return (
                                   <div key={value.sourceId} className="flex items-center gap-2">
@@ -444,9 +441,7 @@ export function MetricsTable({
                 <div className="flex-1">
                   <p>{insight.insight}</p>
                   {insight.significance === 'high' && (
-                    <span className="text-xs text-muted-foreground">
-                      High significance
-                    </span>
+                    <span className="text-xs text-muted-foreground">High significance</span>
                   )}
                 </div>
               </div>
@@ -459,7 +454,10 @@ export function MetricsTable({
       <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
         <div className="flex items-center gap-2">
           <Percent className="h-3 w-3" />
-          <span>Values normalized to {normalizationMethod === 'none' ? 'raw' : normalizationMethod} scale</span>
+          <span>
+            Values normalized to {normalizationMethod === 'none' ? 'raw' : normalizationMethod}{' '}
+            scale
+          </span>
         </div>
         {timePeriodDays !== 30 && (
           <div className="flex items-center gap-2">

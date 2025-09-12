@@ -50,65 +50,66 @@ export function generateEngagementHeatmap(
 ): EngagementHeatmapData[] {
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   const _shortDayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  
+
   // Apply filters
   let filteredPosts = posts
-  
+
   if (filters.platform && filters.platform !== 'all') {
-    filteredPosts = filteredPosts.filter(p => 
-      p.platform.toLowerCase() === filters.platform
-    )
+    filteredPosts = filteredPosts.filter((p) => p.platform.toLowerCase() === filters.platform)
   }
-  
+
   if (filters.source) {
-    filteredPosts = filteredPosts.filter(p => 
+    filteredPosts = filteredPosts.filter((p) =>
       (p.source || p.subreddit || '').toLowerCase().includes(filters.source!.toLowerCase())
     )
   }
-  
+
   // Initialize heatmap grid
   const heatmapGrid: Map<string, ForumPost[]> = new Map()
-  
+
   // Group posts by day and hour
-  filteredPosts.forEach(post => {
+  filteredPosts.forEach((post) => {
     const date = new Date(post.created_utc * 1000)
     const day = date.getDay()
     const hour = date.getHours()
     const key = `${day}-${hour}`
-    
+
     if (!heatmapGrid.has(key)) {
       heatmapGrid.set(key, [])
     }
     heatmapGrid.get(key)!.push(post)
   })
-  
+
   // Calculate metrics for each cell
   const data: EngagementHeatmapData[] = []
-  
+
   for (let day = 0; day < 7; day++) {
     for (let hour = 0; hour < 24; hour++) {
       const key = `${day}-${hour}`
       const cellPosts = heatmapGrid.get(key) || []
-      
+
       if (filters.minPosts && cellPosts.length < filters.minPosts) {
         continue
       }
-      
+
       const totalScore = cellPosts.reduce((sum, p) => sum + p.score, 0)
       const totalComments = cellPosts.reduce((sum, p) => sum + p.num_comments, 0)
       const avgScore = cellPosts.length > 0 ? totalScore / cellPosts.length : 0
       const avgComments = cellPosts.length > 0 ? totalComments / cellPosts.length : 0
-      const avgEngagement = avgScore + (avgComments * 2) // Weight comments more
-      
+      const avgEngagement = avgScore + avgComments * 2 // Weight comments more
+
       // Find best performing post in this time slot
-      const bestPost = cellPosts.reduce((best, post) => {
-        if (!best || post.score > best.score) return post
-        return best
-      }, null as ForumPost | null)
-      
+      const bestPost = cellPosts.reduce(
+        (best, post) => {
+          if (!best || post.score > best.score) return post
+          return best
+        },
+        null as ForumPost | null
+      )
+
       const hourStr = `${hour}:00-${hour + 1}:00`
       const label = `${dayNames[day]} ${hourStr}: ${cellPosts.length} posts, avg score ${avgScore.toFixed(0)}`
-      
+
       data.push({
         day,
         hour,
@@ -119,15 +120,17 @@ export function generateEngagementHeatmap(
         avgComments,
         avgEngagement,
         label,
-        bestPost: bestPost ? {
-          title: bestPost.title,
-          score: bestPost.score,
-          url: bestPost.url || bestPost.permalink,
-        } : undefined,
+        bestPost: bestPost
+          ? {
+              title: bestPost.title,
+              score: bestPost.score,
+              url: bestPost.url || bestPost.permalink,
+            }
+          : undefined,
       })
     }
   }
-  
+
   return data
 }
 
@@ -140,7 +143,7 @@ export function getOptimalPostingTimes(
   topN: number = 10
 ): TimeSlotPerformance[] {
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  
+
   // Sort by selected metric
   const sorted = [...heatmapData].sort((a, b) => {
     switch (metric) {
@@ -155,33 +158,41 @@ export function getOptimalPostingTimes(
         return b.avgEngagement - a.avgEngagement
     }
   })
-  
+
   // Calculate performance thresholds
-  const values = sorted.map(d => {
+  const values = sorted.map((d) => {
     switch (metric) {
-      case 'posts': return d.posts
-      case 'avgScore': return d.avgScore
-      case 'avgComments': return d.avgComments
-      default: return d.avgEngagement
+      case 'posts':
+        return d.posts
+      case 'avgScore':
+        return d.avgScore
+      case 'avgComments':
+        return d.avgComments
+      default:
+        return d.avgEngagement
     }
   })
-  
+
   const max = Math.max(...values)
   const min = Math.min(...values)
   const range = max - min
-  
+
   // Get top N time slots
-  return sorted.slice(0, topN).map(slot => {
-    const value = metric === 'posts' ? slot.posts :
-                  metric === 'avgScore' ? slot.avgScore :
-                  metric === 'avgComments' ? slot.avgComments :
-                  slot.avgEngagement
-    
+  return sorted.slice(0, topN).map((slot) => {
+    const value =
+      metric === 'posts'
+        ? slot.posts
+        : metric === 'avgScore'
+          ? slot.avgScore
+          : metric === 'avgComments'
+            ? slot.avgComments
+            : slot.avgEngagement
+
     const normalized = range > 0 ? ((value - min) / range) * 100 : 50
-    
+
     let performance: TimeSlotPerformance['performance']
     let recommendation: string
-    
+
     if (normalized >= 75) {
       performance = 'excellent'
       recommendation = 'Best time to post for maximum engagement'
@@ -195,11 +206,12 @@ export function getOptimalPostingTimes(
       performance = 'poor'
       recommendation = 'Consider posting at a different time'
     }
-    
-    const hourStr = slot.hour < 12 ? 
-      `${slot.hour === 0 ? 12 : slot.hour}:00 AM` :
-      `${slot.hour === 12 ? 12 : slot.hour - 12}:00 PM`
-    
+
+    const hourStr =
+      slot.hour < 12
+        ? `${slot.hour === 0 ? 12 : slot.hour}:00 AM`
+        : `${slot.hour === 12 ? 12 : slot.hour - 12}:00 PM`
+
     return {
       day: dayNames[slot.day],
       hour: hourStr,
@@ -220,9 +232,9 @@ export function getHeatmapColor(
   theme: 'light' | 'dark' = 'light'
 ): string {
   if (value === 0) return theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'
-  
+
   const intensity = maxValue > 0 ? (value / maxValue) * 100 : 0
-  
+
   // Use different color schemes based on metric
   if (metric === 'avgScore' || metric === 'avgEngagement') {
     // Green gradient for engagement metrics
@@ -278,6 +290,6 @@ export function getHeatmapCellLabel(
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   const hourStr = `${data.hour}:00-${data.hour + 1}:00`
   const metricValue = formatHeatmapValue(data, metric)
-  
+
   return `${dayNames[data.day]} ${hourStr}: ${metricValue}`
 }

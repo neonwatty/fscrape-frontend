@@ -1,11 +1,11 @@
 'use client'
 
 import React, { useState } from 'react'
-import { 
-  AlertTriangle, 
-  Database, 
-  RefreshCw, 
-  Download, 
+import {
+  AlertTriangle,
+  Database,
+  RefreshCw,
+  Download,
   FileX,
   WifiOff,
   MemoryStick,
@@ -16,15 +16,15 @@ import {
   ChevronDown,
   ChevronUp,
   Copy,
-  CheckCircle
+  CheckCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { 
-  DatabaseError as DBError, 
-  DatabaseErrorType, 
+import {
+  DatabaseError as DBError,
+  DatabaseErrorType,
   ErrorSeverity,
   errorRecovery,
-  RecoveryAction
+  RecoveryAction,
 } from '@/lib/db/error-handling'
 
 interface DatabaseErrorProps {
@@ -52,12 +52,13 @@ export function DatabaseError({
   const [recoveryStatus, setRecoveryStatus] = useState<string>('')
 
   // Parse error
-  const dbError = error instanceof DBError 
-    ? error 
-    : new DBError(
-        DatabaseErrorType.UNKNOWN_ERROR,
-        error instanceof Error ? error.message : String(error)
-      )
+  const dbError =
+    error instanceof DBError
+      ? error
+      : new DBError(
+          DatabaseErrorType.UNKNOWN_ERROR,
+          error instanceof Error ? error.message : String(error)
+        )
 
   // Get icon based on error type
   const getErrorIcon = () => {
@@ -156,16 +157,10 @@ ${dbError.stack ? `\nStack Trace:\n${dbError.stack}` : ''}
     <div className={cn('rounded-lg border p-6 space-y-4', className)}>
       {/* Header */}
       <div className="flex items-start space-x-4">
-        <div className={cn('p-3 rounded-full', getSeverityColor())}>
-          {getErrorIcon()}
-        </div>
+        <div className={cn('p-3 rounded-full', getSeverityColor())}>{getErrorIcon()}</div>
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-foreground">
-            Database Error
-          </h3>
-          <p className="text-sm text-muted-foreground mt-1">
-            {dbError.userMessage}
-          </p>
+          <h3 className="text-lg font-semibold text-foreground">Database Error</h3>
+          <p className="text-sm text-muted-foreground mt-1">{dbError.userMessage}</p>
           {dbError.severity === ErrorSeverity.CRITICAL && (
             <div className="mt-2 p-2 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded text-sm">
               Critical error - immediate action required
@@ -185,11 +180,7 @@ ${dbError.stack ? `\nStack Trace:\n${dbError.stack}` : ''}
               <HelpCircle className="h-4 w-4" />
               Error Details
             </span>
-            {isExpanded ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
+            {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
 
           {isExpanded && (
@@ -257,7 +248,7 @@ ${dbError.stack ? `\nStack Trace:\n${dbError.stack}` : ''}
       {showRecoveryOptions && (
         <div className="space-y-3">
           <h4 className="text-sm font-medium text-foreground">Recovery Options</h4>
-          
+
           <div className="grid gap-2">
             {/* Automatic Recovery */}
             {dbError.recoverable && !isRecovering && (
@@ -330,13 +321,13 @@ ${dbError.stack ? `\nStack Trace:\n${dbError.stack}` : ''}
         <p className="text-xs text-muted-foreground">
           {dbError.severity === ErrorSeverity.CRITICAL ? (
             <>
-              If this problem persists, please contact support with the error details above.
-              Error ID: {dbError.timestamp.getTime()}
+              If this problem persists, please contact support with the error details above. Error
+              ID: {dbError.timestamp.getTime()}
             </>
           ) : (
             <>
-              This error is usually temporary. If it persists, try refreshing the page or
-              clearing your browser cache.
+              This error is usually temporary. If it persists, try refreshing the page or clearing
+              your browser cache.
             </>
           )}
         </p>
@@ -346,29 +337,26 @@ ${dbError.stack ? `\nStack Trace:\n${dbError.stack}` : ''}
 }
 
 // Inline Database Error Component
-export function InlineDatabaseError({ 
-  error, 
+export function InlineDatabaseError({
+  error,
   onRetry,
-  className 
+  className,
 }: {
   error: string | Error
   onRetry?: () => void
   className?: string
 }) {
   return (
-    <div className={cn(
-      'flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-md',
-      className
-    )}>
+    <div
+      className={cn(
+        'flex items-center gap-2 p-3 bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300 rounded-md',
+        className
+      )}
+    >
       <AlertCircle className="h-4 w-4 flex-shrink-0" />
-      <span className="text-sm flex-1">
-        {error instanceof Error ? error.message : error}
-      </span>
+      <span className="text-sm flex-1">{error instanceof Error ? error.message : error}</span>
       {onRetry && (
-        <button
-          onClick={onRetry}
-          className="text-xs font-medium underline hover:no-underline"
-        >
+        <button onClick={onRetry} className="text-xs font-medium underline hover:no-underline">
           Retry
         </button>
       )}
@@ -377,11 +365,11 @@ export function InlineDatabaseError({
 }
 
 // Database Status Indicator
-export function DatabaseStatus({ 
-  isConnected, 
+export function DatabaseStatus({
+  isConnected,
   isLoading,
   error,
-  className 
+  className,
 }: {
   isConnected: boolean
   isLoading?: boolean
@@ -408,10 +396,7 @@ export function DatabaseStatus({
 
   return (
     <div className={cn('flex items-center gap-2 text-sm', className)}>
-      <div className={cn(
-        'h-2 w-2 rounded-full',
-        isConnected ? 'bg-green-500' : 'bg-gray-400'
-      )} />
+      <div className={cn('h-2 w-2 rounded-full', isConnected ? 'bg-green-500' : 'bg-gray-400')} />
       <span className="text-muted-foreground">
         Database {isConnected ? 'connected' : 'disconnected'}
       </span>

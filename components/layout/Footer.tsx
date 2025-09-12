@@ -1,18 +1,18 @@
 'use client'
 
 import Link from 'next/link'
-import { 
-  Github, 
-  Twitter, 
-  Globe, 
-  Mail, 
+import {
+  Github,
+  Twitter,
+  Globe,
+  Mail,
   ExternalLink,
   Heart,
   Code2,
   BookOpen,
   Shield,
   FileText,
-  Activity
+  Activity,
 } from 'lucide-react'
 
 const footerLinks = {
@@ -37,29 +37,29 @@ const footerLinks = {
 }
 
 const socialLinks = [
-  { 
-    name: 'GitHub', 
-    href: 'https://github.com/yourusername/fscrape-frontend', 
+  {
+    name: 'GitHub',
+    href: 'https://github.com/yourusername/fscrape-frontend',
     icon: Github,
-    ariaLabel: 'View source code on GitHub'
+    ariaLabel: 'View source code on GitHub',
   },
-  { 
-    name: 'Twitter', 
-    href: 'https://twitter.com/fscrape', 
+  {
+    name: 'Twitter',
+    href: 'https://twitter.com/fscrape',
     icon: Twitter,
-    ariaLabel: 'Follow us on Twitter'
+    ariaLabel: 'Follow us on Twitter',
   },
-  { 
-    name: 'Website', 
-    href: 'https://fscrape.com', 
+  {
+    name: 'Website',
+    href: 'https://fscrape.com',
     icon: Globe,
-    ariaLabel: 'Visit our website'
+    ariaLabel: 'Visit our website',
   },
-  { 
-    name: 'Email', 
-    href: 'mailto:contact@fscrape.com', 
+  {
+    name: 'Email',
+    href: 'mailto:contact@fscrape.com',
     icon: Mail,
-    ariaLabel: 'Send us an email'
+    ariaLabel: 'Send us an email',
   },
 ]
 
@@ -72,19 +72,15 @@ const versionInfo = {
 
 export function Footer() {
   const currentYear = new Date().getFullYear()
-  
+
   return (
-    <footer 
-      className="border-t bg-background"
-      role="contentinfo"
-      aria-label="Site footer"
-    >
+    <footer className="border-t bg-background" role="contentinfo" aria-label="Site footer">
       <div className="container mx-auto px-4 py-8 sm:py-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:grid-cols-5">
           {/* Brand Section */}
           <div className="col-span-2 md:col-span-1 lg:col-span-2">
-            <Link 
-              href="/" 
+            <Link
+              href="/"
               className="inline-flex items-center gap-2 group"
               aria-label="fscrape home"
             >
@@ -94,16 +90,16 @@ export function Footer() {
               <span className="text-xl font-bold">fscrape</span>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground max-w-xs">
-              Comprehensive forum data scraping and analytics platform. 
-              Monitor discussions, track trends, and gain insights across multiple sources.
+              Comprehensive forum data scraping and analytics platform. Monitor discussions, track
+              trends, and gain insights across multiple sources.
             </p>
-            
+
             {/* Social Links */}
             <div className="mt-6 flex space-x-4" role="navigation" aria-label="Social media links">
               {socialLinks.map((link) => {
                 const Icon = link.icon
                 const isExternal = link.href.startsWith('http') || link.href.startsWith('mailto')
-                
+
                 return (
                   <Link
                     key={link.name}
@@ -117,7 +113,7 @@ export function Footer() {
                 )
               })}
             </div>
-            
+
             {/* Version Info - Mobile/Tablet */}
             <div className="mt-6 flex flex-col gap-1 text-xs text-muted-foreground lg:hidden">
               <span>Version {versionInfo.version}</span>
@@ -127,7 +123,9 @@ export function Footer() {
 
           {/* Product Links */}
           <div role="navigation" aria-labelledby="product-heading">
-            <h3 id="product-heading" className="font-semibold text-foreground">Product</h3>
+            <h3 id="product-heading" className="font-semibold text-foreground">
+              Product
+            </h3>
             <ul className="mt-4 space-y-2" role="list">
               {footerLinks.product.map((link) => {
                 const Icon = link.icon
@@ -148,7 +146,9 @@ export function Footer() {
 
           {/* Resources Links */}
           <div role="navigation" aria-labelledby="resources-heading">
-            <h3 id="resources-heading" className="font-semibold text-foreground">Resources</h3>
+            <h3 id="resources-heading" className="font-semibold text-foreground">
+              Resources
+            </h3>
             <ul className="mt-4 space-y-2" role="list">
               {footerLinks.resources.map((link) => {
                 const Icon = link.icon
@@ -160,9 +160,7 @@ export function Footer() {
                     >
                       <Icon className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                       <span>{link.name}</span>
-                      {link.external && (
-                        <ExternalLink className="h-3 w-3 opacity-50" />
-                      )}
+                      {link.external && <ExternalLink className="h-3 w-3 opacity-50" />}
                     </Link>
                   </li>
                 )
@@ -172,7 +170,9 @@ export function Footer() {
 
           {/* Company Links */}
           <div role="navigation" aria-labelledby="company-heading">
-            <h3 id="company-heading" className="font-semibold text-foreground">Company</h3>
+            <h3 id="company-heading" className="font-semibold text-foreground">
+              Company
+            </h3>
             <ul className="mt-4 space-y-2" role="list">
               {footerLinks.company.map((link) => {
                 const Icon = link.icon
@@ -198,12 +198,11 @@ export function Footer() {
             {/* Copyright and Version Info */}
             <div className="flex flex-col sm:flex-row items-center gap-4 text-sm text-muted-foreground">
               <p>© {currentYear} fscrape. All rights reserved.</p>
-              
+
               {/* Version Info - Desktop */}
               <div className="hidden lg:flex items-center gap-4 text-xs">
                 <span className="flex items-center gap-1">
-                  <Code2 className="h-3 w-3" />
-                  v{versionInfo.version}
+                  <Code2 className="h-3 w-3" />v{versionInfo.version}
                 </span>
                 <span className="text-muted-foreground/50">•</span>
                 <span>Build {versionInfo.buildDate}</span>
@@ -217,34 +216,34 @@ export function Footer() {
             </div>
 
             {/* Legal Links */}
-            <nav 
+            <nav
               className="flex flex-wrap justify-center gap-x-6 gap-y-2"
               role="navigation"
               aria-label="Legal information"
             >
-              <Link 
-                href="/privacy" 
+              <Link
+                href="/privacy"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 group"
               >
                 <Shield className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 Privacy Policy
               </Link>
-              <Link 
-                href="/terms" 
+              <Link
+                href="/terms"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 group"
               >
                 <FileText className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 Terms of Service
               </Link>
-              <Link 
-                href="/cookies" 
+              <Link
+                href="/cookies"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 group"
               >
                 <Shield className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                 Cookie Policy
               </Link>
-              <Link 
-                href="/sitemap" 
+              <Link
+                href="/sitemap"
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors inline-flex items-center gap-1 group"
               >
                 <Globe className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -256,10 +255,10 @@ export function Footer() {
           {/* Accessibility Statement */}
           <div className="mt-6 text-center">
             <p className="text-xs text-muted-foreground">
-              Built with <Heart className="inline h-3 w-3 text-red-500" aria-label="love" /> for data enthusiasts. 
-              {' '}
-              <Link 
-                href="/accessibility" 
+              Built with <Heart className="inline h-3 w-3 text-red-500" aria-label="love" /> for
+              data enthusiasts.{' '}
+              <Link
+                href="/accessibility"
                 className="underline hover:text-foreground transition-colors"
               >
                 Accessibility Statement

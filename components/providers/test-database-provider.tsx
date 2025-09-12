@@ -8,24 +8,24 @@ function TestDatabaseConsumer() {
   const { isLoading, isInitialized, error } = useDatabaseStatus()
   const { summary } = useDatabaseSummary()
   const { queryRecentPosts, searchPosts } = usePostQueries()
-  
+
   // Test loading states
   if (isLoading) {
     return <div>Loading database...</div>
   }
-  
+
   if (error) {
     return <div>Error: {error}</div>
   }
-  
+
   if (!isInitialized) {
     return <div>Database not initialized</div>
   }
-  
+
   // Test successful data access
   const recentPosts = queryRecentPosts(5)
   const searchResults = searchPosts('test', 10)
-  
+
   return (
     <div>
       <h2>Database Test</h2>

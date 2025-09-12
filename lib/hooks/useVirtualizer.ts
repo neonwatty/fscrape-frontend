@@ -1,7 +1,10 @@
 'use client'
 
 import { useRef, useState, useCallback, useEffect, useMemo } from 'react'
-import { useVirtualizer as useTanstackVirtualizer, VirtualizerOptions } from '@tanstack/react-virtual'
+import {
+  useVirtualizer as useTanstackVirtualizer,
+  VirtualizerOptions,
+} from '@tanstack/react-virtual'
 
 // Performance metrics interface
 export interface VirtualizerMetrics {
@@ -52,7 +55,7 @@ export function useVirtualizer<T = any>({
     currentScrollTop: 0,
     memoryEfficiency: 0,
   })
-  
+
   const [renderStartTime, setRenderStartTime] = useState<number>(0)
 
   // Calculate item size
@@ -89,10 +92,10 @@ export function useVirtualizer<T = any>({
       const scrollTop = horizontal ? scrollElement.scrollLeft : scrollElement.scrollTop
       const scrollHeight = horizontal ? scrollElement.scrollWidth : scrollElement.scrollHeight
       const clientHeight = horizontal ? scrollElement.clientWidth : scrollElement.clientHeight
-      
+
       const scrollProgress = scrollTop / (scrollHeight - clientHeight)
-      const memoryEfficiency = 1 - (virtualItems.length / data.length)
-      
+      const memoryEfficiency = 1 - virtualItems.length / data.length
+
       const newMetrics: VirtualizerMetrics = {
         totalItems: data.length,
         visibleItems: virtualItems.length,
@@ -102,13 +105,13 @@ export function useVirtualizer<T = any>({
         memoryEfficiency: isNaN(memoryEfficiency) ? 0 : memoryEfficiency,
         renderTime: measurePerformance ? performance.now() - renderStartTime : undefined,
       }
-      
+
       setMetrics(newMetrics)
-      
+
       if (onScroll) {
         onScroll(newMetrics)
       }
-      
+
       if (debug) {
         console.log('Virtualizer Metrics:', newMetrics)
       }
@@ -116,11 +119,21 @@ export function useVirtualizer<T = any>({
 
     scrollElement.addEventListener('scroll', handleScroll, { passive: true })
     handleScroll() // Initial call
-    
+
     return () => {
       scrollElement.removeEventListener('scroll', handleScroll)
     }
-  }, [virtualItems.length, data.length, totalSize, horizontal, onScroll, debug, measurePerformance, renderStartTime])
+  }, [
+    virtualItems.length,
+    data.length,
+    totalSize,
+    horizontal,
+    onScroll,
+    debug,
+    measurePerformance,
+    renderStartTime,
+    scrollElementRef,
+  ])
 
   // Performance tracking
   useEffect(() => {
@@ -143,13 +156,13 @@ export function useVirtualizer<T = any>({
   // Keyboard navigation
   useEffect(() => {
     if (!enableKeyboardNavigation) return
-    
+
     const scrollElement = scrollElementRef.current
     if (!scrollElement) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
       const currentIndex = virtualItems[0]?.index || 0
-      
+
       switch (e.key) {
         case 'ArrowDown':
         case 'ArrowRight':
@@ -182,11 +195,11 @@ export function useVirtualizer<T = any>({
 
     scrollElement.addEventListener('keydown', handleKeyDown)
     scrollElement.tabIndex = 0 // Make focusable
-    
+
     return () => {
       scrollElement.removeEventListener('keydown', handleKeyDown)
     }
-  }, [enableKeyboardNavigation, virtualItems, data.length, scrollToItem])
+  }, [enableKeyboardNavigation, virtualItems, data.length, scrollToItem, scrollElementRef])
 
   // Calculate render range
   const renderRange = useMemo(() => {
@@ -215,18 +228,18 @@ export function useVirtualizer<T = any>({
     virtualizer,
     virtualItems,
     totalSize,
-    
+
     // Calculated properties
     renderRange,
     metrics,
-    
+
     // Helper functions
     scrollToItem,
     getPerformanceStats,
-    
+
     // Refs
     scrollElementRef,
-    
+
     // Utilities
     isScrolling: virtualizer.isScrolling,
     scrollDirection: virtualizer.scrollDirection,
@@ -248,19 +261,19 @@ export function useInfiniteVirtualizer<T = any>({
 }) {
   const [isLoading, setIsLoading] = useState(false)
   const virtualizerResult = useVirtualizer(virtualizerOptions)
-  
+
   // Check if we should load more
   useEffect(() => {
     const { scrollProgress } = virtualizerResult.metrics
-    
+
     if (scrollProgress > threshold && hasMore && !isLoading) {
       setIsLoading(true)
       Promise.resolve(fetchMore()).finally(() => {
         setIsLoading(false)
       })
     }
-  }, [virtualizerResult.metrics.scrollProgress, threshold, hasMore, isLoading, fetchMore])
-  
+  }, [virtualizerResult.metrics, threshold, hasMore, isLoading, fetchMore])
+
   return {
     ...virtualizerResult,
     isLoading,
@@ -285,11 +298,11 @@ export function useBidirectionalVirtualizer<T = any>({
   const [isLoadingNext, setIsLoadingNext] = useState(false)
   const [isLoadingPrevious, setIsLoadingPrevious] = useState(false)
   const virtualizerResult = useVirtualizer(virtualizerOptions)
-  
+
   // Check scroll position for loading
   useEffect(() => {
     const { scrollProgress, currentScrollTop } = virtualizerResult.metrics
-    
+
     // Load next
     if (scrollProgress > 0.8 && hasNext && !isLoadingNext) {
       setIsLoadingNext(true)
@@ -297,7 +310,7 @@ export function useBidirectionalVirtualizer<T = any>({
         setIsLoadingNext(false)
       })
     }
-    
+
     // Load previous
     if (currentScrollTop < 100 && hasPrevious && !isLoadingPrevious) {
       setIsLoadingPrevious(true)
@@ -314,7 +327,7 @@ export function useBidirectionalVirtualizer<T = any>({
     fetchNext,
     fetchPrevious,
   ])
-  
+
   return {
     ...virtualizerResult,
     isLoadingNext,
@@ -348,12 +361,13 @@ export function benchmarkVirtualizer(
   const withVirtualization = visibleItems * baseMemoryPerItem
   const saved = withoutVirtualization - withVirtualization
   const efficiency = (saved / withoutVirtualization) * 100
-  
+
   return {
     memoryUsage: `${withVirtualization}KB vs ${withoutVirtualization}KB`,
     renderEfficiency: `${efficiency.toFixed(1)}% memory saved`,
-    recommendation: itemCount > 100 
-      ? 'Virtualization highly recommended' 
-      : 'Virtualization optional for this dataset size',
+    recommendation:
+      itemCount > 100
+        ? 'Virtualization highly recommended'
+        : 'Virtualization optional for this dataset size',
   }
 }

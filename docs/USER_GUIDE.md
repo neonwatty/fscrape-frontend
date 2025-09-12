@@ -5,6 +5,7 @@
 Forum Scraper Frontend is a powerful analytics platform for exploring and analyzing forum data from Reddit, Hacker News, and other platforms. This guide will help you get the most out of the application.
 
 ## Table of Contents
+
 - [Getting Started](#getting-started)
 - [Dashboard Overview](#dashboard-overview)
 - [Exploring Posts](#exploring-posts)
@@ -58,6 +59,7 @@ At the top of the dashboard, you'll find four key metric cards:
 4. **Posts Today** - New posts from the last 24 hours
 
 Each card shows:
+
 - Current value (large number)
 - Percentage change from previous period
 - Trend indicator (up/down arrow)
@@ -87,6 +89,7 @@ The Posts page is your command center for finding specific content:
 ### Search and Filter
 
 #### Search Bar
+
 - Type keywords to search across titles and content
 - Use quotes for exact phrases: `"machine learning"`
 - Combine terms with AND/OR: `python AND tutorial`
@@ -95,20 +98,24 @@ The Posts page is your command center for finding specific content:
 #### Filter Panel
 
 **Platform Selection**
+
 - Toggle platforms on/off with checkboxes
 - Select multiple platforms to compare
 
 **Date Range**
+
 - Use the calendar picker for custom dates
 - Quick options: Today, This Week, This Month, This Year
 - Clear button to remove date filters
 
 **Score Range**
+
 - Set minimum and maximum scores
 - Use slider for quick adjustments
 - Popular presets: Viral (1000+), Hot (100+), Rising (10+)
 
 **Author Filter**
+
 - Type to search for specific authors
 - Select from dropdown of frequent posters
 - Multi-select supported
@@ -116,12 +123,15 @@ The Posts page is your command center for finding specific content:
 ### Posts Table Features
 
 #### Viewing Options
+
 - **Compact View**: See more posts at once
 - **Detailed View**: Include post preview text
 - **Card View**: Visual grid layout with thumbnails
 
 #### Sorting
+
 Click any column header to sort:
+
 - Title (alphabetical)
 - Author (alphabetical)
 - Platform (grouped)
@@ -130,6 +140,7 @@ Click any column header to sort:
 - Date (newest/oldest)
 
 #### Bulk Actions
+
 - Select multiple posts with checkboxes
 - Export selected posts
 - Mark as read/unread
@@ -166,12 +177,14 @@ Best times to post are highlighted with a star indicator.
 Track platform growth over time:
 
 #### Metrics Available
+
 - **Post Volume**: Number of posts per period
 - **User Growth**: New authors joining
 - **Engagement Rate**: Average score trends
 - **Comment Activity**: Discussion levels
 
 #### Visualization Options
+
 - Line chart for trends
 - Bar chart for comparisons
 - Area chart for cumulative data
@@ -182,12 +195,14 @@ Track platform growth over time:
 Discover influential posters:
 
 #### Author Metrics
+
 - **Post Count**: Total contributions
 - **Average Score**: Engagement quality
 - **Total Reach**: Combined post scores
 - **Activity Timeline**: When they post
 
 #### Filtering Options
+
 - Time period selection
 - Minimum post threshold
 - Platform specific
@@ -198,12 +213,14 @@ Discover influential posters:
 Understand what resonates:
 
 #### Word Cloud
+
 - Most frequent terms in titles
 - Click words to filter posts
 - Adjust minimum frequency
 - Export as image
 
 #### Topic Trends
+
 - Emerging topics (growing mentions)
 - Declining topics (reducing mentions)
 - Seasonal patterns
@@ -218,7 +235,7 @@ Compare performance across platforms:
 Side-by-side platform analysis:
 
 1. **Select Platforms**: Choose 2-4 platforms to compare
-2. **Choose Metrics**: 
+2. **Choose Metrics**:
    - Post volume
    - Average engagement
    - Author diversity
@@ -251,7 +268,7 @@ The application is fully responsive and touch-optimized:
 ### Mobile Navigation
 
 - **Hamburger Menu**: Tap the menu icon for navigation
-- **Swipe Gestures**: 
+- **Swipe Gestures**:
   - Swipe right to open menu
   - Swipe left to close menu
   - Swipe up/down to scroll
@@ -277,7 +294,9 @@ Export your data in multiple formats:
 ### Export Options
 
 #### CSV Export
+
 Perfect for spreadsheets:
+
 ```
 1. Select posts to export
 2. Click "Export" button
@@ -287,7 +306,9 @@ Perfect for spreadsheets:
 ```
 
 #### JSON Export
+
 For developers and APIs:
+
 ```
 1. Choose data to export
 2. Select "JSON Format"
@@ -296,7 +317,9 @@ For developers and APIs:
 ```
 
 #### PDF Reports
+
 Professional reports:
+
 ```
 1. Go to Analytics
 2. Click "Generate Report"
@@ -320,18 +343,21 @@ Set up automatic exports:
 Navigate faster with keyboard shortcuts:
 
 ### Global Shortcuts
+
 - `Ctrl/Cmd + K` - Quick search
 - `Ctrl/Cmd + /` - Show all shortcuts
 - `Esc` - Close modals/panels
 - `?` - Open help
 
 ### Navigation
+
 - `G then D` - Go to Dashboard
 - `G then P` - Go to Posts
 - `G then A` - Go to Analytics
 - `G then C` - Go to Compare
 
 ### Actions
+
 - `N` - New filter
 - `E` - Export data
 - `R` - Refresh data
@@ -339,6 +365,7 @@ Navigate faster with keyboard shortcuts:
 - `Ctrl/Cmd + Z` - Undo last action
 
 ### Table Navigation
+
 - `J` - Next row
 - `K` - Previous row
 - `Enter` - Open selected post
@@ -393,6 +420,7 @@ Navigate faster with keyboard shortcuts:
 ### Common Issues
 
 #### Data Not Loading
+
 ```
 Solution:
 1. Check internet connection
@@ -402,6 +430,7 @@ Solution:
 ```
 
 #### Charts Not Displaying
+
 ```
 Solution:
 1. Enable JavaScript
@@ -411,6 +440,7 @@ Solution:
 ```
 
 #### Export Failing
+
 ```
 Solution:
 1. Reduce data selection
@@ -420,6 +450,7 @@ Solution:
 ```
 
 #### Search Not Working
+
 ```
 Solution:
 1. Check search syntax
@@ -441,28 +472,31 @@ If you encounter issues:
 
 Common error messages and solutions:
 
-| Error | Meaning | Solution |
-|-------|---------|----------|
-| "Database connection failed" | Cannot read database file | Re-upload database or use sample data |
-| "Query timeout" | Operation took too long | Reduce data range or simplify filters |
-| "Invalid filter" | Filter syntax error | Check filter format and values |
-| "Export too large" | Too much data to export | Select smaller date range or fewer columns |
+| Error                        | Meaning                   | Solution                                   |
+| ---------------------------- | ------------------------- | ------------------------------------------ |
+| "Database connection failed" | Cannot read database file | Re-upload database or use sample data      |
+| "Query timeout"              | Operation took too long   | Reduce data range or simplify filters      |
+| "Invalid filter"             | Filter syntax error       | Check filter format and values             |
+| "Export too large"           | Too much data to export   | Select smaller date range or fewer columns |
 
 ## Best Practices
 
 ### For Optimal Performance
+
 - Keep browser updated
 - Use Chrome, Firefox, or Edge for best experience
 - Close unnecessary tabs to free memory
 - Enable hardware acceleration
 
 ### For Data Analysis
+
 - Start with broad filters, then narrow down
 - Save frequently used filter combinations
 - Export data regularly for backup
 - Document your analysis process
 
 ### For Collaboration
+
 - Share specific URLs with filters applied
 - Use consistent naming for saved views
 - Export reports in universal formats
@@ -474,26 +508,26 @@ Common error messages and solutions:
 
 ### Most Used Features
 
-| Feature | Location | Shortcut |
-|---------|----------|----------|
-| Quick Search | Header | Ctrl+K |
-| Filter Posts | Posts Page | N |
-| Export Data | Any Table | E |
-| Change Theme | Header | T |
-| Refresh Data | Any Page | R |
-| View Post | Posts Table | Enter |
-| Dashboard | Navigation | G,D |
+| Feature      | Location    | Shortcut |
+| ------------ | ----------- | -------- |
+| Quick Search | Header      | Ctrl+K   |
+| Filter Posts | Posts Page  | N        |
+| Export Data  | Any Table   | E        |
+| Change Theme | Header      | T        |
+| Refresh Data | Any Page    | R        |
+| View Post    | Posts Table | Enter    |
+| Dashboard    | Navigation  | G,D      |
 
 ### Filter Syntax
 
-| Type | Example | Result |
-|------|---------|--------|
-| Keyword | `python` | Posts containing "python" |
-| Exact | `"machine learning"` | Exact phrase match |
-| Exclude | `-javascript` | Exclude term |
-| Author | `author:john` | Posts by John |
-| Score | `score:>100` | Score greater than 100 |
-| Date | `date:2024-01` | Posts from January 2024 |
+| Type    | Example              | Result                    |
+| ------- | -------------------- | ------------------------- |
+| Keyword | `python`             | Posts containing "python" |
+| Exact   | `"machine learning"` | Exact phrase match        |
+| Exclude | `-javascript`        | Exclude term              |
+| Author  | `author:john`        | Posts by John             |
+| Score   | `score:>100`         | Score greater than 100    |
+| Date    | `date:2024-01`       | Posts from January 2024   |
 
 ---
 

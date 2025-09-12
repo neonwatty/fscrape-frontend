@@ -24,67 +24,67 @@ export interface TablePaginationProps {
    * Current page (0-indexed)
    */
   currentPage: number
-  
+
   /**
    * Total number of pages
    */
   totalPages: number
-  
+
   /**
    * Current page size
    */
   pageSize: number
-  
+
   /**
    * Total number of items
    */
   totalItems: number
-  
+
   /**
    * Available page size options
    */
   pageSizeOptions?: number[]
-  
+
   /**
    * Callback when page changes
    */
   onPageChange: (page: number) => void
-  
+
   /**
    * Callback when page size changes
    */
   onPageSizeChange: (size: number) => void
-  
+
   /**
    * Whether to show page size selector
    */
   showPageSizeSelector?: boolean
-  
+
   /**
    * Whether to show item count
    */
   showItemCount?: boolean
-  
+
   /**
    * Whether to show page jump input
    */
   showPageJump?: boolean
-  
+
   /**
    * Maximum number of page buttons to show
    */
   maxPageButtons?: number
-  
+
   /**
    * Whether pagination is disabled
    */
   disabled?: boolean
-  
+
   /**
    * Additional CSS classes
    */
   className?: string
-  
+
   /**
    * Mobile-optimized layout
    */
@@ -184,7 +184,9 @@ export function TablePagination({
         {showItemCount && (
           <div className="text-sm text-muted-foreground text-center">
             {startItem}-{endItem} of {totalItems.toLocaleString()} items
-            <span className="ml-2">• Page {currentPage + 1} of {totalPages}</span>
+            <span className="ml-2">
+              • Page {currentPage + 1} of {totalPages}
+            </span>
           </div>
         )}
 
@@ -276,7 +278,7 @@ export function TablePagination({
             Showing {startItem}-{endItem} of {totalItems.toLocaleString()} items
           </p>
         )}
-        
+
         {showPageSizeSelector && (
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">Rows per page:</span>
@@ -328,10 +330,7 @@ export function TablePagination({
           {getPageNumbers().map((page, index) => {
             if (page === '...') {
               return (
-                <div
-                  key={`ellipsis-${index}`}
-                  className="flex h-8 w-8 items-center justify-center"
-                >
+                <div key={`ellipsis-${index}`} className="flex h-8 w-8 items-center justify-center">
                   <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
                 </div>
               )
@@ -347,10 +346,7 @@ export function TablePagination({
                 size="icon"
                 onClick={() => onPageChange(pageNumber)}
                 disabled={disabled}
-                className={cn(
-                  'h-8 w-8',
-                  isActive && 'pointer-events-none'
-                )}
+                className={cn('h-8 w-8', isActive && 'pointer-events-none')}
               >
                 {pageNumber + 1}
               </Button>

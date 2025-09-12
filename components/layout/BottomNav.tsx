@@ -23,15 +23,15 @@ export function BottomNav({ onMenuClick, className }: BottomNavProps) {
   const router = useRouter()
   const [activeIndex, setActiveIndex] = useState(0)
   const navRef = useRef<HTMLDivElement>(null)
-  
+
   // Update active index based on current pathname
   useEffect(() => {
-    const index = navigationItems.findIndex(item => item.href === pathname)
+    const index = navigationItems.findIndex((item) => item.href === pathname)
     if (index !== -1) {
       setActiveIndex(index)
     }
   }, [pathname])
-  
+
   // Add swipe gestures for navigation
   useTouchGestures(navRef, {
     onSwipeLeft: () => {
@@ -49,7 +49,7 @@ export function BottomNav({ onMenuClick, className }: BottomNavProps) {
     threshold: 75,
     velocity: 0.3,
   })
-  
+
   const handleNavClick = (href: string, index: number) => {
     setActiveIndex(index)
     router.push(href)
@@ -71,7 +71,7 @@ export function BottomNav({ onMenuClick, className }: BottomNavProps) {
         {navigationItems.map((item, index) => {
           const Icon = item.icon
           const isActive = pathname === item.href
-          
+
           return (
             <button
               key={item.name}
@@ -91,21 +91,21 @@ export function BottomNav({ onMenuClick, className }: BottomNavProps) {
               {isActive && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-primary rounded-full" />
               )}
-              
+
               {/* Icon with animation */}
-              <div className={cn(
-                'relative flex items-center justify-center',
-                'w-6 h-6 mb-1',
-                'transition-all duration-200',
-                isActive && 'scale-110'
-              )}>
-                <Icon 
+              <div
+                className={cn(
+                  'relative flex items-center justify-center',
+                  'w-6 h-6 mb-1',
+                  'transition-all duration-200',
+                  isActive && 'scale-110'
+                )}
+              >
+                <Icon
                   className={cn(
                     'w-5 h-5',
                     'transition-colors duration-200',
-                    isActive 
-                      ? 'text-primary' 
-                      : 'text-muted-foreground group-active:text-primary/70'
+                    isActive ? 'text-primary' : 'text-muted-foreground group-active:text-primary/70'
                   )}
                 />
                 {/* Badge for notifications (example) */}
@@ -113,26 +113,24 @@ export function BottomNav({ onMenuClick, className }: BottomNavProps) {
                   <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full" />
                 )}
               </div>
-              
+
               {/* Label */}
-              <span 
+              <span
                 className={cn(
                   'text-[10px] font-medium',
                   'transition-colors duration-200',
-                  isActive 
-                    ? 'text-primary' 
-                    : 'text-muted-foreground'
+                  isActive ? 'text-primary' : 'text-muted-foreground'
                 )}
               >
                 {item.label}
               </span>
-              
+
               {/* Ripple effect on tap */}
               <span className="absolute inset-0 rounded-lg group-active:bg-primary/10 transition-colors" />
             </button>
           )
         })}
-        
+
         {/* Menu button for additional options */}
         <button
           onClick={onMenuClick}
@@ -149,13 +147,11 @@ export function BottomNav({ onMenuClick, className }: BottomNavProps) {
           <div className="w-6 h-6 mb-1 flex items-center justify-center">
             <Menu className="w-5 h-5 text-muted-foreground group-active:text-primary/70" />
           </div>
-          <span className="text-[10px] font-medium text-muted-foreground">
-            More
-          </span>
+          <span className="text-[10px] font-medium text-muted-foreground">More</span>
           <span className="absolute inset-0 rounded-lg group-active:bg-primary/10 transition-colors" />
         </button>
       </div>
-      
+
       {/* Optional gesture hint */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-full opacity-0 pointer-events-none">
         <div className="bg-foreground/10 text-foreground/60 text-xs px-2 py-1 rounded">
@@ -169,8 +165,8 @@ export function BottomNav({ onMenuClick, className }: BottomNavProps) {
 // Bottom navigation with page indicators for swipe navigation
 export function BottomNavWithIndicator({ className }: { className?: string }) {
   const pathname = usePathname()
-  const activeIndex = navigationItems.findIndex(item => item.href === pathname)
-  
+  const activeIndex = navigationItems.findIndex((item) => item.href === pathname)
+
   return (
     <div className={cn('fixed bottom-0 left-0 right-0 z-40', className)}>
       {/* Page indicators */}
@@ -180,14 +176,12 @@ export function BottomNavWithIndicator({ className }: { className?: string }) {
             key={index}
             className={cn(
               'h-1 rounded-full transition-all duration-300',
-              index === activeIndex
-                ? 'w-6 bg-primary'
-                : 'w-1 bg-muted-foreground/30'
+              index === activeIndex ? 'w-6 bg-primary' : 'w-1 bg-muted-foreground/30'
             )}
           />
         ))}
       </div>
-      
+
       <BottomNav />
     </div>
   )

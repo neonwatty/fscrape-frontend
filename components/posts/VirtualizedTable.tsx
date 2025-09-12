@@ -41,9 +41,7 @@ export function VirtualizedTable({
   const totalSize = virtualizer.getTotalSize()
   const paddingTop = virtualRows.length > 0 ? virtualRows[0]?.start || 0 : 0
   const paddingBottom =
-    virtualRows.length > 0
-      ? totalSize - (virtualRows[virtualRows.length - 1]?.end || 0)
-      : 0
+    virtualRows.length > 0 ? totalSize - (virtualRows[virtualRows.length - 1]?.end || 0) : 0
 
   return (
     <div
@@ -59,10 +57,7 @@ export function VirtualizedTable({
                 <TableHead key={header.id}>
                   {header.isPlaceholder
                     ? null
-                    : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                    : flexRender(header.column.columnDef.header, header.getContext())}
                 </TableHead>
               ))}
             </TableRow>
@@ -80,10 +75,7 @@ export function VirtualizedTable({
               <TableRow
                 key={row.id}
                 data-state={row.getIsSelected() && 'selected'}
-                className={cn(
-                  'transition-colors',
-                  row.getIsSelected() && 'bg-muted/50'
-                )}
+                className={cn('transition-colors', row.getIsSelected() && 'bg-muted/50')}
                 style={{ height: `${rowHeight}px` }}
               >
                 {row.getVisibleCells().map((cell) => (

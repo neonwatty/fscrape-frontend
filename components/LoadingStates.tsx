@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
-import { 
-  Skeleton, 
-  CardSkeleton, 
-  TableSkeleton, 
-  ChartSkeleton, 
+import {
+  Skeleton,
+  CardSkeleton,
+  TableSkeleton,
+  ChartSkeleton,
   ListSkeleton,
-  FormSkeleton 
+  FormSkeleton,
 } from '@/components/ui/skeleton'
 import { Spinner, InlineLoader } from '@/components/ui/spinner'
 import { CheckCircle, AlertCircle, XCircle, Circle } from 'lucide-react'
@@ -55,7 +55,7 @@ export function LoadingState({
     if (state === 'success' && startTime) {
       const elapsed = Date.now() - startTime
       const remainingTime = Math.max(0, minLoadTime - elapsed)
-      
+
       const timer = setTimeout(() => {
         setShowContent(true)
       }, remainingTime)
@@ -128,7 +128,7 @@ export function ProgressiveLoader({
           ) : (
             <Circle className="h-5 w-5 text-muted-foreground" />
           )}
-          <span 
+          <span
             className={cn(
               'text-sm',
               index < currentStep && 'text-muted-foreground line-through',
@@ -177,9 +177,7 @@ export function StaggeredLoader({
           key={index}
           className={cn(
             'transition-all duration-300',
-            index < visibleItems
-              ? 'opacity-100 translate-y-0'
-              : 'opacity-0 translate-y-2'
+            index < visibleItems ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
           )}
         >
           {item}
@@ -331,9 +329,7 @@ export function InfiniteScrollLoader({
       {children}
       {isLoading && (loader || <Spinner size="md" className="my-4" />)}
       {!hasMore && endMessage && (
-        <div className="text-center text-muted-foreground py-4">
-          {endMessage}
-        </div>
+        <div className="text-center text-muted-foreground py-4">{endMessage}</div>
       )}
     </>
   )
@@ -350,7 +346,7 @@ export function PageTransition({
   direction?: 'fade' | 'slide-up' | 'slide-down' | 'slide-left' | 'slide-right'
 }) {
   const transitionClasses = {
-    'fade': loading ? 'opacity-0' : 'opacity-100',
+    fade: loading ? 'opacity-0' : 'opacity-100',
     'slide-up': loading ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0',
     'slide-down': loading ? 'opacity-0 -translate-y-4' : 'opacity-100 translate-y-0',
     'slide-left': loading ? 'opacity-0 translate-x-4' : 'opacity-100 translate-x-0',
@@ -358,12 +354,7 @@ export function PageTransition({
   }
 
   return (
-    <div 
-      className={cn(
-        'transition-all duration-300 ease-in-out',
-        transitionClasses[direction]
-      )}
-    >
+    <div className={cn('transition-all duration-300 ease-in-out', transitionClasses[direction])}>
       {children}
     </div>
   )
@@ -401,10 +392,7 @@ export function DataLoader<T>({
     queryFn()
       .then((result) => {
         setData(result)
-        sessionStorage.setItem(
-          queryKey,
-          JSON.stringify({ data: result, timestamp: Date.now() })
-        )
+        sessionStorage.setItem(queryKey, JSON.stringify({ data: result, timestamp: Date.now() }))
       })
       .catch(setError)
       .finally(() => setLoading(false))

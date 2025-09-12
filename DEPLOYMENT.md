@@ -19,6 +19,7 @@ This guide covers deploying the Forum Scraper Frontend application to various pl
 Before deploying, ensure:
 
 1. **Build passes all checks**:
+
    ```bash
    npm run build
    npm run test:all
@@ -26,6 +27,7 @@ Before deploying, ensure:
    ```
 
 2. **Database is ready**:
+
    ```bash
    npm run db:validate
    ```
@@ -54,13 +56,14 @@ The application automatically deploys to GitHub Pages when changes are pushed to
    - Branch: `gh-pages` / `root`
 
 2. **Build and deploy**:
+
    ```bash
    # Build the application
    npm run build:prod
-   
+
    # Validate export
    npm run validate:export
-   
+
    # Deploy (if using gh-pages package)
    npm run deploy:gh-pages
    ```
@@ -76,7 +79,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
-    
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -99,11 +102,13 @@ jobs:
 ### Manual Setup
 
 1. **Install Vercel CLI**:
+
    ```bash
    npm i -g vercel
    ```
 
 2. **Deploy**:
+
    ```bash
    vercel
    ```
@@ -133,14 +138,15 @@ vercel --prod
 ### Manual Setup
 
 1. **Configure** (`netlify.toml`):
+
    ```toml
    [build]
      command = "npm run build"
      publish = "out"
-   
+
    [[plugins]]
      package = "@netlify/plugin-nextjs"
-   
+
    [[headers]]
      for = "/*"
      [headers.values]
@@ -165,11 +171,13 @@ vercel --prod
 ### Using Node.js Server
 
 1. **Install dependencies**:
+
    ```bash
    npm ci --production
    ```
 
 2. **Build application**:
+
    ```bash
    npm run build
    ```
@@ -182,29 +190,31 @@ vercel --prod
 ### Using Nginx
 
 1. **Build application**:
+
    ```bash
    npm run build
    ```
 
 2. **Nginx configuration**:
+
    ```nginx
    server {
      listen 80;
      server_name your-domain.com;
      root /var/www/fscrape-frontend/out;
-     
+
      location / {
        try_files $uri $uri/ $uri.html /index.html;
      }
-     
+
      # Security headers
      add_header X-Frame-Options "DENY";
      add_header X-Content-Type-Options "nosniff";
-     
+
      # Compression
      gzip on;
      gzip_types text/plain text/css application/json application/javascript;
-     
+
      # Cache static assets
      location ~* \.(jpg|jpeg|png|gif|ico|css|js|svg)$ {
        expires 1y;
@@ -222,23 +232,24 @@ vercel --prod
 ### Using Apache
 
 1. **Apache configuration** (`.htaccess`):
+
    ```apache
    RewriteEngine On
-   
+
    # Security headers
    Header set X-Frame-Options "DENY"
    Header set X-Content-Type-Options "nosniff"
-   
+
    # Compression
    <IfModule mod_deflate.c>
      AddOutputFilterByType DEFLATE text/html text/css application/javascript
    </IfModule>
-   
+
    # Cache control
    <FilesMatch "\.(jpg|jpeg|png|gif|ico|css|js|svg)$">
      Header set Cache-Control "max-age=31536000, public"
    </FilesMatch>
-   
+
    # SPA routing
    RewriteCond %{REQUEST_FILENAME} !-f
    RewriteCond %{REQUEST_FILENAME} !-d
@@ -287,7 +298,7 @@ services:
   frontend:
     build: .
     ports:
-      - "80:80"
+      - '80:80'
     restart: unless-stopped
     volumes:
       - ./database.db:/usr/share/nginx/html/database.db:ro
@@ -298,6 +309,7 @@ services:
 ### Development
 
 Create `.env.local`:
+
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:3000
 NEXT_PUBLIC_GA_ID=UA-XXXXXXXXX-X
@@ -306,6 +318,7 @@ NEXT_PUBLIC_GA_ID=UA-XXXXXXXXX-X
 ### Production
 
 Set in deployment platform:
+
 ```env
 NEXT_PUBLIC_API_URL=https://api.your-domain.com
 NEXT_PUBLIC_GA_ID=UA-XXXXXXXXX-X
@@ -368,6 +381,7 @@ npm run build
 ### 404 Errors
 
 Ensure trailing slashes in Next.js config:
+
 ```javascript
 module.exports = {
   trailingSlash: true,
@@ -399,11 +413,13 @@ navigator.serviceWorker.getRegistrations().then(function(registrations) {
 ### Performance Issues
 
 1. Check bundle size:
+
    ```bash
    npm run analyze
    ```
 
 2. Optimize images:
+
    ```bash
    npm run optimize:images
    ```
@@ -449,6 +465,7 @@ mv out.backup out
 ## 🆘 Support
 
 For deployment issues:
+
 - Check [GitHub Issues](https://github.com/neonwatty/fscrape-frontend/issues)
 - Review [CI/CD logs](https://github.com/neonwatty/fscrape-frontend/actions)
 - Contact maintainers

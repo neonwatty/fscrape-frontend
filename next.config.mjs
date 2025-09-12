@@ -4,86 +4,89 @@ const require = createRequire(import.meta.url)
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
-  
+
   // Static export configuration
   trailingSlash: true,
   distDir: '.next',
-  
+
   // Production optimizations
   productionBrowserSourceMaps: false,
   poweredByHeader: false,
   compress: true,
   generateEtags: true,
-  
+
   // Image optimization for static export
   images: {
     unoptimized: true,
   },
-  
+
   // GitHub Pages deployment paths
   basePath: process.env.NODE_ENV === 'production' ? '/fscrape-frontend' : '',
   assetPrefix: process.env.NODE_ENV === 'production' ? '/fscrape-frontend' : '',
-  
+
   // Optimize package imports
   modularizeImports: {
     'lucide-react': {
       transform: 'lucide-react/dist/esm/icons/{{member}}',
     },
-    'lodash': {
+    lodash: {
       transform: 'lodash/{{member}}',
     },
   },
-  
+
   // Experimental features for performance
   experimental: {
     optimizePackageImports: ['recharts', 'react-window', 'date-fns', '@radix-ui/react-*'],
     webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'TTFB'],
   },
-  
+
   // Compiler options
   compiler: {
-    removeConsole: process.env.NODE_ENV === 'production' ? {
-      exclude: ['error', 'warn']
-    } : false,
+    removeConsole:
+      process.env.NODE_ENV === 'production'
+        ? {
+            exclude: ['error', 'warn'],
+          }
+        : false,
   },
-  
+
   // Security headers for production
   async headers() {
     if (process.env.NODE_ENV !== 'production') {
       return []
     }
-    
+
     return [
       {
         source: '/:path*',
         headers: [
           {
             key: 'X-DNS-Prefetch-Control',
-            value: 'on'
+            value: 'on',
           },
           {
             key: 'Strict-Transport-Security',
-            value: 'max-age=63072000; includeSubDomains; preload'
+            value: 'max-age=63072000; includeSubDomains; preload',
           },
           {
             key: 'X-Frame-Options',
-            value: 'SAMEORIGIN'
+            value: 'SAMEORIGIN',
           },
           {
             key: 'X-Content-Type-Options',
-            value: 'nosniff'
+            value: 'nosniff',
           },
           {
             key: 'X-XSS-Protection',
-            value: '1; mode=block'
+            value: '1; mode=block',
           },
           {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin'
+            value: 'origin-when-cross-origin',
           },
           {
             key: 'Permissions-Policy',
-            value: 'camera=(), microphone=(), geolocation=()'
+            value: 'camera=(), microphone=(), geolocation=()',
           },
           {
             key: 'Content-Security-Policy',
@@ -97,13 +100,15 @@ const nextConfig = {
               frame-ancestors 'none';
               base-uri 'self';
               form-action 'self';
-            `.replace(/\s{2,}/g, ' ').trim()
-          }
-        ]
-      }
+            `
+              .replace(/\s{2,}/g, ' ')
+              .trim(),
+          },
+        ],
+      },
     ]
   },
-  
+
   webpack: (config, { isServer, dev }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -113,13 +118,13 @@ const nextConfig = {
         crypto: false,
       }
     }
-    
+
     // Production optimizations
     if (!dev) {
       // Enable minification and tree shaking
       config.optimization.minimize = true
       config.optimization.minimizer = config.optimization.minimizer || []
-      
+
       // Add Terser plugin for better minification if available
       try {
         const TerserPlugin = require('terser-webpack-plugin')
@@ -146,7 +151,7 @@ const nextConfig = {
         // Terser plugin not available, use default minification
         console.log('Using default minification (terser-webpack-plugin not installed)')
       }
-      
+
       // Split chunks more aggressively
       config.optimization = {
         ...config.optimization,
@@ -165,8 +170,7 @@ const nextConfig = {
             },
             lib: {
               test(module) {
-                return module.size() > 160000 &&
-                  /node_modules[\\/]/.test(module.identifier())
+                return module.size() > 160000 && /node_modules[\\/]/.test(module.identifier())
               },
               name(module) {
                 const hash = require('crypto').createHash('sha1')
@@ -198,11 +202,11 @@ const nextConfig = {
           },
         },
       }
-      
+
       // Enable module concatenation
       config.optimization.concatenateModules = true
     }
-    
+
     return config
   },
 }

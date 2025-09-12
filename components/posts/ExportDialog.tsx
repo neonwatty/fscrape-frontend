@@ -63,7 +63,7 @@ export function ExportDialog({
   const [dateFormat, setDateFormat] = useState<'iso' | 'locale' | 'unix'>('iso')
   const [includeHeaders, setIncludeHeaders] = useState(true)
   const [selectedColumns, setSelectedColumns] = useState<string[]>(
-    defaultExportColumns.map(col => col.key)
+    defaultExportColumns.map((col) => col.key)
   )
   const [exportSelection, setExportSelection] = useState<'all' | 'selected'>('all')
   const [isExporting, setIsExporting] = useState(false)
@@ -79,7 +79,7 @@ export function ExportDialog({
       setExportError(null)
       setExportProgress(0)
       setFilename(`posts-export-${new Date().toISOString().split('T')[0]}`)
-      
+
       // Set default export selection based on whether posts are selected
       if (selectedPosts && selectedPosts.length > 0) {
         setExportSelection('selected')
@@ -103,11 +103,11 @@ export function ExportDialog({
 
   // Handle column selection
   const handleColumnToggle = (columnKey: string) => {
-    setSelectedColumns(prev => {
+    setSelectedColumns((prev) => {
       if (prev.includes(columnKey)) {
         // Don't allow deselecting all columns
         if (prev.length === 1) return prev
-        return prev.filter(key => key !== columnKey)
+        return prev.filter((key) => key !== columnKey)
       }
       return [...prev, columnKey]
     })
@@ -121,9 +121,9 @@ export function ExportDialog({
 
     try {
       const postsToExport = getPostsToExport()
-      
+
       // Filter columns based on selection
-      const columns: ExportColumn[] = defaultExportColumns.filter(col =>
+      const columns: ExportColumn[] = defaultExportColumns.filter((col) =>
         selectedColumns.includes(col.key)
       )
 
@@ -140,7 +140,7 @@ export function ExportDialog({
       })
 
       setExportSuccess(true)
-      
+
       // Close dialog after successful export
       setTimeout(() => {
         onOpenChange(false)
@@ -160,9 +160,7 @@ export function ExportDialog({
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>
-            Export {postsCount} posts to your preferred format
-          </DialogDescription>
+          <DialogDescription>Export {postsCount} posts to your preferred format</DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
@@ -170,7 +168,10 @@ export function ExportDialog({
           {selectedPosts && selectedPosts.length > 0 && (
             <div className="space-y-2">
               <Label>Export Range</Label>
-              <RadioGroup value={exportSelection} onValueChange={(value: 'all' | 'selected') => setExportSelection(value)}>
+              <RadioGroup
+                value={exportSelection}
+                onValueChange={(value: 'all' | 'selected') => setExportSelection(value)}
+              >
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="all" id="all" />
                   <Label htmlFor="all" className="font-normal">
@@ -241,7 +242,10 @@ export function ExportDialog({
                 {/* Date format */}
                 <div className="space-y-2">
                   <Label htmlFor="dateFormat">Date Format</Label>
-                  <Select value={dateFormat} onValueChange={(value: 'iso' | 'locale' | 'unix') => setDateFormat(value)}>
+                  <Select
+                    value={dateFormat}
+                    onValueChange={(value: 'iso' | 'locale' | 'unix') => setDateFormat(value)}
+                  >
                     <SelectTrigger id="dateFormat">
                       <SelectValue />
                     </SelectTrigger>
@@ -271,7 +275,7 @@ export function ExportDialog({
                 <div className="space-y-2">
                   <Label>Columns to Export</Label>
                   <div className="grid grid-cols-2 gap-2 max-h-[200px] overflow-y-auto p-2 border rounded-md">
-                    {defaultExportColumns.map(col => (
+                    {defaultExportColumns.map((col) => (
                       <div key={col.key} className="flex items-center space-x-2">
                         <Checkbox
                           id={col.key}
@@ -292,9 +296,7 @@ export function ExportDialog({
           {/* Export size estimate */}
           <Alert>
             <AlertCircle className="h-4 w-4" />
-            <AlertDescription>
-              Estimated file size: {formattedSize}
-            </AlertDescription>
+            <AlertDescription>Estimated file size: {formattedSize}</AlertDescription>
           </Alert>
 
           {/* Progress indicator */}
@@ -328,11 +330,7 @@ export function ExportDialog({
         </div>
 
         <DialogFooter>
-          <Button
-            variant="outline"
-            onClick={() => onOpenChange(false)}
-            disabled={isExporting}
-          >
+          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isExporting}>
             Cancel
           </Button>
           <Button

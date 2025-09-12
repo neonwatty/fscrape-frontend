@@ -38,24 +38,27 @@ export class PerformanceMonitor {
             const navEntry = entry as PerformanceNavigationTiming
             this.metrics.ttfb = navEntry.responseStart - navEntry.requestStart
           }
-          
+
           if (entry.entryType === 'paint') {
             if (entry.name === 'first-contentful-paint') {
               this.metrics.fcp = entry.startTime
             }
           }
-          
+
           if (entry.entryType === 'largest-contentful-paint') {
             this.metrics.lcp = entry.startTime
           }
-          
+
           if (entry.entryType === 'first-input') {
             const fidEntry = entry as PerformanceEventTiming
             this.metrics.fid = fidEntry.processingStart - fidEntry.startTime
           }
-          
+
           if (entry.entryType === 'layout-shift') {
-            const layoutEntry = entry as any
+            const layoutEntry = entry as PerformanceEntry & {
+              hadRecentInput: boolean
+              value: number
+            }
             if (!layoutEntry.hadRecentInput) {
               this.metrics.cls = (this.metrics.cls || 0) + layoutEntry.value
             }
@@ -63,8 +66,14 @@ export class PerformanceMonitor {
         }
       })
 
-      this.observer.observe({ 
-        entryTypes: ['navigation', 'paint', 'largest-contentful-paint', 'first-input', 'layout-shift'] 
+      this.observer.observe({
+        entryTypes: [
+          'navigation',
+          'paint',
+          'largest-contentful-paint',
+          'first-input',
+          'layout-shift',
+        ],
       })
     } catch (error) {
       console.warn('Performance Observer not supported:', error)
@@ -82,16 +91,16 @@ export class PerformanceMonitor {
 
     // Collect resource timings
     const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[]
-    this.resources = resources.map(resource => ({
+    this.resources = resources.map((resource) => ({
       name: resource.name,
       duration: resource.duration,
       size: resource.transferSize || 0,
-      type: this.getResourceType(resource.name)
+      type: this.getResourceType(resource.name),
     }))
 
     // Memory usage (if available)
     if ('memory' in performance) {
-      const memory = (performance as any).memory
+      const memory = (performance as Performance & { memory: { usedJSHeapSize: number } }).memory
       this.metrics.memoryUsage = memory.usedJSHeapSize / 1048576 // Convert to MB
     }
   }
@@ -109,7 +118,7 @@ export class PerformanceMonitor {
   }
 
   public getResourcesByType(type: string): ResourceTiming[] {
-    return this.resources.filter(r => r.type === type)
+    return this.resources.filter((r) => r.type === type)
   }
 
   public getBundleSize(): number {
@@ -132,15 +141,11 @@ export class PerformanceMonitor {
   }
 
   public getLargestResources(count: number = 10): ResourceTiming[] {
-    return [...this.resources]
-      .sort((a, b) => b.size - a.size)
-      .slice(0, count)
+    return [...this.resources].sort((a, b) => b.size - a.size).slice(0, count)
   }
 
   public getSlowestResources(count: number = 10): ResourceTiming[] {
-    return [...this.resources]
-      .sort((a, b) => b.duration - a.duration)
-      .slice(0, count)
+    return [...this.resources].sort((a, b) => b.duration - a.duration).slice(0, count)
   }
 
   public destroy() {
@@ -169,7 +174,7 @@ export function analyzeBundleSize() {
   if (typeof window === 'undefined') return null
 
   const monitor = new PerformanceMonitor()
-  
+
   setTimeout(() => {
     const analysis = {
       js: monitor.getBundleSize(),
@@ -177,31 +182,31 @@ export function analyzeBundleSize() {
       images: monitor.getImageSize(),
       total: monitor.getTotalResourceSize(),
       largestResources: monitor.getLargestResources(5),
-      slowestResources: monitor.getSlowestResources(5)
+      slowestResources: monitor.getSlowestResources(5),
     }
-    
+
     if (process.env.NODE_ENV === 'development') {
       console.log('Bundle Analysis:', analysis)
     }
-    
+
     monitor.destroy()
     return analysis
   }, 2000)
-  
+
   return null
 }
 
 // Performance report generator
 export function generatePerformanceReport(): string {
   const monitor = new PerformanceMonitor()
-  
+
   setTimeout(() => {
     const metrics = monitor.getMetrics()
     const bundleSize = monitor.getBundleSize()
     const cssSize = monitor.getCSSSize()
     const imageSize = monitor.getImageSize()
     const totalSize = monitor.getTotalResourceSize()
-    
+
     const report = `
 Performance Report
 ==================
@@ -221,24 +226,26 @@ Resource Sizes:
 Memory Usage: ${metrics.memoryUsage?.toFixed(2) || 'N/A'}MB
 
 Largest Resources:
-${monitor.getLargestResources(3).map(r => 
-  `  - ${r.name.split('/').pop()}: ${(r.size / 1024).toFixed(2)}KB`
-).join('\n')}
+${monitor
+  .getLargestResources(3)
+  .map((r) => `  - ${r.name.split('/').pop()}: ${(r.size / 1024).toFixed(2)}KB`)
+  .join('\n')}
 
 Slowest Resources:
-${monitor.getSlowestResources(3).map(r => 
-  `  - ${r.name.split('/').pop()}: ${r.duration.toFixed(2)}ms`
-).join('\n')}
+${monitor
+  .getSlowestResources(3)
+  .map((r) => `  - ${r.name.split('/').pop()}: ${r.duration.toFixed(2)}ms`)
+  .join('\n')}
     `
-    
+
     monitor.destroy()
-    
+
     if (process.env.NODE_ENV === 'development') {
       console.log(report)
     }
-    
+
     return report
   }, 3000)
-  
+
   return ''
 }

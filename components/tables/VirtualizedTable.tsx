@@ -68,19 +68,13 @@ const VirtualRow = memo(function VirtualRow({
       {columns.map((column) => (
         <div
           key={column.key}
-          className={cn(
-            'px-4 py-2 truncate',
-            column.className
-          )}
+          className={cn('px-4 py-2 truncate', column.className)}
           style={{
             width: column.width || `${100 / columns.length}%`,
-            minWidth: column.width
+            minWidth: column.width,
           }}
         >
-          {column.render 
-            ? column.render(item)
-            : String((item as any)[column.key] || '')
-          }
+          {column.render ? column.render(item) : String((item as any)[column.key] || '')}
         </div>
       ))}
     </div>
@@ -108,11 +102,12 @@ export function VirtualizedTable<T = any>({
 }: VirtualizedTableProps<T>) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [scrollbarWidth, setScrollbarWidth] = useState(0)
-  
+
   // Calculate scrollbar width
   useEffect(() => {
     const scrollDiv = document.createElement('div')
-    scrollDiv.style.cssText = 'width: 100px; height: 100px; overflow: scroll; position: absolute; top: -9999px;'
+    scrollDiv.style.cssText =
+      'width: 100px; height: 100px; overflow: scroll; position: absolute; top: -9999px;'
     document.body.appendChild(scrollDiv)
     const scrollbarWidth = scrollDiv.offsetWidth - scrollDiv.clientWidth
     document.body.removeChild(scrollDiv)
@@ -134,9 +129,7 @@ export function VirtualizedTable<T = any>({
   // Calculate padding for virtual scrolling
   const paddingTop = virtualItems.length > 0 ? virtualItems[0]?.start || 0 : 0
   const paddingBottom =
-    virtualItems.length > 0
-      ? totalSize - (virtualItems[virtualItems.length - 1]?.end || 0)
-      : 0
+    virtualItems.length > 0 ? totalSize - (virtualItems[virtualItems.length - 1]?.end || 0) : 0
 
   // Loading state
   if (loading) {
@@ -162,7 +155,7 @@ export function VirtualizedTable<T = any>({
   return (
     <div className={cn('relative border rounded-lg', className)}>
       {/* Header */}
-      <div 
+      <div
         className={cn(
           'flex border-b bg-muted/30 font-medium',
           stickyHeader && 'sticky top-0 z-10',
@@ -176,7 +169,7 @@ export function VirtualizedTable<T = any>({
             className={cn('px-4 py-3 text-sm', column.className)}
             style={{
               width: column.width || `${100 / columns.length}%`,
-              minWidth: column.width
+              minWidth: column.width,
             }}
           >
             {column.header}
@@ -192,15 +185,11 @@ export function VirtualizedTable<T = any>({
           enableHorizontalScroll ? 'overflow-x-auto' : 'overflow-x-hidden'
         )}
         style={{
-          height: typeof containerHeight === 'number' 
-            ? `${containerHeight}px` 
-            : containerHeight,
+          height: typeof containerHeight === 'number' ? `${containerHeight}px` : containerHeight,
         }}
       >
         {/* Virtual spacer for top padding */}
-        {paddingTop > 0 && (
-          <div style={{ height: paddingTop }} />
-        )}
+        {paddingTop > 0 && <div style={{ height: paddingTop }} />}
 
         {/* Render only visible rows */}
         {virtualItems.map((virtualRow) => {
@@ -221,9 +210,7 @@ export function VirtualizedTable<T = any>({
         })}
 
         {/* Virtual spacer for bottom padding */}
-        {paddingBottom > 0 && (
-          <div style={{ height: paddingBottom }} />
-        )}
+        {paddingBottom > 0 && <div style={{ height: paddingBottom }} />}
       </div>
 
       {/* Row count indicator */}
@@ -232,7 +219,8 @@ export function VirtualizedTable<T = any>({
           Showing {virtualItems.length} of {data.length.toLocaleString()} rows
         </span>
         <span className="text-xs">
-          Rendered: {virtualItems[0]?.index ?? 0 + 1} - {(virtualItems[virtualItems.length - 1]?.index ?? 0) + 1}
+          Rendered: {virtualItems[0]?.index ?? 0 + 1} -{' '}
+          {(virtualItems[virtualItems.length - 1]?.index ?? 0) + 1}
         </span>
       </div>
     </div>
@@ -249,16 +237,16 @@ export { WindowedTable } from './WindowedTable'
 export type { VirtualizedTableColumn } from './types'
 
 // Performance monitoring component
-export function VirtualTablePerformance({ 
-  rowCount, 
-  visibleCount 
-}: { 
+export function VirtualTablePerformance({
+  rowCount,
+  visibleCount,
+}: {
   rowCount: number
-  visibleCount: number 
+  visibleCount: number
 }) {
   const efficiency = ((visibleCount / rowCount) * 100).toFixed(2)
   const memorySaved = ((1 - visibleCount / rowCount) * 100).toFixed(0)
-  
+
   return (
     <div className="flex items-center gap-4 text-xs text-muted-foreground">
       <span>Total: {rowCount.toLocaleString()}</span>
@@ -286,7 +274,7 @@ export function EnhancedVirtualizedTable<T = any>(
 
   // Filter and sort data
   let processedData = [...props.data]
-  
+
   // Apply search
   if (props.enableSearch && searchTerm) {
     processedData = processedData.filter((item) =>
@@ -301,7 +289,7 @@ export function EnhancedVirtualizedTable<T = any>(
     processedData.sort((a, b) => {
       const aValue = (a as any)[sortConfig.key]
       const bValue = (b as any)[sortConfig.key]
-      
+
       if (aValue < bValue) return sortConfig.direction === 'asc' ? -1 : 1
       if (aValue > bValue) return sortConfig.direction === 'asc' ? 1 : -1
       return 0
@@ -332,7 +320,9 @@ export function EnhancedVirtualizedTable<T = any>(
       {props.showPerformanceStats && (
         <VirtualTablePerformance
           rowCount={props.data.length}
-          visibleCount={Math.ceil((props.containerHeight as number || 600) / (props.rowHeight || 48))}
+          visibleCount={Math.ceil(
+            ((props.containerHeight as number) || 600) / (props.rowHeight || 48)
+          )}
         />
       )}
     </div>

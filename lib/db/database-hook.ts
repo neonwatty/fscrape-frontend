@@ -3,15 +3,15 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Database } from 'sql.js'
 import { initializeDatabase, isDatabaseInitialized, closeDatabase } from './sql-loader'
-import { 
-  DatabaseError, 
-  DatabaseErrorType, 
+import {
+  DatabaseError,
+  DatabaseErrorType,
   ErrorSeverity,
   classifyError,
   errorLogger,
   errorRecovery,
   safeExecuteQuery,
-  TransactionManager
+  TransactionManager,
 } from './error-handling'
 
 interface UseDatabaseOptions {
@@ -37,14 +37,14 @@ interface UseDatabaseReturn {
 }
 
 export function useDatabaseInitializer(options: UseDatabaseOptions = {}): UseDatabaseReturn {
-  const { 
-    autoLoad = false, 
+  const {
+    autoLoad = false,
     databasePath,
     enableErrorRecovery = true,
     maxRetries = 3,
-    retryDelay = 1000
+    retryDelay = 1000,
   } = options
-  
+
   const [database, setDatabase] = useState<Database | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
@@ -59,9 +59,10 @@ export function useDatabaseInitializer(options: UseDatabaseOptions = {}): UseDat
       errorType,
       err instanceof Error ? err.message : 'Database operation failed',
       {
-        severity: errorType === DatabaseErrorType.INITIALIZATION_ERROR 
-          ? ErrorSeverity.HIGH 
-          : ErrorSeverity.MEDIUM,
+        severity:
+          errorType === DatabaseErrorType.INITIALIZATION_ERROR
+            ? ErrorSeverity.HIGH
+            : ErrorSeverity.MEDIUM,
         originalError: err instanceof Error ? err : undefined,
         retryable: retryCount < maxRetries,
         recoverable: enableErrorRecovery,
@@ -69,13 +70,13 @@ export function useDatabaseInitializer(options: UseDatabaseOptions = {}): UseDat
           databasePath,
           retryCount,
           maxRetries,
-        }
+        },
       }
     )
-    
+
     // Log error
     errorLogger.log(dbError)
-    
+
     return dbError
   }
 
@@ -96,7 +97,7 @@ export function useDatabaseInitializer(options: UseDatabaseOptions = {}): UseDat
       const dbError = createDatabaseError(err, DatabaseErrorType.INITIALIZATION_ERROR)
       setError(dbError)
       setIsInitialized(false)
-      
+
       // Attempt automatic recovery if enabled
       if (enableErrorRecovery && dbError.recoverable) {
         const recovered = await errorRecovery.attemptRecovery(dbError)
@@ -120,14 +121,14 @@ export function useDatabaseInitializer(options: UseDatabaseOptions = {}): UseDat
         {
           severity: ErrorSeverity.HIGH,
           retryable: false,
-          context: { retryCount, maxRetries }
+          context: { retryCount, maxRetries },
         }
       )
       setError(dbError)
       return
     }
 
-    setRetryCount(prev => prev + 1)
+    setRetryCount((prev) => prev + 1)
     await loadDatabase(lastLoadPath)
   }, [retryCount, maxRetries, lastLoadPath])
 
@@ -137,7 +138,7 @@ export function useDatabaseInitializer(options: UseDatabaseOptions = {}): UseDat
       if (transaction?.isInTransaction()) {
         transaction.rollback().catch(console.error)
       }
-      
+
       closeDatabase()
       setDatabase(null)
       setTransaction(null)
@@ -151,24 +152,25 @@ export function useDatabaseInitializer(options: UseDatabaseOptions = {}): UseDat
     setError(null)
   }, [])
 
-  const executeQuery = useCallback(async (query: string, params?: any[]) => {
-    if (!database) {
-      throw new DatabaseError(
-        DatabaseErrorType.QUERY_ERROR,
-        'Database not initialized',
-        { severity: ErrorSeverity.HIGH }
-      )
-    }
+  const executeQuery = useCallback(
+    async (query: string, params?: any[]) => {
+      if (!database) {
+        throw new DatabaseError(DatabaseErrorType.QUERY_ERROR, 'Database not initialized', {
+          severity: ErrorSeverity.HIGH,
+        })
+      }
 
-    const result = await safeExecuteQuery(database, query, params)
-    
-    if (!result.success && result.error) {
-      setError(result.error)
-      throw result.error
-    }
-    
-    return result.data
-  }, [database])
+      const result = await safeExecuteQuery(database, query, params)
+
+      if (!result.success && result.error) {
+        setError(result.error)
+        throw result.error
+      }
+
+      return result.data
+    },
+    [database]
+  )
 
   const getErrorHistory = useCallback(() => {
     return errorLogger.getErrorHistory()

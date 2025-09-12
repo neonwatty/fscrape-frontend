@@ -44,10 +44,10 @@ export function SwipeActions({
   const [confirmingAction, setConfirmingAction] = useState<SwipeAction | null>(null)
   const [touchStart, setTouchStart] = useState({ x: 0, y: 0 })
   const [isSwiping, setIsSwiping] = useState(false)
-  
+
   const containerRef = useRef<HTMLDivElement>(null)
   const x = useMotionValue(0)
-  
+
   // Transform values for visual feedback
   const leftActionOpacity = useTransform(x, [0, threshold], [0, 1])
   const rightActionOpacity = useTransform(x, [-threshold, 0], [1, 0])
@@ -61,77 +61,87 @@ export function SwipeActions({
   }, [hapticFeedback])
 
   // Handle action execution
-  const executeAction = useCallback(async (action: SwipeAction) => {
-    if (action.confirmRequired && !confirmingAction) {
-      setConfirmingAction(action)
-      triggerHaptic()
-      return
-    }
-    
-    try {
-      await action.onClick()
-      triggerHaptic()
-    } catch (error) {
-      console.error('Action failed:', error)
-    } finally {
-      setActiveAction(null)
-      setConfirmingAction(null)
-      x.set(0)
-    }
-  }, [confirmingAction, x, triggerHaptic])
-
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    if (disabled) return
-    
-    const touch = e.touches[0]
-    setTouchStart({ x: touch.clientX, y: touch.clientY })
-    onSwipeStart?.()
-  }, [disabled, onSwipeStart])
-
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (disabled) return
-    
-    const touch = e.touches[0]
-    const deltaX = touch.clientX - touchStart.x
-    const deltaY = touch.clientY - touchStart.y
-    
-    // Only swipe horizontally if horizontal movement is greater than vertical
-    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
-      e.preventDefault()
-      setIsSwiping(true)
-      
-      // Apply resistance at the edges
-      const resistedX = deltaX > 0
-        ? Math.min(deltaX * (1 - deltaX / (maxSwipe * 2)), maxSwipe)
-        : Math.max(deltaX * (1 + deltaX / (maxSwipe * 2)), -maxSwipe)
-      
-      x.set(resistedX)
-      
-      // Determine active action based on swipe distance
-      if (resistedX > threshold && leftActions.length > 0) {
-        const actionIndex = Math.min(
-          Math.floor((resistedX - threshold) / 60),
-          leftActions.length - 1
-        )
-        setActiveAction(leftActions[actionIndex])
-      } else if (resistedX < -threshold && rightActions.length > 0) {
-        const actionIndex = Math.min(
-          Math.floor((Math.abs(resistedX) - threshold) / 60),
-          rightActions.length - 1
-        )
-        setActiveAction(rightActions[actionIndex])
-      } else {
-        setActiveAction(null)
+  const executeAction = useCallback(
+    async (action: SwipeAction) => {
+      if (action.confirmRequired && !confirmingAction) {
+        setConfirmingAction(action)
+        triggerHaptic()
+        return
       }
-    }
-  }, [disabled, touchStart, x, threshold, maxSwipe, leftActions, rightActions])
+
+      try {
+        await action.onClick()
+        triggerHaptic()
+      } catch (error) {
+        console.error('Action failed:', error)
+      } finally {
+        setActiveAction(null)
+        setConfirmingAction(null)
+        x.set(0)
+      }
+    },
+    [confirmingAction, x, triggerHaptic]
+  )
+
+  const handleTouchStart = useCallback(
+    (e: TouchEvent) => {
+      if (disabled) return
+
+      const touch = e.touches[0]
+      setTouchStart({ x: touch.clientX, y: touch.clientY })
+      onSwipeStart?.()
+    },
+    [disabled, onSwipeStart]
+  )
+
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (disabled) return
+
+      const touch = e.touches[0]
+      const deltaX = touch.clientX - touchStart.x
+      const deltaY = touch.clientY - touchStart.y
+
+      // Only swipe horizontally if horizontal movement is greater than vertical
+      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+        e.preventDefault()
+        setIsSwiping(true)
+
+        // Apply resistance at the edges
+        const resistedX =
+          deltaX > 0
+            ? Math.min(deltaX * (1 - deltaX / (maxSwipe * 2)), maxSwipe)
+            : Math.max(deltaX * (1 + deltaX / (maxSwipe * 2)), -maxSwipe)
+
+        x.set(resistedX)
+
+        // Determine active action based on swipe distance
+        if (resistedX > threshold && leftActions.length > 0) {
+          const actionIndex = Math.min(
+            Math.floor((resistedX - threshold) / 60),
+            leftActions.length - 1
+          )
+          setActiveAction(leftActions[actionIndex])
+        } else if (resistedX < -threshold && rightActions.length > 0) {
+          const actionIndex = Math.min(
+            Math.floor((Math.abs(resistedX) - threshold) / 60),
+            rightActions.length - 1
+          )
+          setActiveAction(rightActions[actionIndex])
+        } else {
+          setActiveAction(null)
+        }
+      }
+    },
+    [disabled, touchStart, x, threshold, maxSwipe, leftActions, rightActions]
+  )
 
   const handleTouchEnd = useCallback(() => {
     if (!isSwiping) return
-    
+
     setIsSwiping(false)
     onSwipeEnd?.()
-    
+
     if (activeAction) {
       executeAction(activeAction)
     } else {
@@ -144,12 +154,12 @@ export function SwipeActions({
   useEffect(() => {
     const element = containerRef.current
     if (!element) return
-    
+
     element.addEventListener('touchstart', handleTouchStart, { passive: true })
     element.addEventListener('touchmove', handleTouchMove, { passive: false })
     element.addEventListener('touchend', handleTouchEnd, { passive: true })
     element.addEventListener('touchcancel', handleTouchEnd, { passive: true })
-    
+
     return () => {
       element.removeEventListener('touchstart', handleTouchStart)
       element.removeEventListener('touchmove', handleTouchMove)
@@ -160,11 +170,16 @@ export function SwipeActions({
 
   const getActionColor = (color?: string) => {
     switch (color) {
-      case 'primary': return 'bg-primary text-primary-foreground'
-      case 'destructive': return 'bg-destructive text-destructive-foreground'
-      case 'success': return 'bg-green-500 text-white'
-      case 'warning': return 'bg-yellow-500 text-white'
-      default: return 'bg-secondary text-secondary-foreground'
+      case 'primary':
+        return 'bg-primary text-primary-foreground'
+      case 'destructive':
+        return 'bg-destructive text-destructive-foreground'
+      case 'success':
+        return 'bg-green-500 text-white'
+      case 'warning':
+        return 'bg-yellow-500 text-white'
+      default:
+        return 'bg-secondary text-secondary-foreground'
     }
   }
 
@@ -234,7 +249,8 @@ export function SwipeActions({
           >
             <div className="flex flex-col items-center gap-4 p-6 bg-card rounded-lg shadow-lg">
               <p className="text-sm text-center">
-                {confirmingAction.confirmText || `Are you sure you want to ${confirmingAction.label}?`}
+                {confirmingAction.confirmText ||
+                  `Are you sure you want to ${confirmingAction.label}?`}
               </p>
               <div className="flex gap-2">
                 <button
@@ -277,7 +293,7 @@ export const SwipeActionPresets = {
     confirmRequired: true,
     confirmText: 'Are you sure you want to delete this item?',
   }),
-  
+
   archive: (onClick: () => void): SwipeAction => ({
     id: 'archive',
     label: 'Archive',
@@ -285,7 +301,7 @@ export const SwipeActionPresets = {
     color: 'default',
     onClick,
   }),
-  
+
   favorite: (onClick: () => void): SwipeAction => ({
     id: 'favorite',
     label: 'Favorite',
@@ -293,7 +309,7 @@ export const SwipeActionPresets = {
     color: 'warning',
     onClick,
   }),
-  
+
   more: (onClick: () => void): SwipeAction => ({
     id: 'more',
     label: 'More',
@@ -321,25 +337,21 @@ export function SwipeableListItem({
 }: SwipeableListItemProps) {
   const leftActions: SwipeAction[] = []
   const rightActions: SwipeAction[] = []
-  
+
   if (onFavorite) {
     leftActions.push(SwipeActionPresets.favorite(onFavorite))
   }
-  
+
   if (onArchive) {
     rightActions.push(SwipeActionPresets.archive(onArchive))
   }
-  
+
   if (onDelete) {
     rightActions.push(SwipeActionPresets.delete(onDelete))
   }
-  
+
   return (
-    <SwipeActions
-      leftActions={leftActions}
-      rightActions={rightActions}
-      className={className}
-    >
+    <SwipeActions leftActions={leftActions} rightActions={rightActions} className={className}>
       {children}
     </SwipeActions>
   )

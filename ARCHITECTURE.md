@@ -65,11 +65,11 @@ graph TD
     C --> D[Database Layer]
     D --> E[SQL.js]
     E --> F[IndexedDB Storage]
-    
+
     B --> G[API Layer]
     G --> H[Service Worker]
     H --> I[Cache Storage]
-    
+
     J[Static Assets] --> K[CDN/GitHub Pages]
     K --> H
 ```
@@ -92,12 +92,12 @@ components/
 ```typescript
 // Context + Hooks Pattern
 const useDatabase = () => {
-  const [db, setDb] = useState<Database | null>(null);
-  const [loading, setLoading] = useState(true);
-  
+  const [db, setDb] = useState<Database | null>(null)
+  const [loading, setLoading] = useState(true)
+
   // Database initialization and management
-  return { db, loading, error };
-};
+  return { db, loading, error }
+}
 ```
 
 ### 3. Data Fetching
@@ -135,7 +135,7 @@ const CACHE_STRATEGIES = {
   CACHE_FIRST: [images, fonts, styles],
   NETWORK_FIRST: [api, json],
   STALE_WHILE_REVALIDATE: [js, static],
-};
+}
 ```
 
 ### Virtualization
@@ -151,21 +151,21 @@ const CACHE_STRATEGIES = {
 ```typescript
 interface DatabaseSchema {
   posts: {
-    id: number;
-    title: string;
-    content: string;
-    author: string;
-    created_at: string;
+    id: number
+    title: string
+    content: string
+    author: string
+    created_at: string
     // ...
-  };
-  
+  }
+
   analytics: {
-    id: number;
-    metric: string;
-    value: number;
-    timestamp: string;
+    id: number
+    metric: string
+    value: number
+    timestamp: string
     // ...
-  };
+  }
 }
 ```
 
@@ -186,7 +186,7 @@ const securityHeaders = {
   'X-Frame-Options': 'DENY',
   'X-Content-Type-Options': 'nosniff',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
-};
+}
 ```
 
 ### Data Protection
@@ -203,9 +203,7 @@ const securityHeaders = {
 ```css
 /* CSS Variables for Theming */
 :root {
-  --primary: theme colors
-  --background: adaptive colors
-  --foreground: text colors
+  --primary: theme colors --background: adaptive colors --foreground: text colors;
 }
 ```
 
@@ -229,9 +227,9 @@ const securityHeaders = {
 
 ```javascript
 // Lifecycle Management
-self.addEventListener('install', precache);
-self.addEventListener('activate', cleanup);
-self.addEventListener('fetch', handleRequest);
+self.addEventListener('install', precache)
+self.addEventListener('activate', cleanup)
+self.addEventListener('fetch', handleRequest)
 ```
 
 ### Web App Manifest
@@ -271,16 +269,16 @@ self.addEventListener('fetch', handleRequest);
 ```typescript
 // Unit Test Example
 describe('Component', () => {
-  it('should render', () => {});
-  it('should handle interaction', () => {});
-});
+  it('should render', () => {})
+  it('should handle interaction', () => {})
+})
 
 // E2E Test Example
 test('user flow', async ({ page }) => {
-  await page.goto('/');
-  await page.click('button');
-  await expect(page).toHaveURL('/dashboard');
-});
+  await page.goto('/')
+  await page.click('button')
+  await expect(page).toHaveURL('/dashboard')
+})
 ```
 
 ## 🚢 Deployment Architecture
@@ -312,7 +310,7 @@ build:
 // Web Vitals Tracking
 export function reportWebVitals(metric) {
   // Send to analytics
-  console.log(metric);
+  console.log(metric)
 }
 ```
 

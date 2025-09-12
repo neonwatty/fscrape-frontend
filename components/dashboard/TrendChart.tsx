@@ -1,21 +1,53 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { TimeSeriesChart } from '@/components/charts/TimeSeriesChart'
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from 'recharts'
 import { useDatabase } from '@/lib/db/database-context'
 import { getPostsTimeSeries, getPostsByHour, getPlatformStats, getPosts } from '@/lib/db/queries'
 import { Calendar, Clock, TrendingUp, BarChart3, Activity } from 'lucide-react'
 import { formatLargeNumber } from '@/lib/utils/formatters'
 
+interface ChartDataPoint {
+  date: string
+  fullDate: string
+  posts: number
+  avgScore: number
+  avgComments: number
+  value: number // Added for TimeSeriesChart compatibility
+  [key: string]: string | number // Index signature for TimeSeriesDataPoint compatibility
+}
+
+interface HourlyDataPoint {
+  hour: string
+  hourNum: number
+  posts: number
+  avgScore: number
+}
+
 interface PlatformData {
-  reddit: any[]
-  hackernews: any[]
-  all: any[]
+  reddit: ChartDataPoint[]
+  hackernews: ChartDataPoint[]
+  all: ChartDataPoint[]
 }
 
 export function TrendChart() {
@@ -23,70 +55,76 @@ export function TrendChart() {
   const [timeSeriesData, setTimeSeriesData] = useState<PlatformData>({
     reddit: [],
     hackernews: [],
-    all: []
+    all: [],
   })
-  const [hourlyData, setHourlyData] = useState<any[]>([])
+  const [hourlyData, setHourlyData] = useState<HourlyDataPoint[]>([])
   const [activeTab, setActiveTab] = useState('daily')
   const [selectedPlatform, setSelectedPlatform] = useState<'all' | 'reddit' | 'hackernews'>('all')
   const [timeRange, setTimeRange] = useState<7 | 14 | 30 | 60>(30)
   const [platforms, setPlatforms] = useState<string[]>([])
   const [_loading, setLoading] = useState(false)
-  const [_zoomRange, setZoomRange] = useState<{ start: number, end: number } | null>(null)
+  const [_zoomRange, setZoomRange] = useState<{ start: number; end: number } | null>(null)
 
   // Fetch data based on filters
-  const fetchData = () => {
+  const fetchData = useCallback(() => {
     if (!isInitialized) return
-    
+
     setLoading(true)
     try {
       // Get available platforms
       const platformStats = getPlatformStats()
-      const availablePlatforms = platformStats.map(p => p.platform.toLowerCase())
+      const availablePlatforms = platformStats.map((p) => p.platform.toLowerCase())
       setPlatforms(availablePlatforms)
 
       // Get time series data for all platforms
       const tsData = getPostsTimeSeries(timeRange)
-      
+
       // Process data for each platform
       const platformTimeSeriesData: PlatformData = {
         all: [],
         reddit: [],
-        hackernews: []
+        hackernews: [],
       }
 
       // Get data for each platform separately
       const allDates = new Set<string>()
-      
+
       // Fetch platform-specific data
-      availablePlatforms.forEach(platform => {
+      availablePlatforms.forEach((platform) => {
         const platformPosts = getPosts({
           platform,
           dateFrom: new Date(Date.now() - timeRange * 24 * 60 * 60 * 1000),
-          limit: 10000
+          limit: 10000,
         })
-        
+
         // Group by date
-        const dateGroups = platformPosts.reduce((acc, post) => {
-          const date = new Date(post.created_utc * 1000).toISOString().split('T')[0]
-          allDates.add(date)
-          if (!acc[date]) {
-            acc[date] = { count: 0, totalScore: 0, totalComments: 0 }
-          }
-          acc[date].count++
-          acc[date].totalScore += post.score
-          acc[date].totalComments += post.num_comments
-          return acc
-        }, {} as Record<string, { count: number, totalScore: number, totalComments: number }>)
-        
+        const dateGroups = platformPosts.reduce(
+          (acc, post) => {
+            const date = new Date(post.created_utc * 1000).toISOString().split('T')[0]
+            allDates.add(date)
+            if (!acc[date]) {
+              acc[date] = { count: 0, totalScore: 0, totalComments: 0 }
+            }
+            acc[date].count++
+            acc[date].totalScore += post.score
+            acc[date].totalComments += post.num_comments
+            return acc
+          },
+          {} as Record<string, { count: number; totalScore: number; totalComments: number }>
+        )
+
         // Convert to array format
-        const platformData = Object.entries(dateGroups).map(([date, data]) => ({
-          date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          fullDate: date,
-          posts: data.count,
-          avgScore: Math.round(data.totalScore / data.count),
-          avgComments: Math.round(data.totalComments / data.count)
-        })).sort((a, b) => a.fullDate.localeCompare(b.fullDate))
-        
+        const platformData = Object.entries(dateGroups)
+          .map(([date, data]) => ({
+            date: new Date(date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+            fullDate: date,
+            posts: data.count,
+            avgScore: Math.round(data.totalScore / data.count),
+            avgComments: Math.round(data.totalComments / data.count),
+            value: data.count, // Add value for TimeSeriesChart compatibility
+          }))
+          .sort((a, b) => a.fullDate.localeCompare(b.fullDate))
+
         if (platform === 'reddit') {
           platformTimeSeriesData.reddit = platformData
         } else if (platform === 'hackernews') {
@@ -95,54 +133,64 @@ export function TrendChart() {
       })
 
       // Combine all platform data
-      const allData = tsData.map(item => ({
-        date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        fullDate: item.date,
-        posts: item.count,
-        avgScore: Math.round(item.avgScore || 0),
-        avgComments: Math.round(item.avgComments || 0)
-      })).sort((a, b) => a.fullDate.localeCompare(b.fullDate))
+      const allData = tsData
+        .map((item) => ({
+          date: new Date(item.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          fullDate: item.date,
+          posts: item.count,
+          avgScore: Math.round(item.avgScore || 0),
+          avgComments: Math.round(item.avgComments || 0),
+          value: item.count, // Add value for TimeSeriesChart compatibility
+        }))
+        .sort((a, b) => a.fullDate.localeCompare(b.fullDate))
 
       platformTimeSeriesData.all = allData
       setTimeSeriesData(platformTimeSeriesData)
 
       // Get hourly distribution
       const hourData = getPostsByHour(7)
-      const formattedHourData = hourData.map(item => ({
+      const formattedHourData = hourData.map((item) => ({
         hour: `${item.hour}:00`,
         hourNum: item.hour,
         posts: item.count,
-        avgScore: Math.round(item.avgScore || 0)
+        avgScore: Math.round(item.avgScore || 0),
       }))
       setHourlyData(formattedHourData)
     } finally {
       setLoading(false)
     }
-  }
+  }, [isInitialized, timeRange])
 
   useEffect(() => {
     fetchData()
-  }, [isInitialized, timeRange])
+  }, [isInitialized, timeRange, fetchData])
 
   const handleZoom = (startIndex: number, endIndex: number) => {
     setZoomRange({ start: startIndex, end: endIndex })
   }
 
-  const CustomTooltip = ({ active, payload, label }: any) => {
+  const CustomTooltip = ({
+    active,
+    payload,
+    label,
+  }: {
+    active?: boolean
+    payload?: Array<{ name: string; value: string | number; color?: string; fill?: string }>
+    label?: string
+  }) => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-background border rounded-lg shadow-lg p-3">
           <p className="font-medium text-sm mb-2">{label}</p>
-          {payload.map((entry: any, index: number) => (
+          {payload?.map((entry, index) => (
             <div key={index} className="flex items-center justify-between gap-3 text-sm">
               <div className="flex items-center gap-1">
-                <div 
-                  className="w-2 h-2 rounded-full" 
-                  style={{ backgroundColor: entry.color }}
-                />
+                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
                 <span className="text-muted-foreground">{entry.name}:</span>
               </div>
-              <span className="font-medium">{formatLargeNumber(entry.value)}</span>
+              <span className="font-medium">
+                {formatLargeNumber(typeof entry.value === 'number' ? entry.value : 0)}
+              </span>
             </div>
           ))}
         </div>
@@ -179,7 +227,10 @@ export function TrendChart() {
           </div>
           <div className="flex items-center gap-2">
             {/* Time range selector */}
-            <Select value={timeRange.toString()} onValueChange={(v) => setTimeRange(Number(v) as any)}>
+            <Select
+              value={timeRange.toString()}
+              onValueChange={(v) => setTimeRange(Number(v) as 7 | 14 | 30 | 60)}
+            >
               <SelectTrigger className="w-[120px]">
                 <SelectValue />
               </SelectTrigger>
@@ -190,9 +241,12 @@ export function TrendChart() {
                 <SelectItem value="60">60 days</SelectItem>
               </SelectContent>
             </Select>
-            
+
             {/* Platform filter */}
-            <Select value={selectedPlatform} onValueChange={(v: any) => setSelectedPlatform(v)}>
+            <Select
+              value={selectedPlatform}
+              onValueChange={(v) => setSelectedPlatform(v as 'all' | 'reddit' | 'hackernews')}
+            >
               <SelectTrigger className="w-[140px]">
                 <SelectValue />
               </SelectTrigger>
@@ -231,12 +285,14 @@ export function TrendChart() {
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-medium">Posts Over Time</h4>
                 <div className="flex gap-2">
-                  {platforms.map(platform => (
+                  {platforms.map((platform) => (
                     <Badge
                       key={platform}
                       variant={selectedPlatform === platform ? 'default' : 'outline'}
                       className="cursor-pointer"
-                      onClick={() => setSelectedPlatform(platform as any)}
+                      onClick={() =>
+                        setSelectedPlatform(platform as 'all' | 'reddit' | 'hackernews')
+                      }
                     >
                       {platform}
                     </Badge>
@@ -246,13 +302,13 @@ export function TrendChart() {
               <TimeSeriesChart
                 data={currentData}
                 lines={[
-                  { 
-                    dataKey: 'posts', 
-                    name: 'Posts', 
+                  {
+                    dataKey: 'posts',
+                    name: 'Posts',
                     color: getPlatformColor(selectedPlatform),
                     strokeWidth: 2,
-                    dot: false
-                  }
+                    dot: false,
+                  },
                 ]}
                 chartType="area"
                 height={400}
@@ -267,8 +323,8 @@ export function TrendChart() {
                     startColor: getPlatformColor(selectedPlatform),
                     endColor: getPlatformColor(selectedPlatform),
                     startOpacity: 0.8,
-                    endOpacity: 0
-                  }
+                    endOpacity: 0,
+                  },
                 ]}
               />
             </div>
@@ -280,25 +336,21 @@ export function TrendChart() {
               <ResponsiveContainer width="100%" height={400}>
                 <BarChart data={hourlyData}>
                   <CartesianGrid strokeDasharray="3 3" className="stroke-muted" opacity={0.3} />
-                  <XAxis 
-                    dataKey="hour" 
+                  <XAxis
+                    dataKey="hour"
                     className="text-xs"
                     tick={{ fill: 'currentColor', fontSize: 11 }}
                   />
-                  <YAxis 
+                  <YAxis
                     className="text-xs"
                     tick={{ fill: 'currentColor', fontSize: 11 }}
                     tickFormatter={(value) => formatLargeNumber(value)}
                   />
                   <Tooltip content={<CustomTooltip />} />
-                  <Bar 
-                    dataKey="posts" 
-                    name="Posts"
-                    radius={[4, 4, 0, 0]}
-                  >
+                  <Bar dataKey="posts" name="Posts" radius={[4, 4, 0, 0]}>
                     {hourlyData.map((entry, index) => (
-                      <Cell 
-                        key={`cell-${index}`} 
+                      <Cell
+                        key={`cell-${index}`}
                         fill={entry.hourNum >= 9 && entry.hourNum <= 17 ? '#22c55e' : '#3b82f6'}
                       />
                     ))}
@@ -317,20 +369,20 @@ export function TrendChart() {
               <TimeSeriesChart
                 data={currentData}
                 lines={[
-                  { 
-                    dataKey: 'avgScore', 
-                    name: 'Avg Score', 
+                  {
+                    dataKey: 'avgScore',
+                    name: 'Avg Score',
                     color: '#ff7300',
                     strokeWidth: 2,
-                    dot: false
+                    dot: false,
                   },
-                  { 
-                    dataKey: 'avgComments', 
-                    name: 'Avg Comments', 
+                  {
+                    dataKey: 'avgComments',
+                    name: 'Avg Comments',
                     color: '#387908',
                     strokeWidth: 2,
-                    dot: false
-                  }
+                    dot: false,
+                  },
                 ]}
                 chartType="line"
                 height={400}
@@ -347,14 +399,14 @@ export function TrendChart() {
               <TimeSeriesChart
                 data={timeSeriesData.all}
                 lines={[
-                  { 
-                    dataKey: 'posts', 
-                    name: 'All Platforms', 
+                  {
+                    dataKey: 'posts',
+                    name: 'All Platforms',
                     color: '#8884d8',
                     strokeWidth: 2,
                     type: 'monotone',
-                    dot: false
-                  }
+                    dot: false,
+                  },
                 ]}
                 chartType="line"
                 height={400}
@@ -363,23 +415,27 @@ export function TrendChart() {
                 customTooltip={CustomTooltip}
                 referenceLines={[
                   {
-                    y: Math.max(...(timeSeriesData.all.map(d => d.posts) || [0])) * 0.8,
+                    y: Math.max(...(timeSeriesData.all.map((d) => d.posts) || [0])) * 0.8,
                     label: '80% Peak',
-                    color: '#666'
-                  }
+                    color: '#666',
+                  },
                 ]}
               />
               <div className="grid grid-cols-2 gap-4 mt-4">
-                {platforms.map(platform => {
-                  const platformData = platform === 'reddit' ? timeSeriesData.reddit : timeSeriesData.hackernews
+                {platforms.map((platform) => {
+                  const platformData =
+                    platform === 'reddit' ? timeSeriesData.reddit : timeSeriesData.hackernews
                   const totalPosts = platformData.reduce((sum, d) => sum + d.posts, 0)
                   const avgPosts = platformData.length > 0 ? totalPosts / platformData.length : 0
-                  
+
                   return (
                     <div key={platform} className="p-4 border rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium capitalize">{platform}</span>
-                        <Badge variant="outline" style={{ backgroundColor: getPlatformColor(platform) + '20' }}>
+                        <Badge
+                          variant="outline"
+                          style={{ backgroundColor: getPlatformColor(platform) + '20' }}
+                        >
                           {formatLargeNumber(totalPosts)} posts
                         </Badge>
                       </div>

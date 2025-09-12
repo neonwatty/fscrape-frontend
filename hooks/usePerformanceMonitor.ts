@@ -24,9 +24,9 @@ export function usePerformanceMonitor(componentName: string) {
     renderTime: 0,
     updateCount: 0,
     lastUpdateTime: 0,
-    averageUpdateTime: 0
+    averageUpdateTime: 0,
   })
-  
+
   const [webVitals, setWebVitals] = useState<WebVitalsData>({})
   const renderStartTime = useRef<number>(0)
   const updateTimes = useRef<number[]>([])
@@ -34,11 +34,11 @@ export function usePerformanceMonitor(componentName: string) {
 
   useEffect(() => {
     renderStartTime.current = performance.now()
-    
+
     // Initialize performance monitor
     if (typeof window !== 'undefined') {
       monitorRef.current = new PerformanceMonitor()
-      
+
       // Collect web vitals
       collectWebVitals((metrics) => {
         setWebVitals({
@@ -46,11 +46,11 @@ export function usePerformanceMonitor(componentName: string) {
           fcp: metrics.fcp,
           lcp: metrics.lcp,
           fid: metrics.fid,
-          cls: metrics.cls
+          cls: metrics.cls,
         })
       })
     }
-    
+
     return () => {
       if (monitorRef.current) {
         monitorRef.current.destroy()
@@ -61,35 +61,36 @@ export function usePerformanceMonitor(componentName: string) {
   useEffect(() => {
     const renderEndTime = performance.now()
     const renderTime = renderEndTime - renderStartTime.current
-    
+
     updateTimes.current.push(renderTime)
-    
+
     // Keep only last 10 measurements
     if (updateTimes.current.length > 10) {
       updateTimes.current.shift()
     }
-    
-    const averageUpdateTime = updateTimes.current.reduce((a, b) => a + b, 0) / updateTimes.current.length
-    
+
+    const averageUpdateTime =
+      updateTimes.current.reduce((a, b) => a + b, 0) / updateTimes.current.length
+
     // Get memory usage if available
     let memoryUsage: number | undefined
     if ('memory' in performance) {
       memoryUsage = (performance as any).memory.usedJSHeapSize / 1048576
     }
-    
-    setPerformanceData(prev => ({
+
+    setPerformanceData((prev) => ({
       renderTime: prev.updateCount === 0 ? renderTime : prev.renderTime,
       updateCount: prev.updateCount + 1,
       lastUpdateTime: renderTime,
       averageUpdateTime,
-      memoryUsage
+      memoryUsage,
     }))
-    
+
     // Log performance in development
     if (process.env.NODE_ENV === 'development' && renderTime > 16) {
       console.warn(`[${componentName}] Slow render detected: ${renderTime.toFixed(2)}ms`)
     }
-    
+
     renderStartTime.current = performance.now()
   })
 
@@ -97,14 +98,14 @@ export function usePerformanceMonitor(componentName: string) {
     console.log(`[${componentName}] Performance Data:`, {
       ...performanceData,
       webVitals,
-      bundleSize: monitorRef.current?.getBundleSize()
+      bundleSize: monitorRef.current?.getBundleSize(),
     })
   }, [componentName, performanceData, webVitals])
 
   return {
     performanceData,
     webVitals,
-    logPerformance
+    logPerformance,
   }
 }
 
@@ -120,34 +121,29 @@ export function useRenderMonitor(componentName: string, threshold: number = 16) 
   useEffect(() => {
     const renderTime = performance.now() - renderStartTime.current
     renderCount.current++
-    
+
     if (renderTime > threshold) {
       console.warn(
         `[${componentName}] Slow render #${renderCount.current}: ${renderTime.toFixed(2)}ms`
       )
     }
-    
+
     if (process.env.NODE_ENV === 'development') {
       // Track unnecessary re-renders
       if (renderCount.current > 10) {
-        console.warn(
-          `[${componentName}] High render count: ${renderCount.current} renders`
-        )
+        console.warn(`[${componentName}] High render count: ${renderCount.current} renders`)
       }
     }
   })
-  
+
   return {
     renderCount: renderCount.current,
-    lastRenderTime: performance.now() - renderStartTime.current
+    lastRenderTime: performance.now() - renderStartTime.current,
   }
 }
 
 // Hook for lazy loading with performance tracking
-export function useLazyLoadWithTracking<T>(
-  importFn: () => Promise<T>,
-  componentName: string
-) {
+export function useLazyLoadWithTracking<T>(importFn: () => Promise<T>, componentName: string) {
   const [module, setModule] = useState<T | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<Error | null>(null)
@@ -155,18 +151,18 @@ export function useLazyLoadWithTracking<T>(
 
   const load = useCallback(async () => {
     if (module || loading) return
-    
+
     setLoading(true)
     loadStartTime.current = performance.now()
-    
+
     try {
       const imported = await importFn()
       const loadTime = performance.now() - loadStartTime.current
-      
+
       if (process.env.NODE_ENV === 'development') {
         console.log(`[${componentName}] Lazy loaded in ${loadTime.toFixed(2)}ms`)
       }
-      
+
       setModule(imported)
     } catch (err) {
       setError(err as Error)
@@ -189,25 +185,25 @@ export function useLazyLoadWithTracking<T>(
 // Hook for monitoring component mount/unmount performance
 export function useMountMonitor(componentName: string) {
   const mountTime = useRef<number>(0)
-  
+
   useEffect(() => {
     mountTime.current = performance.now()
-    
+
     if (process.env.NODE_ENV === 'development') {
       console.log(`[${componentName}] Mounted`)
     }
-    
+
     return () => {
       const lifetime = performance.now() - mountTime.current
-      
+
       if (process.env.NODE_ENV === 'development') {
         console.log(`[${componentName}] Unmounted after ${lifetime.toFixed(2)}ms`)
       }
     }
   }, [componentName])
-  
+
   return {
     mountTime: mountTime.current,
-    lifetime: performance.now() - mountTime.current
+    lifetime: performance.now() - mountTime.current,
   }
 }

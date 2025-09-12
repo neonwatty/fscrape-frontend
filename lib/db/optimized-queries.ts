@@ -35,7 +35,7 @@ export class OptimizedPostQuery {
   public sql: string = ''
   public params: unknown[] = []
   private indexes: Set<string> = new Set()
-  
+
   constructor(private filters: PostFilters = {}) {
     this.buildBaseQuery()
   }
@@ -124,10 +124,10 @@ export class OptimizedPostQuery {
   applySorting(orderBy: string = 'created_utc', direction: 'ASC' | 'DESC' = 'DESC'): this {
     const validColumns = ['created_utc', 'score', 'num_comments', 'author', 'title']
     const column = validColumns.includes(orderBy) ? orderBy : 'created_utc'
-    
+
     this.sql += ` ORDER BY ${column} ${direction}`
     this.indexes.add(`idx_${column}`)
-    
+
     return this
   }
 
@@ -135,10 +135,10 @@ export class OptimizedPostQuery {
   applyPagination(page: number = 1, pageSize: number = 50): this {
     const limit = Math.min(pageSize, 1000) // Max 1000 records per page
     const offset = (page - 1) * limit
-    
+
     this.sql += ` LIMIT ? OFFSET ?`
     this.params.push(limit, offset)
-    
+
     return this
   }
 
@@ -174,35 +174,29 @@ export function getOptimizedPosts(
     .applyFilters()
     .applySorting(orderBy, orderDirection)
     .applyPagination(page, pageSize)
-  
+
   // Execute main query
   const data = query.execute()
-  
+
   // Get total count (optimized with COUNT(*))
   const countQuery = new OptimizedPostQuery(filters).applyFilters()
-  const countSql = countQuery.sql.replace(
-    /SELECT.*?FROM/,
-    'SELECT COUNT(*) as count FROM'
-  )
+  const countSql = countQuery.sql.replace(/SELECT.*?FROM/, 'SELECT COUNT(*) as count FROM')
   const countResult = executeQueryFirst(countSql, countQuery.params) as { count: number }
   const total = countResult?.count || 0
-  
+
   return {
     data,
     total,
     page,
     pageSize,
-    hasMore: page * pageSize < total
+    hasMore: page * pageSize < total,
   }
 }
 
 /**
  * Get recent posts with limit (optimized for dashboard)
  */
-export function getRecentPostsOptimized(
-  limit: number = 10,
-  platform?: string
-): ForumPost[] {
+export function getRecentPostsOptimized(limit: number = 10, platform?: string): ForumPost[] {
   let sql = `
     SELECT 
       id, title, author, score, num_comments, 
@@ -210,16 +204,16 @@ export function getRecentPostsOptimized(
     FROM posts
   `
   const params: unknown[] = []
-  
+
   if (platform) {
     sql += ' WHERE platform = ?'
     params.push(platform)
   }
-  
+
   // Use index on created_utc for efficient sorting
   sql += ' ORDER BY created_utc DESC LIMIT ?'
   params.push(limit)
-  
+
   return executeQuery(sql, params) as ForumPost[]
 }
 
@@ -242,23 +236,23 @@ export function getTopAuthorsOptimized(
     WHERE author IS NOT NULL AND author != '[deleted]'
   `
   const params: unknown[] = []
-  
+
   // Apply filters
   if (filters.platform) {
     sql += ' AND platform = ?'
     params.push(filters.platform)
   }
-  
+
   if (filters.dateFrom) {
     sql += ' AND created_utc >= ?'
     params.push(Math.floor(filters.dateFrom.getTime() / 1000))
   }
-  
+
   if (filters.dateTo) {
     sql += ' AND created_utc <= ?'
     params.push(Math.floor(filters.dateTo.getTime() / 1000))
   }
-  
+
   // Group and order with index optimization
   sql += `
     GROUP BY author
@@ -267,7 +261,7 @@ export function getTopAuthorsOptimized(
     LIMIT ?
   `
   params.push(limit)
-  
+
   return executeQuery(sql, params) as AuthorStats[]
 }
 
@@ -289,7 +283,7 @@ export function getPlatformStatsOptimized(): PlatformStats[] {
     GROUP BY platform
     ORDER BY post_count DESC
   `
-  
+
   return executeQuery(sql) as PlatformStats[]
 }
 
@@ -305,9 +299,9 @@ export function getTimeSeriesOptimized(
     hour: 3600,
     day: 86400,
     week: 604800,
-    month: 2592000
+    month: 2592000,
   }[interval]
-  
+
   let sql = `
     SELECT 
       (created_utc / ?) * ? as time_bucket,
@@ -319,40 +313,40 @@ export function getTimeSeriesOptimized(
     WHERE 1=1
   `
   const params: unknown[] = [timeBucket, timeBucket]
-  
+
   // Apply filters
   if (filters.platform) {
     sql += ' AND platform = ?'
     params.push(filters.platform)
   }
-  
+
   if (filters.dateFrom) {
     sql += ' AND created_utc >= ?'
     params.push(Math.floor(filters.dateFrom.getTime() / 1000))
   }
-  
+
   if (filters.dateTo) {
     sql += ' AND created_utc <= ?'
     params.push(Math.floor(filters.dateTo.getTime() / 1000))
   }
-  
+
   sql += `
     GROUP BY time_bucket
     ORDER BY time_bucket ASC
   `
-  
+
   const results = executeQuery(sql, params) as Array<{
     time_bucket: number
     post_count: number
     avg_score: number
     total_comments: number
   }>
-  
-  return results.map(row => ({
+
+  return results.map((row) => ({
     date: new Date(row.time_bucket * 1000).toISOString(),
     count: row.post_count,
     avgScore: row.avg_score,
-    avgComments: row.total_comments / row.post_count
+    avgComments: row.total_comments / row.post_count,
   }))
 }
 
@@ -372,15 +366,15 @@ export function createOptimizedIndexes(): void {
     // Index for text search
     'CREATE INDEX IF NOT EXISTS idx_title ON posts(title)',
   ]
-  
-  indexes.forEach(sql => {
+
+  indexes.forEach((sql) => {
     try {
       executeQuery(sql)
     } catch (error) {
       console.warn(`Failed to create index: ${sql}`, error)
     }
   })
-  
+
   // Run ANALYZE to update statistics
   executeQuery('ANALYZE')
 }
@@ -396,16 +390,16 @@ export function batchInsertPosts(posts: ForumPost[], batchSize: number = 500): v
       platform, source, permalink
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `
-  
+
   // Process in batches to avoid memory issues
   for (let i = 0; i < posts.length; i += batchSize) {
     const batch = posts.slice(i, i + batchSize)
-    
+
     // Use transaction for batch insert
     executeQuery('BEGIN TRANSACTION')
-    
+
     try {
-      batch.forEach(post => {
+      batch.forEach((post) => {
         executeQuery(sql, [
           post.id,
           post.title,
@@ -417,10 +411,10 @@ export function batchInsertPosts(posts: ForumPost[], batchSize: number = 500): v
           post.url,
           post.platform,
           post.source,
-          post.permalink
+          post.permalink,
         ])
       })
-      
+
       executeQuery('COMMIT')
     } catch (error) {
       executeQuery('ROLLBACK')
@@ -432,24 +426,20 @@ export function batchInsertPosts(posts: ForumPost[], batchSize: number = 500): v
 /**
  * Query result caching for frequently accessed data
  */
-const queryCache = new Map<string, { data: any, timestamp: number }>()
+const queryCache = new Map<string, { data: any; timestamp: number }>()
 const CACHE_TTL = 60000 // 1 minute
 
-export function getCachedQuery<T>(
-  cacheKey: string,
-  queryFn: () => T,
-  ttl: number = CACHE_TTL
-): T {
+export function getCachedQuery<T>(cacheKey: string, queryFn: () => T, ttl: number = CACHE_TTL): T {
   const cached = queryCache.get(cacheKey)
   const now = Date.now()
-  
-  if (cached && (now - cached.timestamp) < ttl) {
+
+  if (cached && now - cached.timestamp < ttl) {
     return cached.data
   }
-  
+
   const data = queryFn()
   queryCache.set(cacheKey, { data, timestamp: now })
-  
+
   // Clean old cache entries
   if (queryCache.size > 100) {
     const oldestKey = queryCache.keys().next().value
@@ -457,6 +447,6 @@ export function getCachedQuery<T>(
       queryCache.delete(oldestKey)
     }
   }
-  
+
   return data
 }

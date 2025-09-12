@@ -5,6 +5,7 @@
 The following icons have been generated for the PWA:
 
 ### Standard Icons
+
 - icon-72.png (72x72)
 - icon-96.png (96x96)
 - icon-128.png (128x128)
@@ -15,10 +16,12 @@ The following icons have been generated for the PWA:
 - icon-512.png (512x512)
 
 ### Maskable Icons
+
 - icon-maskable-192.png (192x192) - For adaptive icons
 - icon-maskable-512.png (512x512) - For adaptive icons
 
 ### Special Icons
+
 - apple-touch-icon.png (180x180) - For iOS
 - favicon.png (32x32) - Browser favicon
 
@@ -27,7 +30,7 @@ The following icons have been generated for the PWA:
 - **Minimum Required**: 192x192 and 512x512
 - **Maskable Icons**: Include safe zone padding (10% on each side)
 - **Format**: PNG with transparency support
-- **Purpose**: 
+- **Purpose**:
   - "any": Standard icons
   - "maskable": Adaptive icons with safe zone
 

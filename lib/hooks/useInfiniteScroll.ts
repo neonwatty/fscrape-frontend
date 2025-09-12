@@ -5,37 +5,37 @@ export interface UseInfiniteScrollOptions {
    * Callback function triggered when the sentinel element is intersected
    */
   onLoadMore: () => void | Promise<void>
-  
+
   /**
    * Whether more data is available to load
    */
   hasMore: boolean
-  
+
   /**
    * Whether data is currently being loaded
    */
   isLoading?: boolean
-  
+
   /**
    * Root element for intersection (defaults to viewport)
    */
   root?: Element | null
-  
+
   /**
    * Margin around root element
    */
   rootMargin?: string
-  
+
   /**
    * Visibility threshold to trigger loading (0-1)
    */
   threshold?: number
-  
+
   /**
    * Enable/disable the infinite scroll
    */
   enabled?: boolean
-  
+
   /**
    * Delay before triggering load (ms)
    */
@@ -47,17 +47,17 @@ export interface UseInfiniteScrollReturn {
    * Ref to attach to the sentinel element
    */
   sentinelRef: React.RefObject<HTMLDivElement | null>
-  
+
   /**
    * Whether the intersection observer is active
    */
   isObserving: boolean
-  
+
   /**
    * Manually trigger a load
    */
   loadMore: () => void
-  
+
   /**
    * Reset the infinite scroll state
    */
@@ -106,7 +106,7 @@ export function useInfiniteScroll({
   const handleIntersection = useCallback(
     (entries: IntersectionObserverEntry[]) => {
       const [entry] = entries
-      
+
       if (entry.isIntersecting && hasMore && !isLoading && enabled) {
         // Clear any existing timeout
         if (loadTimeoutRef.current) {
@@ -180,17 +180,17 @@ export interface UsePaginatedDataOptions<T> {
    * Function to fetch data for a specific page
    */
   fetchData: (page: number, pageSize: number) => Promise<T[]>
-  
+
   /**
    * Initial page size
    */
   initialPageSize?: number
-  
+
   /**
    * Whether to enable infinite scroll
    */
   infiniteScroll?: boolean
-  
+
   /**
    * Root margin for intersection observer
    */
@@ -202,62 +202,62 @@ export interface UsePaginatedDataReturn<T> {
    * Current data array
    */
   data: T[]
-  
+
   /**
    * Current page number (0-indexed)
    */
   currentPage: number
-  
+
   /**
    * Current page size
    */
   pageSize: number
-  
+
   /**
    * Total number of items (if known)
    */
   totalItems?: number
-  
+
   /**
    * Whether data is being loaded
    */
   isLoading: boolean
-  
+
   /**
    * Whether there is more data to load
    */
   hasMore: boolean
-  
+
   /**
    * Error state
    */
   error: Error | null
-  
+
   /**
    * Load next page
    */
   loadNextPage: () => Promise<void>
-  
+
   /**
    * Load previous page
    */
   loadPreviousPage: () => Promise<void>
-  
+
   /**
    * Jump to specific page
    */
   goToPage: (page: number) => Promise<void>
-  
+
   /**
    * Change page size
    */
   setPageSize: (size: number) => void
-  
+
   /**
    * Reset pagination
    */
   reset: () => void
-  
+
   /**
    * Infinite scroll sentinel ref
    */
@@ -286,16 +286,16 @@ export function usePaginatedData<T>({
 
     try {
       const newData = await fetchData(currentPage + 1, pageSize)
-      
+
       if (infiniteScroll) {
         // Append data for infinite scroll
-        setData(prev => [...prev, ...newData])
+        setData((prev) => [...prev, ...newData])
       } else {
         // Replace data for pagination
         setData(newData)
       }
-      
-      setCurrentPage(prev => prev + 1)
+
+      setCurrentPage((prev) => prev + 1)
       setHasMore(newData.length === pageSize)
     } catch (err) {
       setError(err as Error)
@@ -313,7 +313,7 @@ export function usePaginatedData<T>({
     try {
       const newData = await fetchData(currentPage - 1, pageSize)
       setData(newData)
-      setCurrentPage(prev => prev - 1)
+      setCurrentPage((prev) => prev - 1)
     } catch (err) {
       setError(err as Error)
     } finally {
@@ -321,23 +321,26 @@ export function usePaginatedData<T>({
     }
   }, [currentPage, pageSize, fetchData, isLoading])
 
-  const goToPage = useCallback(async (page: number) => {
-    if (isLoading || page < 0) return
+  const goToPage = useCallback(
+    async (page: number) => {
+      if (isLoading || page < 0) return
 
-    setIsLoading(true)
-    setError(null)
+      setIsLoading(true)
+      setError(null)
 
-    try {
-      const newData = await fetchData(page, pageSize)
-      setData(newData)
-      setCurrentPage(page)
-      setHasMore(newData.length === pageSize)
-    } catch (err) {
-      setError(err as Error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [pageSize, fetchData, isLoading])
+      try {
+        const newData = await fetchData(page, pageSize)
+        setData(newData)
+        setCurrentPage(page)
+        setHasMore(newData.length === pageSize)
+      } catch (err) {
+        setError(err as Error)
+      } finally {
+        setIsLoading(false)
+      }
+    },
+    [pageSize, fetchData, isLoading]
+  )
 
   const reset = useCallback(() => {
     setData([])

@@ -9,12 +9,12 @@ const mockTimeSeriesData: TimeSeriesDataPoint[] = [
   { date: 'Jan 4', value: 180, posts: 180, avgScore: 70, avgComments: 20 },
   { date: 'Jan 5', value: 200, posts: 200, avgScore: 80, avgComments: 25 },
   { date: 'Jan 6', value: 160, posts: 160, avgScore: 65, avgComments: 18 },
-  { date: 'Jan 7', value: 140, posts: 140, avgScore: 58, avgComments: 14 }
+  { date: 'Jan 7', value: 140, posts: 140, avgScore: 58, avgComments: 14 },
 ]
 
 describe('TimeSeriesChart Data Validation', () => {
   it('should have valid data structure', () => {
-    mockTimeSeriesData.forEach(point => {
+    mockTimeSeriesData.forEach((point) => {
       expect(point).toHaveProperty('date')
       expect(point).toHaveProperty('value')
       expect(typeof point.date).toBe('string')
@@ -23,7 +23,7 @@ describe('TimeSeriesChart Data Validation', () => {
   })
 
   it('should have non-negative values', () => {
-    mockTimeSeriesData.forEach(point => {
+    mockTimeSeriesData.forEach((point) => {
       expect(point.value).toBeGreaterThanOrEqual(0)
       if (point.posts !== undefined) {
         expect(point.posts).toBeGreaterThanOrEqual(0)
@@ -38,7 +38,7 @@ describe('TimeSeriesChart Data Validation', () => {
   })
 
   it('should have sequential dates', () => {
-    const dates = mockTimeSeriesData.map(d => d.date)
+    const dates = mockTimeSeriesData.map((d) => d.date)
     expect(dates).toHaveLength(7)
     expect(dates[0]).toBe('Jan 1')
     expect(dates[dates.length - 1]).toBe('Jan 7')
@@ -50,7 +50,7 @@ describe('Zoom Functionality', () => {
     const startIndex = 2
     const endIndex = 5
     const zoomedData = mockTimeSeriesData.slice(startIndex, endIndex + 1)
-    
+
     expect(zoomedData).toHaveLength(4)
     expect(zoomedData[0].date).toBe('Jan 3')
     expect(zoomedData[zoomedData.length - 1].date).toBe('Jan 6')
@@ -60,11 +60,11 @@ describe('Zoom Functionality', () => {
     const startIndex = 1
     const endIndex = 4
     const zoomedData = mockTimeSeriesData.slice(startIndex, endIndex + 1)
-    
-    const values = zoomedData.map(d => d.value)
+
+    const values = zoomedData.map((d) => d.value)
     const minValue = Math.min(...values)
     const maxValue = Math.max(...values)
-    
+
     expect(minValue).toBe(120)
     expect(maxValue).toBe(200)
   })
@@ -80,14 +80,14 @@ describe('Zoom Functionality', () => {
 describe('Platform Filtering', () => {
   const platformData = {
     all: mockTimeSeriesData,
-    reddit: mockTimeSeriesData.map(d => ({ ...d, platform: 'reddit' })),
-    hackernews: mockTimeSeriesData.map(d => ({ ...d, platform: 'hackernews' }))
+    reddit: mockTimeSeriesData.map((d) => ({ ...d, platform: 'reddit' })),
+    hackernews: mockTimeSeriesData.map((d) => ({ ...d, platform: 'hackernews' })),
   }
 
   it('should filter data by platform', () => {
     const redditData = platformData.reddit
     expect(redditData).toHaveLength(7)
-    redditData.forEach(point => {
+    redditData.forEach((point) => {
       expect(point.platform).toBe('reddit')
     })
   })
@@ -107,7 +107,7 @@ describe('Chart Aggregations', () => {
   it('should calculate correct averages', () => {
     const totalPosts = mockTimeSeriesData.reduce((sum, d) => sum + (d.posts || 0), 0)
     const avgPosts = totalPosts / mockTimeSeriesData.length
-    
+
     expect(totalPosts).toBe(1050)
     expect(avgPosts).toBe(150)
   })
@@ -115,16 +115,16 @@ describe('Chart Aggregations', () => {
   it('should calculate engagement metrics', () => {
     const totalScore = mockTimeSeriesData.reduce((sum, d) => sum + (d.avgScore || 0), 0)
     const totalComments = mockTimeSeriesData.reduce((sum, d) => sum + (d.avgComments || 0), 0)
-    
+
     expect(totalScore).toBe(438)
     expect(totalComments).toBe(114)
   })
 
   it('should find peak values', () => {
-    const peakPost = mockTimeSeriesData.reduce((max, d) => 
+    const peakPost = mockTimeSeriesData.reduce((max, d) =>
       (d.posts || 0) > (max.posts || 0) ? d : max
     )
-    
+
     expect(peakPost.posts).toBe(200)
     expect(peakPost.date).toBe('Jan 5')
   })
@@ -137,7 +137,7 @@ describe('Time Range Selection', () => {
       value: Math.random() * 200,
       posts: Math.floor(Math.random() * 200),
       avgScore: Math.floor(Math.random() * 100),
-      avgComments: Math.floor(Math.random() * 30)
+      avgComments: Math.floor(Math.random() * 30),
     }))
   }
 

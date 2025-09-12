@@ -24,8 +24,8 @@ Visit [http://localhost:3000](http://localhost:3000) to see the app!
 
 ## 📸 Screenshots
 
-| Dashboard | Posts Explorer | Analytics |
-|-----------|---------------|-----------|
+| Dashboard                                 | Posts Explorer                    | Analytics                                 |
+| ----------------------------------------- | --------------------------------- | ----------------------------------------- |
 | ![Dashboard](./docs/images/dashboard.png) | ![Posts](./docs/images/posts.png) | ![Analytics](./docs/images/analytics.png) |
 
 ## 🚀 Features
@@ -88,6 +88,7 @@ Open [http://localhost:3000](http://localhost:3000) to view the application.
 ### Alternative Installation Methods
 
 #### Using npm with specific Node version
+
 ```bash
 # Using nvm (Node Version Manager)
 nvm use 18
@@ -95,12 +96,14 @@ npm install
 ```
 
 #### Clean Installation
+
 ```bash
 # Remove existing dependencies and reinstall
 npm run clean:deps
 ```
 
 #### CI/CD Installation
+
 ```bash
 # Installation for CI environments
 npm run ci:install
@@ -156,11 +159,12 @@ The application exposes the following API endpoints when running locally:
 - `POST /api/export` - Export data in various formats
 
 Example usage:
+
 ```javascript
 // Fetch posts with filters
 fetch('/api/posts?platform=reddit&limit=50')
-  .then(res => res.json())
-  .then(data => console.log(data));
+  .then((res) => res.json())
+  .then((data) => console.log(data))
 ```
 
 ## 🧪 Testing
@@ -225,16 +229,16 @@ npm run preview:static
 
 ## 📊 Scripts
 
-| Script | Description |
-|--------|-------------|
-| `dev` | Start development server |
-| `build` | Build for production |
-| `lint` | Run ESLint |
-| `type-check` | Run TypeScript type checking |
-| `format` | Format code with Prettier |
-| `test` | Run Vitest tests |
-| `test:e2e` | Run Playwright E2E tests |
-| `validate:export` | Validate static export |
+| Script            | Description                  |
+| ----------------- | ---------------------------- |
+| `dev`             | Start development server     |
+| `build`           | Build for production         |
+| `lint`            | Run ESLint                   |
+| `type-check`      | Run TypeScript type checking |
+| `format`          | Format code with Prettier    |
+| `test`            | Run Vitest tests             |
+| `test:e2e`        | Run Playwright E2E tests     |
+| `validate:export` | Validate static export       |
 
 ## 🚀 Deployment
 
@@ -326,15 +330,15 @@ module.exports = {
 
 ## 🌐 Browser Compatibility
 
-| Browser | Minimum Version | Notes |
-|---------|----------------|-------|
-| Chrome | 90+ | Full support |
-| Firefox | 88+ | Full support |
-| Safari | 14+ | Full support |
-| Edge | 90+ | Full support |
-| Opera | 76+ | Full support |
-| Mobile Chrome | 90+ | PWA supported |
-| Mobile Safari | 14+ | Limited PWA |
+| Browser       | Minimum Version | Notes         |
+| ------------- | --------------- | ------------- |
+| Chrome        | 90+             | Full support  |
+| Firefox       | 88+             | Full support  |
+| Safari        | 14+             | Full support  |
+| Edge          | 90+             | Full support  |
+| Opera         | 76+             | Full support  |
+| Mobile Chrome | 90+             | PWA supported |
+| Mobile Safari | 14+             | Limited PWA   |
 
 ## 🔐 Security
 
@@ -353,12 +357,14 @@ module.exports = {
 #### Installation Issues
 
 **Problem**: `npm install` fails with peer dependency errors
+
 ```bash
 # Solution: Use legacy peer deps flag
 npm install --legacy-peer-deps
 ```
 
 **Problem**: Node version mismatch
+
 ```bash
 # Solution: Use correct Node version
 nvm use 18
@@ -369,12 +375,14 @@ nvm install 18 && nvm use 18
 #### Build Issues
 
 **Problem**: Build fails with memory error
+
 ```bash
 # Solution: Increase Node memory limit
 NODE_OPTIONS="--max-old-space-size=4096" npm run build
 ```
 
 **Problem**: Static export validation fails
+
 ```bash
 # Solution: Check for dynamic routes and API calls
 npm run validate:export
@@ -383,6 +391,7 @@ npm run validate:export
 #### Runtime Issues
 
 **Problem**: Database not loading
+
 ```bash
 # Solution: Update database and verify path
 npm run db:update
@@ -390,6 +399,7 @@ npm run db:validate
 ```
 
 **Problem**: PWA not installing
+
 ```bash
 # Solution: Ensure HTTPS and valid manifest
 # Check DevTools > Application > Manifest
@@ -398,6 +408,7 @@ npm run db:validate
 #### Testing Issues
 
 **Problem**: E2E tests failing
+
 ```bash
 # Solution: Install Playwright dependencies
 npm run test:e2e:install

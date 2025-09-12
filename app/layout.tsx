@@ -10,13 +10,13 @@ import { InstallPrompt } from '@/components/pwa/InstallPrompt'
 import './globals.css'
 
 // Font loading with optimization
-const inter = Inter({ 
+const inter = Inter({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-inter',
 })
 
-const jetbrainsMono = JetBrains_Mono({ 
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
   display: 'swap',
   variable: '--font-mono',
@@ -25,9 +25,10 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: {
     default: 'fscrape - Forum Data Analytics',
-    template: '%s | fscrape'
+    template: '%s | fscrape',
   },
-  description: 'Comprehensive forum data scraping and analytics platform. Monitor discussions, track trends, and gain insights across multiple sources.',
+  description:
+    'Comprehensive forum data scraping and analytics platform. Monitor discussions, track trends, and gain insights across multiple sources.',
   keywords: ['forum analytics', 'data scraping', 'trend analysis', 'discussion monitoring'],
   authors: [{ name: 'fscrape Team' }],
   creator: 'fscrape',
@@ -85,8 +86,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html 
-      lang="en" 
+    <html
+      lang="en"
       className={`${inter.variable} ${jetbrainsMono.variable} scroll-smooth`}
       suppressHydrationWarning
     >
@@ -97,13 +98,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className={`${inter.className} antialiased touch-manipulation`}>
         {/* Skip to main content link for accessibility */}
-        <a 
-          href="#main-content" 
+        <a
+          href="#main-content"
           className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
         >
           Skip to main content
         </a>
-        
+
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
@@ -116,17 +117,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <InstallPrompt />
               <div className="flex flex-col min-h-screen">
                 <Header />
-                
-                <main 
-                  id="main-content"
-                  className="flex-1 bg-background pb-20 md:pb-0"
-                  role="main"
-                >
-                  <FadeTransition>
-                    {children}
-                  </FadeTransition>
+
+                <main id="main-content" className="flex-1 bg-background pb-20 md:pb-0" role="main">
+                  <FadeTransition>{children}</FadeTransition>
                 </main>
-                
+
                 <BottomNav />
               </div>
             </AnalyticsProvider>
@@ -134,10 +129,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </ThemeProvider>
 
         {/* Accessibility announcement area for screen readers */}
-        <div 
-          role="status" 
-          aria-live="polite" 
-          aria-atomic="true" 
+        <div
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
           className="sr-only"
           id="announcements"
         />

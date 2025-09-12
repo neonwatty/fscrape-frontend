@@ -13,42 +13,46 @@ import type { NormalizedMetric } from '@/components/compare/NormalizedView'
 
 // Dynamic imports for comparison components
 const SourceSelector = dynamic(
-  () => import('@/components/compare/SourceSelector').then(mod => ({ default: mod.SourceSelector })),
+  () =>
+    import('@/components/compare/SourceSelector').then((mod) => ({ default: mod.SourceSelector })),
   { loading: () => <Skeleton className="h-20 w-full" />, ssr: false }
 )
 
-
 const ComparisonCharts = dynamic(
-  () => import('@/components/compare/ComparisonCharts').then(mod => ({ default: mod.ComparisonCharts })),
+  () =>
+    import('@/components/compare/ComparisonCharts').then((mod) => ({
+      default: mod.ComparisonCharts,
+    })),
   { loading: () => <Skeleton className="h-96 w-full" />, ssr: false }
 )
 
 const MetricsCard = dynamic(
-  () => import('@/components/compare/MetricsCard').then(mod => ({ default: mod.MetricsCard })),
+  () => import('@/components/compare/MetricsCard').then((mod) => ({ default: mod.MetricsCard })),
   { loading: () => <Skeleton className="h-32 w-full" />, ssr: false }
 )
 
 const MetricsTable = dynamic(
-  () => import('@/components/compare/MetricsTable').then(mod => ({ default: mod.MetricsTable })),
+  () => import('@/components/compare/MetricsTable').then((mod) => ({ default: mod.MetricsTable })),
   { loading: () => <Skeleton className="h-96 w-full" />, ssr: false }
 )
 
 const NormalizedView = dynamic(
-  () => import('@/components/compare/NormalizedView').then(mod => ({ default: mod.NormalizedView })),
+  () =>
+    import('@/components/compare/NormalizedView').then((mod) => ({ default: mod.NormalizedView })),
   { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
 )
-import { 
-  BarChart3, 
-  LineChart, 
-  TrendingUp, 
-  Layers, 
-  Download, 
-  Save, 
+import {
+  BarChart3,
+  LineChart,
+  TrendingUp,
+  Layers,
+  Download,
+  Save,
   Settings,
   Table,
   FileDown,
   Share2,
-  RefreshCw
+  RefreshCw,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -60,7 +64,7 @@ const generateMockSources = (): Source[] => [
     platform: 'Reddit',
     postCount: 15234,
     dateRange: { start: '2024-01-01', end: '2024-01-31' },
-    color: '#FF4500'
+    color: '#FF4500',
   },
   {
     id: 'reddit-prog',
@@ -68,7 +72,7 @@ const generateMockSources = (): Source[] => [
     platform: 'Reddit',
     postCount: 12456,
     dateRange: { start: '2024-01-01', end: '2024-01-31' },
-    color: '#5296DD'
+    color: '#5296DD',
   },
   {
     id: 'hn-main',
@@ -76,7 +80,7 @@ const generateMockSources = (): Source[] => [
     platform: 'HackerNews',
     postCount: 8932,
     dateRange: { start: '2024-01-01', end: '2024-01-31' },
-    color: '#FF6600'
+    color: '#FF6600',
   },
   {
     id: 'reddit-webdev',
@@ -84,7 +88,7 @@ const generateMockSources = (): Source[] => [
     platform: 'Reddit',
     postCount: 10234,
     dateRange: { start: '2024-01-01', end: '2024-01-31' },
-    color: '#00D4AA'
+    color: '#00D4AA',
   },
   {
     id: 'reddit-ml',
@@ -92,37 +96,42 @@ const generateMockSources = (): Source[] => [
     platform: 'Reddit',
     postCount: 7823,
     dateRange: { start: '2024-01-01', end: '2024-01-31' },
-    color: '#8B5CF6'
-  }
+    color: '#8B5CF6',
+  },
 ]
 
 const generateTimeSeriesData = (sources: string[]): ComparisonData[] => {
   const days = 30
   const data: ComparisonData[] = []
-  
+
   for (let i = 0; i < days; i++) {
     const date = new Date(2024, 0, i + 1)
     const dataPoint: ComparisonData = {
-      date: date.toISOString().split('T')[0]
+      date: date.toISOString().split('T')[0],
     }
-    
-    sources.forEach(sourceId => {
+
+    sources.forEach((sourceId) => {
       dataPoint[sourceId] = Math.floor(Math.random() * 500) + 100
     })
-    
+
     data.push(dataPoint)
   }
-  
+
   return data
 }
 
 const generateMetricData = (sources: string[]): MetricData[] => {
-  return sources.map(sourceId => ({
+  return sources.map((sourceId) => ({
     sourceId,
     value: Math.floor(Math.random() * 10000) + 1000,
     change: (Math.random() - 0.5) * 20,
-    trend: Math.random() > 0.5 ? 'up' : Math.random() > 0.5 ? 'down' : 'neutral' as 'up' | 'down' | 'neutral',
-    sparklineData: Array.from({ length: 10 }, () => Math.random() * 100)
+    trend:
+      Math.random() > 0.5
+        ? 'up'
+        : Math.random() > 0.5
+          ? 'down'
+          : ('neutral' as 'up' | 'down' | 'neutral'),
+    sparklineData: Array.from({ length: 10 }, () => Math.random() * 100),
   }))
 }
 
@@ -131,16 +140,18 @@ const generateNormalizedMetrics = (sources: string[]): NormalizedMetric[] => {
   const min = Math.min(...rawValues)
   const max = Math.max(...rawValues)
   const mean = rawValues.reduce((a, b) => a + b, 0) / rawValues.length
-  const stdDev = Math.sqrt(rawValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / rawValues.length)
-  
+  const stdDev = Math.sqrt(
+    rawValues.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / rawValues.length
+  )
+
   return sources.map((sourceId, index) => {
     const rawValue = rawValues[index]
     return {
       sourceId,
       rawValue,
       normalizedValue: (rawValue - min) / (max - min),
-      percentile: (rawValues.filter(v => v <= rawValue).length / rawValues.length) * 100,
-      zScore: (rawValue - mean) / stdDev
+      percentile: (rawValues.filter((v) => v <= rawValue).length / rawValues.length) * 100,
+      zScore: (rawValue - mean) / stdDev,
     }
   })
 }
@@ -164,9 +175,13 @@ export default function ComparePage() {
   const [timeSeriesData, setTimeSeriesData] = useState<ComparisonData[]>([])
   const [metricData, setMetricData] = useState<MetricData[]>([])
   const [normalizedMetrics, setNormalizedMetrics] = useState<NormalizedMetric[]>([])
-  const [activeTab, setActiveTab] = useState<'charts' | 'metrics' | 'table' | 'normalized'>('charts')
+  const [activeTab, setActiveTab] = useState<'charts' | 'metrics' | 'table' | 'normalized'>(
+    'charts'
+  )
   const [chartType, setChartType] = useState<'line' | 'bar' | 'area' | 'composed'>('line')
-  const [normalizationMethod, setNormalizationMethod] = useState<'minmax' | 'zscore' | 'robust' | 'none'>('minmax')
+  const [normalizationMethod, setNormalizationMethod] = useState<
+    'minmax' | 'zscore' | 'robust' | 'none'
+  >('minmax')
   const [aggregation, setAggregation] = useState<'daily' | 'weekly' | 'monthly'>('daily')
   const [savedPresets, setSavedPresets] = useState<ComparisonPreset[]>([])
   const [showPresetMenu, setShowPresetMenu] = useState(false)
@@ -188,58 +203,70 @@ export default function ComparePage() {
     }
   }, [])
 
-  const selectedSourceObjects = sources.filter(s => selectedSources.includes(s.id))
+  const selectedSourceObjects = sources.filter((s) => selectedSources.includes(s.id))
 
   // Export functionality
-  const exportData = useCallback(async (format: 'csv' | 'json' | 'pdf') => {
-    setIsExporting(true)
-    
-    try {
-      const exportData = {
-        sources: selectedSourceObjects,
-        timeSeriesData,
-        metrics: metricData,
-        normalized: normalizedMetrics,
-        settings: {
-          chartType,
-          normalizationMethod,
-          aggregation
-        },
-        exportDate: new Date().toISOString()
-      }
+  const exportData = useCallback(
+    async (format: 'csv' | 'json' | 'pdf') => {
+      setIsExporting(true)
 
-      if (format === 'json') {
-        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `comparison-${new Date().toISOString().split('T')[0]}.json`
-        a.click()
-        URL.revokeObjectURL(url)
-      } else if (format === 'csv') {
-        // Convert to CSV format
-        const headers = ['Date', ...selectedSourceObjects.map(s => s.name)].join(',')
-        const rows = timeSeriesData.map(row => {
-          const values = [row.date, ...selectedSources.map(id => row[id])]
-          return values.join(',')
-        })
-        const csv = [headers, ...rows].join('\n')
-        const blob = new Blob([csv], { type: 'text/csv' })
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement('a')
-        a.href = url
-        a.download = `comparison-${new Date().toISOString().split('T')[0]}.csv`
-        a.click()
-        URL.revokeObjectURL(url)
-      } else if (format === 'pdf') {
-        // For PDF, we'd typically use a library like jsPDF
-        // For now, we'll use browser print
-        window.print()
+      try {
+        const exportData = {
+          sources: selectedSourceObjects,
+          timeSeriesData,
+          metrics: metricData,
+          normalized: normalizedMetrics,
+          settings: {
+            chartType,
+            normalizationMethod,
+            aggregation,
+          },
+          exportDate: new Date().toISOString(),
+        }
+
+        if (format === 'json') {
+          const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' })
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `comparison-${new Date().toISOString().split('T')[0]}.json`
+          a.click()
+          URL.revokeObjectURL(url)
+        } else if (format === 'csv') {
+          // Convert to CSV format
+          const headers = ['Date', ...selectedSourceObjects.map((s) => s.name)].join(',')
+          const rows = timeSeriesData.map((row) => {
+            const values = [row.date, ...selectedSources.map((id) => row[id])]
+            return values.join(',')
+          })
+          const csv = [headers, ...rows].join('\n')
+          const blob = new Blob([csv], { type: 'text/csv' })
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `comparison-${new Date().toISOString().split('T')[0]}.csv`
+          a.click()
+          URL.revokeObjectURL(url)
+        } else if (format === 'pdf') {
+          // For PDF, we'd typically use a library like jsPDF
+          // For now, we'll use browser print
+          window.print()
+        }
+      } finally {
+        setIsExporting(false)
       }
-    } finally {
-      setIsExporting(false)
-    }
-  }, [selectedSourceObjects, timeSeriesData, metricData, normalizedMetrics, chartType, normalizationMethod, aggregation, selectedSources])
+    },
+    [
+      selectedSourceObjects,
+      timeSeriesData,
+      metricData,
+      normalizedMetrics,
+      chartType,
+      normalizationMethod,
+      aggregation,
+      selectedSources,
+    ]
+  )
 
   // Save preset functionality
   const savePreset = useCallback(() => {
@@ -253,9 +280,9 @@ export default function ComparePage() {
       settings: {
         chartType,
         normalizationMethod,
-        aggregation
+        aggregation,
       },
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
     }
 
     const updatedPresets = [...savedPresets, newPreset]
@@ -273,11 +300,14 @@ export default function ComparePage() {
   }, [])
 
   // Delete preset functionality
-  const deletePreset = useCallback((presetId: string) => {
-    const updatedPresets = savedPresets.filter(p => p.id !== presetId)
-    setSavedPresets(updatedPresets)
-    localStorage.setItem('comparisonPresets', JSON.stringify(updatedPresets))
-  }, [savedPresets])
+  const deletePreset = useCallback(
+    (presetId: string) => {
+      const updatedPresets = savedPresets.filter((p) => p.id !== presetId)
+      setSavedPresets(updatedPresets)
+      localStorage.setItem('comparisonPresets', JSON.stringify(updatedPresets))
+    },
+    [savedPresets]
+  )
 
   // Generate metrics data for table
   const metricsTableData = useMemo(() => {
@@ -285,16 +315,16 @@ export default function ComparePage() {
       posts: {},
       engagement: {},
       sentiment: {},
-      growth: {}
+      growth: {},
     }
-    
-    selectedSources.forEach(sourceId => {
+
+    selectedSources.forEach((sourceId) => {
       metrics.posts[sourceId] = Math.floor(Math.random() * 10000) + 1000
       metrics.engagement[sourceId] = Math.random() * 0.1
       metrics.sentiment[sourceId] = Math.random() * 5
       metrics.growth[sourceId] = (Math.random() - 0.5) * 0.2
     })
-    
+
     return metrics
   }, [selectedSources])
 
@@ -310,7 +340,7 @@ export default function ComparePage() {
                 Analyze and compare metrics across different platforms and sources
               </p>
             </div>
-            
+
             {/* Action buttons */}
             <div className="flex flex-wrap gap-2">
               {/* Presets dropdown */}
@@ -326,7 +356,7 @@ export default function ComparePage() {
                   <Settings className="h-4 w-4" />
                   Presets
                 </button>
-                
+
                 {showPresetMenu && (
                   <div className="absolute right-0 top-full mt-2 w-64 rounded-lg border bg-background shadow-lg z-50">
                     <div className="p-2 border-b">
@@ -345,7 +375,7 @@ export default function ComparePage() {
                           No saved presets
                         </p>
                       ) : (
-                        savedPresets.map(preset => (
+                        savedPresets.map((preset) => (
                           <div
                             key={preset.id}
                             className="flex items-center justify-between p-2 hover:bg-accent group"
@@ -356,15 +386,26 @@ export default function ComparePage() {
                             >
                               <div className="font-medium">{preset.name}</div>
                               <div className="text-xs text-muted-foreground">
-                                {preset.sources.length} sources • {new Date(preset.createdAt).toLocaleDateString()}
+                                {preset.sources.length} sources •{' '}
+                                {new Date(preset.createdAt).toLocaleDateString()}
                               </div>
                             </button>
                             <button
                               onClick={() => deletePreset(preset.id)}
                               className="opacity-0 group-hover:opacity-100 p-1 hover:bg-destructive/10 rounded"
                             >
-                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              <svg
+                                className="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M6 18L18 6M6 6l12 12"
+                                />
                               </svg>
                             </button>
                           </div>
@@ -393,7 +434,7 @@ export default function ComparePage() {
                   )}
                   Export
                 </button>
-                
+
                 <div className="absolute right-0 top-full mt-2 w-48 rounded-lg border bg-background shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity z-50">
                   <button
                     onClick={() => exportData('csv')}
@@ -536,7 +577,7 @@ export default function ComparePage() {
                   showSparkline
                   compareMode="absolute"
                 />
-                
+
                 <MetricsCard
                   title="Relative Performance"
                   description="Percentage difference from baseline"
@@ -545,7 +586,7 @@ export default function ComparePage() {
                   compareMode="percentage"
                   baselineSourceId={selectedSources[0]}
                 />
-                
+
                 <MetricsCard
                   title="Indexed Comparison"
                   description="All sources indexed to baseline (100)"
@@ -554,7 +595,7 @@ export default function ComparePage() {
                   compareMode="indexed"
                   baselineSourceId={selectedSources[0]}
                 />
-                
+
                 <MetricsCard
                   title="Growth Metrics"
                   description="Period-over-period growth rates"
@@ -585,20 +626,26 @@ export default function ComparePage() {
                     title="Normalized Comparison"
                     metrics={normalizedMetrics}
                     sources={selectedSourceObjects}
-                    normalizationMethod={normalizationMethod === 'none' ? 'minmax' : normalizationMethod as 'minmax' | 'zscore' | 'percentile' | 'log'}
+                    normalizationMethod={
+                      normalizationMethod === 'none'
+                        ? 'minmax'
+                        : (normalizationMethod as 'minmax' | 'zscore' | 'percentile' | 'log')
+                    }
                     showRawValues
                   />
-                  
+
                   <div className="space-y-4">
                     {/* Settings panel */}
                     <div className="rounded-lg border bg-card p-6">
                       <h3 className="text-lg font-semibold mb-4">Comparison Settings</h3>
-                      
+
                       <div className="space-y-4">
                         <div>
-                          <label className="text-sm font-medium mb-2 block">Normalization Method</label>
+                          <label className="text-sm font-medium mb-2 block">
+                            Normalization Method
+                          </label>
                           <div className="grid grid-cols-2 gap-2">
-                            {(['minmax', 'zscore', 'robust', 'none'] as const).map(method => (
+                            {(['minmax', 'zscore', 'robust', 'none'] as const).map((method) => (
                               <button
                                 key={method}
                                 onClick={() => setNormalizationMethod(method)}
@@ -609,18 +656,22 @@ export default function ComparePage() {
                                     : 'bg-secondary hover:bg-secondary/80'
                                 )}
                               >
-                                {method === 'minmax' ? 'Min-Max' :
-                                 method === 'zscore' ? 'Z-Score' :
-                                 method === 'robust' ? 'Robust' : 'None'}
+                                {method === 'minmax'
+                                  ? 'Min-Max'
+                                  : method === 'zscore'
+                                    ? 'Z-Score'
+                                    : method === 'robust'
+                                      ? 'Robust'
+                                      : 'None'}
                               </button>
                             ))}
                           </div>
                         </div>
-                        
+
                         <div>
                           <label className="text-sm font-medium mb-2 block">Data Aggregation</label>
                           <div className="grid grid-cols-3 gap-2">
-                            {(['daily', 'weekly', 'monthly'] as const).map(agg => (
+                            {(['daily', 'weekly', 'monthly'] as const).map((agg) => (
                               <button
                                 key={agg}
                                 onClick={() => setAggregation(agg)}
@@ -659,7 +710,7 @@ export default function ComparePage() {
                 <button
                   onClick={() => {
                     // Auto-select first 3 sources for demo
-                    const demoSources = sources.slice(0, 3).map(s => s.id)
+                    const demoSources = sources.slice(0, 3).map((s) => s.id)
                     setSelectedSources(demoSources)
                   }}
                   className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"

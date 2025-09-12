@@ -13,7 +13,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area'
 import { ForumPost } from '@/lib/db/types'
@@ -25,7 +31,7 @@ import {
   formatTrend,
   type EnhancedAuthorStats,
   type AuthorSortKey,
-  type AuthorFilterCriteria
+  type AuthorFilterCriteria,
 } from '@/lib/analytics/author-utils'
 import { formatLargeNumber } from '@/lib/utils/formatters'
 import {
@@ -39,7 +45,7 @@ import {
   ChevronDown,
   ExternalLink,
   Search,
-  Filter
+  Filter,
 } from 'lucide-react'
 
 export interface TopAuthorsProps {
@@ -55,7 +61,9 @@ export interface TopAuthorsProps {
 const getTierBadge = (tier: string) => {
   switch (tier) {
     case 'elite':
-      return <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">Elite</Badge>
+      return (
+        <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white">Elite</Badge>
+      )
     case 'top':
       return <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white">Top</Badge>
     case 'active':
@@ -107,7 +115,7 @@ export function TopAuthors({
   className = '',
   limit = 20,
   showFilters = true,
-  showTrends = true
+  showTrends = true,
 }: TopAuthorsProps) {
   const [sortKey, setSortKey] = useState<AuthorSortKey>('totalScore')
   const [sortDesc, setSortDesc] = useState(true)
@@ -117,7 +125,7 @@ export function TopAuthors({
     minPosts: 0,
     platform: undefined,
     source: undefined,
-    trend: 'all'
+    trend: 'all',
   })
 
   // Calculate enhanced author stats
@@ -129,7 +137,7 @@ export function TopAuthors({
   const filteredStats = useMemo(() => {
     return filterAuthorStats(allAuthorStats, {
       ...filters,
-      search: searchQuery
+      search: searchQuery,
     })
   }, [allAuthorStats, filters, searchQuery])
 
@@ -141,9 +149,8 @@ export function TopAuthors({
 
   // Get unique platforms and sources for filters
   const platforms = useMemo(() => {
-    return [...new Set(posts.map(p => p.platform))]
+    return [...new Set(posts.map((p) => p.platform))]
   }, [posts])
-
 
   // Handle sorting
   const handleSort = (key: AuthorSortKey) => {
@@ -166,7 +173,7 @@ export function TopAuthors({
           </div>
           {getTierBadge(getAuthorTier(stat))}
         </div>
-        
+
         <div className="grid grid-cols-2 gap-2 text-sm mb-3">
           <div>
             <span className="text-muted-foreground">Posts:</span>
@@ -252,20 +259,22 @@ export function TopAuthors({
                   className="pl-9"
                 />
               </div>
-              
+
               <Select
                 value={filters.platform || 'all'}
-                onValueChange={(v) => setFilters(prev => ({ 
-                  ...prev, 
-                  platform: v === 'all' ? undefined : v 
-                }))}
+                onValueChange={(v) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    platform: v === 'all' ? undefined : v,
+                  }))
+                }
               >
                 <SelectTrigger className="w-full sm:w-40">
                   <SelectValue placeholder="Platform" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Platforms</SelectItem>
-                  {platforms.map(platform => (
+                  {platforms.map((platform) => (
                     <SelectItem key={platform} value={platform}>
                       {platform}
                     </SelectItem>
@@ -276,10 +285,12 @@ export function TopAuthors({
               {showTrends && (
                 <Select
                   value={filters.trend || 'all'}
-                  onValueChange={(v) => setFilters(prev => ({ 
-                    ...prev, 
-                    trend: v as AuthorFilterCriteria['trend']
-                  }))}
+                  onValueChange={(v) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      trend: v as AuthorFilterCriteria['trend'],
+                    }))
+                  }
                 >
                   <SelectTrigger className="w-full sm:w-40">
                     <SelectValue placeholder="Trend" />
@@ -298,10 +309,12 @@ export function TopAuthors({
               <Filter className="w-4 h-4 text-muted-foreground" />
               <Select
                 value={filters.minPosts?.toString() || '0'}
-                onValueChange={(v) => setFilters(prev => ({ 
-                  ...prev, 
-                  minPosts: parseInt(v) 
-                }))}
+                onValueChange={(v) =>
+                  setFilters((prev) => ({
+                    ...prev,
+                    minPosts: parseInt(v),
+                  }))
+                }
               >
                 <SelectTrigger className="w-40">
                   <SelectValue />
@@ -350,9 +363,12 @@ export function TopAuthors({
                           className="p-0 h-auto font-medium hover:bg-transparent"
                         >
                           Author
-                          {sortKey === 'author' && (
-                            sortDesc ? <ChevronDown className="ml-1 w-3 h-3" /> : <ChevronUp className="ml-1 w-3 h-3" />
-                          )}
+                          {sortKey === 'author' &&
+                            (sortDesc ? (
+                              <ChevronDown className="ml-1 w-3 h-3" />
+                            ) : (
+                              <ChevronUp className="ml-1 w-3 h-3" />
+                            ))}
                         </Button>
                       </TableHead>
                       <TableHead>Tier</TableHead>
@@ -364,9 +380,12 @@ export function TopAuthors({
                           className="p-0 h-auto font-medium hover:bg-transparent"
                         >
                           Posts
-                          {sortKey === 'postCount' && (
-                            sortDesc ? <ChevronDown className="ml-1 w-3 h-3" /> : <ChevronUp className="ml-1 w-3 h-3" />
-                          )}
+                          {sortKey === 'postCount' &&
+                            (sortDesc ? (
+                              <ChevronDown className="ml-1 w-3 h-3" />
+                            ) : (
+                              <ChevronUp className="ml-1 w-3 h-3" />
+                            ))}
                         </Button>
                       </TableHead>
                       <TableHead className="text-right">
@@ -377,9 +396,12 @@ export function TopAuthors({
                           className="p-0 h-auto font-medium hover:bg-transparent"
                         >
                           Avg Score
-                          {sortKey === 'avgScore' && (
-                            sortDesc ? <ChevronDown className="ml-1 w-3 h-3" /> : <ChevronUp className="ml-1 w-3 h-3" />
-                          )}
+                          {sortKey === 'avgScore' &&
+                            (sortDesc ? (
+                              <ChevronDown className="ml-1 w-3 h-3" />
+                            ) : (
+                              <ChevronUp className="ml-1 w-3 h-3" />
+                            ))}
                         </Button>
                       </TableHead>
                       <TableHead className="text-right">
@@ -390,9 +412,12 @@ export function TopAuthors({
                           className="p-0 h-auto font-medium hover:bg-transparent"
                         >
                           Total Score
-                          {sortKey === 'totalScore' && (
-                            sortDesc ? <ChevronDown className="ml-1 w-3 h-3" /> : <ChevronUp className="ml-1 w-3 h-3" />
-                          )}
+                          {sortKey === 'totalScore' &&
+                            (sortDesc ? (
+                              <ChevronDown className="ml-1 w-3 h-3" />
+                            ) : (
+                              <ChevronUp className="ml-1 w-3 h-3" />
+                            ))}
                         </Button>
                       </TableHead>
                       <TableHead className="text-right">
@@ -403,9 +428,12 @@ export function TopAuthors({
                           className="p-0 h-auto font-medium hover:bg-transparent"
                         >
                           Engagement
-                          {sortKey === 'avgEngagement' && (
-                            sortDesc ? <ChevronDown className="ml-1 w-3 h-3" /> : <ChevronUp className="ml-1 w-3 h-3" />
-                          )}
+                          {sortKey === 'avgEngagement' &&
+                            (sortDesc ? (
+                              <ChevronDown className="ml-1 w-3 h-3" />
+                            ) : (
+                              <ChevronUp className="ml-1 w-3 h-3" />
+                            ))}
                         </Button>
                       </TableHead>
                       {showTrends && (
@@ -417,9 +445,12 @@ export function TopAuthors({
                             className="p-0 h-auto font-medium hover:bg-transparent"
                           >
                             Trend
-                            {sortKey === 'trend' && (
-                              sortDesc ? <ChevronDown className="ml-1 w-3 h-3" /> : <ChevronUp className="ml-1 w-3 h-3" />
-                            )}
+                            {sortKey === 'trend' &&
+                              (sortDesc ? (
+                                <ChevronDown className="ml-1 w-3 h-3" />
+                              ) : (
+                                <ChevronUp className="ml-1 w-3 h-3" />
+                              ))}
                           </Button>
                         </TableHead>
                       )}
@@ -433,9 +464,15 @@ export function TopAuthors({
                         <TableCell className="font-medium">{stat.author}</TableCell>
                         <TableCell>{getTierBadge(getAuthorTier(stat))}</TableCell>
                         <TableCell className="text-right">{stat.postCount}</TableCell>
-                        <TableCell className="text-right">{formatLargeNumber(stat.avgScore)}</TableCell>
-                        <TableCell className="text-right">{formatLargeNumber(stat.totalScore)}</TableCell>
-                        <TableCell className="text-right">{formatLargeNumber(stat.avgEngagement)}</TableCell>
+                        <TableCell className="text-right">
+                          {formatLargeNumber(stat.avgScore)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {formatLargeNumber(stat.totalScore)}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {formatLargeNumber(stat.avgEngagement)}
+                        </TableCell>
                         {showTrends && (
                           <TableCell className="text-center">
                             {getTrendIcon(stat.trend, stat.trendValue)}
@@ -490,7 +527,7 @@ export function TopAuthors({
                       </div>
                       {getTierBadge(getAuthorTier(stat))}
                     </div>
-                    
+
                     <div className="space-y-2">
                       <div className="flex justify-between text-sm">
                         <span className="text-muted-foreground">Posts</span>
@@ -514,7 +551,7 @@ export function TopAuthors({
 
                     {stat.platforms.length > 0 && (
                       <div className="mt-3 flex flex-wrap gap-1">
-                        {stat.platforms.map(platform => (
+                        {stat.platforms.map((platform) => (
                           <Badge key={platform} variant="outline" className="text-xs">
                             {platform}
                           </Badge>

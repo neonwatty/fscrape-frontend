@@ -35,13 +35,13 @@ export function MetricsCard({
   showSparkline = false,
   compareMode = 'absolute',
   baselineSourceId,
-  className
+  className,
 }: MetricsCardProps) {
-  const getSourceById = (id: string) => sources.find(s => s.id === id)
-  
-  const baselineValue = baselineSourceId 
-    ? metrics.find(m => m.sourceId === baselineSourceId)?.value || 0
-    : Math.max(...metrics.map(m => m.value))
+  const getSourceById = (id: string) => sources.find((s) => s.id === id)
+
+  const baselineValue = baselineSourceId
+    ? metrics.find((m) => m.sourceId === baselineSourceId)?.value || 0
+    : Math.max(...metrics.map((m) => m.value))
 
   const getComparativeValue = (metric: MetricData) => {
     switch (compareMode) {
@@ -83,19 +83,21 @@ export function MetricsCard({
 
   const renderSparkline = (data?: number[]) => {
     if (!data || data.length === 0) return null
-    
+
     const min = Math.min(...data)
     const max = Math.max(...data)
     const range = max - min || 1
     const width = 60
     const height = 30
-    
-    const points = data.map((value, index) => {
-      const x = (index / (data.length - 1)) * width
-      const y = height - ((value - min) / range) * height
-      return `${x},${y}`
-    }).join(' ')
-    
+
+    const points = data
+      .map((value, index) => {
+        const x = (index / (data.length - 1)) * width
+        const y = height - ((value - min) / range) * height
+        return `${x},${y}`
+      })
+      .join(' ')
+
     return (
       <svg width={width} height={height} className="inline-block ml-2">
         <polyline
@@ -118,9 +120,7 @@ export function MetricsCard({
           <Activity className="h-5 w-5 text-muted-foreground" />
           {title}
         </h3>
-        {description && (
-          <p className="text-sm text-muted-foreground mt-1">{description}</p>
-        )}
+        {description && <p className="text-sm text-muted-foreground mt-1">{description}</p>}
       </div>
 
       <div className="space-y-4">
@@ -151,9 +151,7 @@ export function MetricsCard({
                 )}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-sm truncate">
-                      {source.name}
-                    </span>
+                    <span className="font-medium text-sm truncate">{source.name}</span>
                     {isBaseline && (
                       <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">
                         Baseline
@@ -165,21 +163,15 @@ export function MetricsCard({
                       </span>
                     )}
                   </div>
-                  <span className="text-xs text-muted-foreground">
-                    {source.platform}
-                  </span>
+                  <span className="text-xs text-muted-foreground">{source.platform}</span>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
                 <div className="text-right">
-                  <div className="font-semibold">
-                    {formatComparativeValue(comparativeValue)}
-                  </div>
+                  <div className="font-semibold">{formatComparativeValue(comparativeValue)}</div>
                   {compareMode !== 'absolute' && (
-                    <div className="text-xs text-muted-foreground">
-                      {format(metric.value)}
-                    </div>
+                    <div className="text-xs text-muted-foreground">{format(metric.value)}</div>
                   )}
                 </div>
 
@@ -193,9 +185,7 @@ export function MetricsCard({
                     )}
                   >
                     {getTrendIcon(metric.trend)}
-                    <span className="text-xs">
-                      {Math.abs(metric.change).toFixed(1)}%
-                    </span>
+                    <span className="text-xs">{Math.abs(metric.change).toFixed(1)}%</span>
                   </div>
 
                   {showSparkline && renderSparkline(metric.sparklineData)}
@@ -210,11 +200,7 @@ export function MetricsCard({
         <div className="mt-4 pt-4 border-t">
           <div className="flex items-center justify-between text-xs text-muted-foreground">
             <span>Comparison Mode: {compareMode}</span>
-            {baselineSourceId && (
-              <span>
-                Baseline: {getSourceById(baselineSourceId)?.name}
-              </span>
-            )}
+            {baselineSourceId && <span>Baseline: {getSourceById(baselineSourceId)?.name}</span>}
           </div>
         </div>
       )}

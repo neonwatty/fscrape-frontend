@@ -20,7 +20,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { ForumPost } from '@/lib/db/types'
 import {
   calculateGrowthTrends,
@@ -30,16 +36,10 @@ import {
   formatGrowthRate,
   getGrowthTrendEmoji,
   type TimeGranularity,
-  type GrowthSummary
+  type GrowthSummary,
 } from '@/lib/analytics/growth-utils'
 import { formatLargeNumber } from '@/lib/utils/formatters'
-import { 
-  TrendingUp, 
-  Activity,
-  BarChart3,
-  Layers,
-  ZoomOut
-} from 'lucide-react'
+import { TrendingUp, Activity, BarChart3, Layers, ZoomOut } from 'lucide-react'
 
 export interface GrowthChartProps {
   posts: ForumPost[]
@@ -60,7 +60,15 @@ interface ZoomState {
   animation: boolean
 }
 
-const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>; label?: string }) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean
+  payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>
+  label?: string
+}) => {
   if (!active || !payload || payload.length === 0) return null
 
   return (
@@ -68,8 +76,8 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
       <p className="font-medium text-sm mb-2">{label}</p>
       {payload.map((entry, index) => (
         <div key={index} className="flex items-center gap-2 text-sm">
-          <div 
-            className="w-3 h-3 rounded-full" 
+          <div
+            className="w-3 h-3 rounded-full"
             style={{ backgroundColor: entry.color || entry.fill }}
           />
           <span className="text-muted-foreground">{entry.name}:</span>
@@ -90,7 +98,7 @@ export function GrowthChart({
   height = 400,
   showFilters = true,
   showSummary = true,
-  defaultGranularity = 'day'
+  defaultGranularity = 'day',
 }: GrowthChartProps) {
   const [activeTab, setActiveTab] = useState<'volume' | 'platforms' | 'sources'>('volume')
   const [granularity, setGranularity] = useState<TimeGranularity>(defaultGranularity)
@@ -100,16 +108,16 @@ export function GrowthChart({
     refAreaRight: null,
     left: null,
     right: null,
-    animation: true
+    animation: true,
   })
 
   // Calculate date range
   const { startDate, endDate } = useMemo(() => {
     if (dateRange === 'all') return { startDate: undefined, endDate: undefined }
-    
+
     const end = new Date()
     const start = new Date()
-    
+
     switch (dateRange) {
       case '7d':
         start.setDate(end.getDate() - 7)
@@ -121,7 +129,7 @@ export function GrowthChart({
         start.setDate(end.getDate() - 90)
         break
     }
-    
+
     return { startDate: start, endDate: end }
   }, [dateRange])
 
@@ -148,7 +156,7 @@ export function GrowthChart({
   // Get unique platforms for line chart
   const platforms = useMemo(() => {
     const platformSet = new Set<string>()
-    posts.forEach(post => platformSet.add(post.platform))
+    posts.forEach((post) => platformSet.add(post.platform))
     return Array.from(platformSet)
   }, [posts])
 
@@ -157,7 +165,7 @@ export function GrowthChart({
     const colors: Record<string, string> = {
       reddit: '#FF4500',
       hackernews: '#FF6600',
-      default: '#8884d8'
+      default: '#8884d8',
     }
     return colors[platform.toLowerCase()] || colors.default
   }
@@ -170,7 +178,7 @@ export function GrowthChart({
       setZoomState({
         ...zoomState,
         refAreaLeft: activeLabel,
-        refAreaRight: activeLabel
+        refAreaRight: activeLabel,
       })
     }
   }
@@ -181,7 +189,7 @@ export function GrowthChart({
     if (activeLabel) {
       setZoomState({
         ...zoomState,
-        refAreaRight: activeLabel
+        refAreaRight: activeLabel,
       })
     }
   }
@@ -196,14 +204,14 @@ export function GrowthChart({
       setZoomState({
         ...zoomState,
         refAreaLeft: null,
-        refAreaRight: null
+        refAreaRight: null,
       })
       return
     }
 
     // Swap if needed
     if (left > right) {
-      [left, right] = [right, left]
+      ;[left, right] = [right, left]
     }
 
     setZoomState({
@@ -211,7 +219,7 @@ export function GrowthChart({
       refAreaRight: null,
       left,
       right,
-      animation: false
+      animation: false,
     })
   }
 
@@ -221,7 +229,7 @@ export function GrowthChart({
       refAreaRight: null,
       left: null,
       right: null,
-      animation: true
+      animation: true,
     })
   }
 
@@ -242,7 +250,7 @@ export function GrowthChart({
                 <Activity className="w-3 h-3" />
                 {formatLargeNumber(summary.totalPosts)} posts
               </Badge>
-              <Badge 
+              <Badge
                 variant={summary.growthRate > 0 ? 'default' : 'secondary'}
                 className="flex items-center gap-1"
               >
@@ -352,15 +360,15 @@ export function GrowthChart({
               >
                 <defs>
                   <linearGradient id="volumeGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1} />
                   </linearGradient>
                   <linearGradient id="engagementGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.1}/>
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.8} />
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.1} />
                   </linearGradient>
                 </defs>
-                
+
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" opacity={0.3} />
                 <XAxis
                   dataKey="date"
@@ -370,7 +378,8 @@ export function GrowthChart({
                   tickFormatter={(value) => {
                     const date = new Date(value)
                     if (granularity === 'hour') return `${date.getHours()}:00`
-                    if (granularity === 'month') return date.toLocaleDateString('en', { month: 'short' })
+                    if (granularity === 'month')
+                      return date.toLocaleDateString('en', { month: 'short' })
                     return date.toLocaleDateString('en', { month: 'short', day: 'numeric' })
                   }}
                 />
@@ -389,7 +398,7 @@ export function GrowthChart({
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                
+
                 <Area
                   yAxisId="left"
                   type="monotone"
@@ -400,7 +409,7 @@ export function GrowthChart({
                   fill="url(#volumeGradient)"
                   animationDuration={zoomState.animation ? 300 : 0}
                 />
-                
+
                 <Line
                   yAxisId="left"
                   type="monotone"
@@ -412,7 +421,7 @@ export function GrowthChart({
                   strokeDasharray="5 5"
                   animationDuration={zoomState.animation ? 300 : 0}
                 />
-                
+
                 <Area
                   yAxisId="right"
                   type="monotone"
@@ -435,7 +444,7 @@ export function GrowthChart({
                     fillOpacity={0.3}
                   />
                 )}
-                
+
                 <Brush
                   dataKey="date"
                   height={30}
@@ -450,19 +459,23 @@ export function GrowthChart({
           {/* Platform Adoption Chart */}
           <TabsContent value="platforms">
             <ResponsiveContainer width="100%" height={height}>
-              <AreaChart
-                data={platformData}
-                margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
-              >
+              <AreaChart data={platformData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
                 <defs>
-                  {platforms.map(platform => (
-                    <linearGradient key={platform} id={`gradient-${platform}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor={getPlatformColor(platform)} stopOpacity={0.8}/>
-                      <stop offset="95%" stopColor={getPlatformColor(platform)} stopOpacity={0.1}/>
+                  {platforms.map((platform) => (
+                    <linearGradient
+                      key={platform}
+                      id={`gradient-${platform}`}
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="5%" stopColor={getPlatformColor(platform)} stopOpacity={0.8} />
+                      <stop offset="95%" stopColor={getPlatformColor(platform)} stopOpacity={0.1} />
                     </linearGradient>
                   ))}
                 </defs>
-                
+
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" opacity={0.3} />
                 <XAxis
                   dataKey="date"
@@ -470,7 +483,8 @@ export function GrowthChart({
                   tick={{ fill: 'currentColor', fontSize: 11 }}
                   tickFormatter={(value) => {
                     const date = new Date(value)
-                    if (granularity === 'month') return date.toLocaleDateString('en', { month: 'short' })
+                    if (granularity === 'month')
+                      return date.toLocaleDateString('en', { month: 'short' })
                     return date.toLocaleDateString('en', { month: 'short', day: 'numeric' })
                   }}
                 />
@@ -481,8 +495,8 @@ export function GrowthChart({
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                
-                {platforms.map(platform => (
+
+                {platforms.map((platform) => (
                   <Area
                     key={platform}
                     type="monotone"
@@ -493,7 +507,7 @@ export function GrowthChart({
                     fill={`url(#gradient-${platform})`}
                   />
                 ))}
-                
+
                 <Brush
                   dataKey="date"
                   height={30}
@@ -508,10 +522,7 @@ export function GrowthChart({
           {/* Source Activity Chart */}
           <TabsContent value="sources">
             <ResponsiveContainer width="100%" height={height}>
-              <LineChart
-                data={sourceData}
-                margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
-              >
+              <LineChart data={sourceData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" opacity={0.3} />
                 <XAxis
                   dataKey="date"
@@ -519,26 +530,24 @@ export function GrowthChart({
                   tick={{ fill: 'currentColor', fontSize: 11 }}
                   tickFormatter={(value) => {
                     const date = new Date(value)
-                    if (granularity === 'month') return date.toLocaleDateString('en', { month: 'short' })
+                    if (granularity === 'month')
+                      return date.toLocaleDateString('en', { month: 'short' })
                     return date.toLocaleDateString('en', { month: 'short', day: 'numeric' })
                   }}
                 />
-                <YAxis
-                  className="text-xs"
-                  tick={{ fill: 'currentColor', fontSize: 11 }}
-                />
-                <Tooltip 
-                  content={({ active, payload, label }: { active?: boolean; payload?: Array<{ payload: { topSource: string; sources: Array<{ name: string; count: number }> } }>; label?: string }) => {
+                <YAxis className="text-xs" tick={{ fill: 'currentColor', fontSize: 11 }} />
+                <Tooltip
+                  content={({ active, payload, label }: any) => {
                     if (!active || !payload || payload.length === 0) return null
                     const data = payload[0].payload
-                    
+
                     return (
                       <div className="bg-background border rounded-lg shadow-lg p-3">
                         <p className="font-medium text-sm mb-2">{label}</p>
                         <p className="text-sm mb-2">
                           Top Source: <span className="font-medium">{data.topSource}</span>
                         </p>
-                        {data.sources.slice(0, 5).map((source, i) => (
+                        {data.sources.slice(0, 5).map((source: any, i: number) => (
                           <div key={i} className="text-xs flex justify-between gap-4">
                             <span className="text-muted-foreground">{source.name}:</span>
                             <span className="font-medium">{source.count} posts</span>
@@ -549,32 +558,33 @@ export function GrowthChart({
                   }}
                 />
                 <Legend />
-                
+
                 {/* Show lines for top 3 sources */}
-                {sourceData.length > 0 && (() => {
-                  const topSources = new Set<string>()
-                  sourceData.forEach(d => {
-                    d.sources.slice(0, 3).forEach(s => topSources.add(s.name))
-                  })
-                  const sourceList = Array.from(topSources).slice(0, 5)
-                  const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6']
-                  
-                  return sourceList.map((source, i) => (
-                    <Line
-                      key={source}
-                      type="monotone"
-                      dataKey={(d: { sources: Array<{ name: string; count: number }> }) => {
-                        const sourceData = d.sources.find((s) => s.name === source)
-                        return sourceData?.count || 0
-                      }}
-                      name={source}
-                      stroke={colors[i]}
-                      strokeWidth={2}
-                      dot={false}
-                    />
-                  ))
-                })()}
-                
+                {sourceData.length > 0 &&
+                  (() => {
+                    const topSources = new Set<string>()
+                    sourceData.forEach((d) => {
+                      d.sources.slice(0, 3).forEach((s) => topSources.add(s.name))
+                    })
+                    const sourceList = Array.from(topSources).slice(0, 5)
+                    const colors = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6']
+
+                    return sourceList.map((source, i) => (
+                      <Line
+                        key={source}
+                        type="monotone"
+                        dataKey={(d: { sources: Array<{ name: string; count: number }> }) => {
+                          const sourceData = d.sources.find((s) => s.name === source)
+                          return sourceData?.count || 0
+                        }}
+                        name={source}
+                        stroke={colors[i]}
+                        strokeWidth={2}
+                        dot={false}
+                      />
+                    ))
+                  })()}
+
                 <Brush
                   dataKey="date"
                   height={30}

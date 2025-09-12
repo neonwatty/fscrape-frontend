@@ -45,12 +45,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import {
   ArrowUpDown,
   ChevronDown,
@@ -76,10 +71,10 @@ import { ExportDialog } from './ExportDialog'
 const fuzzyFilter: FilterFn<ForumPost> = (row, columnId, value) => {
   const itemValue = row.getValue(columnId)
   if (typeof itemValue !== 'string') return false
-  
+
   const searchValue = value.toLowerCase()
   const cellValue = itemValue.toLowerCase()
-  
+
   return cellValue.includes(searchValue)
 }
 
@@ -107,13 +102,11 @@ export function PostsTableEnhanced({
   const [searchResults, setSearchResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
   const [searchLoading, setSearchLoading] = useState(false)
-  
+
   // Table state
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: 'created_utc', desc: true }
-  ])
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'created_utc', desc: true }])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [pagination, setPagination] = useState({
@@ -128,50 +121,64 @@ export function PostsTableEnhanced({
   const [filters, setFilters] = useState<PostFilters>({})
 
   // Load posts with search and filters
-  const loadPosts = useCallback(async (append = false) => {
-    if (!isInitialized || !database) return
-    
-    setLoading(true)
-    try {
-      let fetchedPosts: ForumPost[] = []
-      let searchData: SearchResult[] = []
-      
-      if (globalFilter) {
-        // Use FTS search
-        searchData = searchPostsFTS(globalFilter, 5000)
-        fetchedPosts = searchData
-        setSearchResults(searchData)
-      } else {
-        // Load recent posts
-        fetchedPosts = getRecentPosts(5000)
-        setSearchResults([])
+  const loadPosts = useCallback(
+    async (append = false) => {
+      if (!isInitialized || !database) return
+
+      setLoading(true)
+      try {
+        let fetchedPosts: ForumPost[] = []
+        let searchData: SearchResult[] = []
+
+        if (globalFilter) {
+          // Use FTS search
+          searchData = searchPostsFTS(globalFilter, 5000)
+          fetchedPosts = searchData
+          setSearchResults(searchData)
+        } else {
+          // Load recent posts
+          fetchedPosts = getRecentPosts(5000)
+          setSearchResults([])
+        }
+
+        // Apply custom filters
+        if (Object.keys(filters).length > 0) {
+          fetchedPosts = applyFilters(fetchedPosts, filters)
+        }
+
+        setAllPosts(fetchedPosts)
+
+        // For infinite scroll, append data
+        if (enableInfiniteScroll && append) {
+          setPosts((prev) => [
+            ...prev,
+            ...fetchedPosts.slice(prev.length, prev.length + pagination.pageSize),
+          ])
+          setHasMoreData(fetchedPosts.length > posts.length + pagination.pageSize)
+        } else if (enableInfiniteScroll) {
+          // Initial load for infinite scroll
+          setPosts(fetchedPosts.slice(0, pagination.pageSize))
+          setHasMoreData(fetchedPosts.length > pagination.pageSize)
+        } else {
+          // Regular pagination
+          setPosts(fetchedPosts)
+        }
+      } catch (error) {
+        console.error('Error loading posts:', error)
+      } finally {
+        setLoading(false)
       }
-      
-      // Apply custom filters
-      if (Object.keys(filters).length > 0) {
-        fetchedPosts = applyFilters(fetchedPosts, filters)
-      }
-      
-      setAllPosts(fetchedPosts)
-      
-      // For infinite scroll, append data
-      if (enableInfiniteScroll && append) {
-        setPosts(prev => [...prev, ...fetchedPosts.slice(prev.length, prev.length + pagination.pageSize)])
-        setHasMoreData(fetchedPosts.length > posts.length + pagination.pageSize)
-      } else if (enableInfiniteScroll) {
-        // Initial load for infinite scroll
-        setPosts(fetchedPosts.slice(0, pagination.pageSize))
-        setHasMoreData(fetchedPosts.length > pagination.pageSize)
-      } else {
-        // Regular pagination
-        setPosts(fetchedPosts)
-      }
-    } catch (error) {
-      console.error('Error loading posts:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [isInitialized, database, globalFilter, filters, enableInfiniteScroll, pagination.pageSize, posts.length])
+    },
+    [
+      isInitialized,
+      database,
+      globalFilter,
+      filters,
+      enableInfiniteScroll,
+      pagination.pageSize,
+      posts.length,
+    ]
+  )
 
   useEffect(() => {
     loadPosts(false)
@@ -182,7 +189,7 @@ export function PostsTableEnhanced({
     if (enableInfiniteScroll && hasMoreData && !loading) {
       const nextBatch = allPosts.slice(posts.length, posts.length + pagination.pageSize)
       if (nextBatch.length > 0) {
-        setPosts(prev => [...prev, ...nextBatch])
+        setPosts((prev) => [...prev, ...nextBatch])
         setHasMoreData(allPosts.length > posts.length + nextBatch.length)
       } else {
         setHasMoreData(false)
@@ -244,11 +251,11 @@ export function PostsTableEnhanced({
         cell: ({ row }) => {
           const title = row.getValue('title') as string
           const url = row.original.url || row.original.permalink
-          
+
           // Check for search highlighting
-          const searchResult = searchResults.find(sr => sr.id === row.original.id)
+          const searchResult = searchResults.find((sr) => sr.id === row.original.id)
           const displayTitle = searchResult?.titleHighlighted || title
-          
+
           return (
             <div className="max-w-[500px]">
               <TooltipProvider>
@@ -297,11 +304,7 @@ export function PostsTableEnhanced({
         header: 'Source',
         cell: ({ row }) => {
           const source = row.original.source || row.original.subreddit || ''
-          return (
-            <div className="text-sm text-muted-foreground">
-              {source}
-            </div>
-          )
+          return <div className="text-sm text-muted-foreground">{source}</div>
         },
         filterFn: fuzzyFilter,
       },
@@ -414,9 +417,7 @@ export function PostsTableEnhanced({
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem
-                  onClick={() => window.open(post.url || post.permalink, '_blank')}
-                >
+                <DropdownMenuItem onClick={() => window.open(post.url || post.permalink, '_blank')}>
                   <ExternalLink className="mr-2 h-4 w-4" />
                   Open in new tab
                 </DropdownMenuItem>
@@ -473,23 +474,26 @@ export function PostsTableEnhanced({
   // Handle selection change
   useEffect(() => {
     const selectedRows = table.getSelectedRowModel().flatRows
-    const selectedPosts = selectedRows.map(row => row.original)
+    const selectedPosts = selectedRows.map((row) => row.original)
     onSelectionChange?.(selectedPosts)
   }, [rowSelection, onSelectionChange, table])
 
   // Get selected posts
   const getSelectedPosts = useCallback(() => {
     const selectedRows = table.getSelectedRowModel().flatRows
-    return selectedRows.map(row => row.original)
+    return selectedRows.map((row) => row.original)
   }, [table])
 
   const handleBulkDelete = useCallback(() => {
     const selectedRows = table.getSelectedRowModel().flatRows
     if (selectedRows.length === 0) return
-    
+
     if (confirm(`Are you sure you want to archive ${selectedRows.length} posts?`)) {
       // Implementation would go here
-      console.log('Archiving posts:', selectedRows.map(r => r.original.id))
+      console.log(
+        'Archiving posts:',
+        selectedRows.map((r) => r.original.id)
+      )
       table.resetRowSelection()
     }
   }, [table])
@@ -509,30 +513,22 @@ export function PostsTableEnhanced({
                 {hasSelection && ` • ${selectedCount} selected`}
               </CardDescription>
             </div>
-            
+
             <div className="flex flex-col gap-2 sm:flex-row">
               {/* Bulk actions */}
               {hasSelection && (
                 <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowExportDialog(true)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setShowExportDialog(true)}>
                     <Download className="mr-2 h-4 w-4" />
                     Export ({selectedCount})
                   </Button>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleBulkDelete}
-                  >
+                  <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
                     <Trash2 className="mr-2 h-4 w-4" />
                     Archive ({selectedCount})
                   </Button>
                 </div>
               )}
-              
+
               {/* Column visibility */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -564,14 +560,10 @@ export function PostsTableEnhanced({
               </DropdownMenu>
             </div>
           </div>
-          
+
           {/* Export all button (when no selection) */}
           {!hasSelection && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowExportDialog(true)}
-            >
+            <Button variant="outline" size="sm" onClick={() => setShowExportDialog(true)}>
               <Download className="mr-2 h-4 w-4" />
               Export All
             </Button>
@@ -596,14 +588,16 @@ export function PostsTableEnhanced({
                   debounceMs={300}
                 />
               )}
-              
+
               {showFilters && (
                 <TableFilters
                   filters={filters}
                   onFiltersChange={setFilters}
                   filterOptions={{
                     platforms: ['reddit', 'hackernews'],
-                    sources: Array.from(new Set(posts.map(p => p.source || p.subreddit || '').filter(Boolean))),
+                    sources: Array.from(
+                      new Set(posts.map((p) => p.source || p.subreddit || '').filter(Boolean))
+                    ),
                   }}
                   showPresets={true}
                   showAdvanced={true}
@@ -617,12 +611,7 @@ export function PostsTableEnhanced({
       <CardContent>
         <div className="rounded-md border">
           {enableVirtualization && table.getRowModel().rows.length > 100 ? (
-            <VirtualizedTable
-              table={table}
-              rowHeight={53}
-              overscan={10}
-              className="h-[600px]"
-            />
+            <VirtualizedTable table={table} rowHeight={53} overscan={10} className="h-[600px]" />
           ) : (
             <Table>
               <TableHeader>
@@ -633,10 +622,7 @@ export function PostsTableEnhanced({
                         <TableHead key={header.id}>
                           {header.isPlaceholder
                             ? null
-                            : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                            : flexRender(header.column.columnDef.header, header.getContext())}
                         </TableHead>
                       )
                     })}
@@ -649,27 +635,18 @@ export function PostsTableEnhanced({
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && 'selected'}
-                      className={cn(
-                        'transition-colors',
-                        row.getIsSelected() && 'bg-muted/50'
-                      )}
+                      className={cn('transition-colors', row.getIsSelected() && 'bg-muted/50')}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell
-                      colSpan={columns.length}
-                      className="h-24 text-center"
-                    >
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
                       {loading ? 'Loading posts...' : 'No results found.'}
                     </TableCell>
                   </TableRow>
@@ -714,7 +691,7 @@ export function PostsTableEnhanced({
             onPageChange={(page) => table.setPageIndex(page)}
             onPageSizeChange={(size) => {
               table.setPageSize(size)
-              setPagination(prev => ({ ...prev, pageSize: size }))
+              setPagination((prev) => ({ ...prev, pageSize: size }))
             }}
             showPageSizeSelector={true}
             showItemCount={true}
@@ -725,12 +702,12 @@ export function PostsTableEnhanced({
           />
         )}
       </CardContent>
-      
+
       {/* Export Dialog */}
       <ExportDialog
         open={showExportDialog}
         onOpenChange={setShowExportDialog}
-        posts={table.getFilteredRowModel().rows.map(row => row.original)}
+        posts={table.getFilteredRowModel().rows.map((row) => row.original)}
         selectedPosts={hasSelection ? getSelectedPosts() : undefined}
         title="Export Posts"
       />

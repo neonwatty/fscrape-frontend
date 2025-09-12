@@ -10,15 +10,9 @@ import { useInstallPrompt } from '@/lib/hooks/useInstallPrompt'
 export function InstallPrompt() {
   const [showUpdateNotification, setShowUpdateNotification] = useState(false)
   const { isSupported, isOnline, isUpdateAvailable, updateServiceWorker } = useServiceWorker()
-  
+
   // Use the new install prompt hook
-  const {
-    installState,
-    showPrompt,
-    analytics,
-    install,
-    dismiss,
-  } = useInstallPrompt({
+  const { installState, showPrompt, analytics, install, dismiss } = useInstallPrompt({
     promptDelay: 5000,
     reminderDelay: 7,
     onInstall: (analytics) => {
@@ -30,14 +24,12 @@ export function InstallPrompt() {
     enableAnalytics: true,
   })
 
-
   // Show update notification when update is available
   useEffect(() => {
     if (isUpdateAvailable) {
       setShowUpdateNotification(true)
     }
   }, [isUpdateAvailable])
-
 
   const handleUpdate = () => {
     updateServiceWorker()
@@ -77,11 +69,11 @@ export function InstallPrompt() {
                 </p>
                 {analytics.promptShown > 1 && (
                   <p className="text-xs opacity-75 mt-1">
-                    You've seen this {analytics.promptShown} times
+                    You&apos;ve seen this {analytics.promptShown} times
                   </p>
                 )}
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   onClick={install}
@@ -101,14 +93,14 @@ export function InstallPrompt() {
                   Not Now
                 </Button>
               </div>
-              
+
               {installState.platform === 'ios' && (
                 <p className="text-xs opacity-75">
-                  Tap share button and "Add to Home Screen"
+                  Tap share button and &quot;Add to Home Screen&quot;
                 </p>
               )}
             </AlertDescription>
-            
+
             <button
               onClick={dismiss}
               className="absolute top-2 right-2 text-white/70 hover:text-white"
@@ -133,7 +125,7 @@ export function InstallPrompt() {
                   A new version of the app is ready to install
                 </p>
               </div>
-              
+
               <div className="flex gap-2">
                 <Button
                   onClick={handleUpdate}
@@ -142,11 +134,7 @@ export function InstallPrompt() {
                 >
                   Update Now
                 </Button>
-                <Button
-                  onClick={() => setShowUpdateNotification(false)}
-                  size="sm"
-                  variant="ghost"
-                >
+                <Button onClick={() => setShowUpdateNotification(false)} size="sm" variant="ghost">
                   Later
                 </Button>
               </div>
@@ -158,9 +146,7 @@ export function InstallPrompt() {
       {/* Offline Indicator */}
       {!isOnline && (
         <div className="fixed top-0 left-0 right-0 bg-yellow-500 text-white text-center py-2 z-50">
-          <p className="text-sm font-medium">
-            You're offline - Some features may be limited
-          </p>
+          <p className="text-sm font-medium">You&apos;re offline - Some features may be limited</p>
         </div>
       )}
     </>
@@ -169,11 +155,7 @@ export function InstallPrompt() {
 
 // Mini install button for manual trigger
 export function InstallButton() {
-  const {
-    installState,
-    install,
-    deferredPrompt,
-  } = useInstallPrompt({
+  const { installState, install, deferredPrompt } = useInstallPrompt({
     promptDelay: 0, // No delay for manual trigger
     enableAnalytics: true,
   })
@@ -227,12 +209,7 @@ export function InstallAnalytics() {
           </>
         )}
       </div>
-      <Button
-        onClick={clearAnalytics}
-        size="sm"
-        variant="outline"
-        className="mt-3"
-      >
+      <Button onClick={clearAnalytics} size="sm" variant="outline" className="mt-3">
         Clear Analytics
       </Button>
     </div>

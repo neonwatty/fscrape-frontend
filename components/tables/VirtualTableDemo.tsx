@@ -22,7 +22,7 @@ interface TestRow {
 function generateRow(index: number): TestRow {
   const statuses: TestRow['status'][] = ['active', 'inactive', 'pending']
   const cities = ['New York', 'London', 'Tokyo', 'Paris', 'Berlin', 'Sydney', 'Toronto', 'Dubai']
-  
+
   return {
     id: index + 1,
     name: `User ${index + 1}`,
@@ -43,10 +43,7 @@ export function VirtualTableDemo() {
   const [loading, setLoading] = useState(false)
 
   // Generate test data
-  const data = useMemo(
-    () => generateTestData(rowCount, generateRow),
-    [rowCount]
-  )
+  const data = useMemo(() => generateTestData(rowCount, generateRow), [rowCount])
 
   // Define columns
   const columns = [
@@ -80,7 +77,15 @@ export function VirtualTableDemo() {
       header: 'Score',
       width: 100,
       render: (item: TestRow) => (
-        <span className={item.score > 70 ? 'text-green-600' : item.score > 40 ? 'text-yellow-600' : 'text-red-600'}>
+        <span
+          className={
+            item.score > 70
+              ? 'text-green-600'
+              : item.score > 40
+                ? 'text-yellow-600'
+                : 'text-red-600'
+          }
+        >
           {item.score}
         </span>
       ),
@@ -95,8 +100,8 @@ export function VirtualTableDemo() {
             item.status === 'active'
               ? 'bg-green-100 text-green-700'
               : item.status === 'pending'
-              ? 'bg-yellow-100 text-yellow-700'
-              : 'bg-gray-100 text-gray-700'
+                ? 'bg-yellow-100 text-yellow-700'
+                : 'bg-gray-100 text-gray-700'
           }`}
         >
           {item.status}

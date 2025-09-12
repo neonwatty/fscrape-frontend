@@ -6,48 +6,48 @@ import { executeQuery } from './sql-loader'
  */
 export function createDatabaseIndexes(): void {
   console.log('Creating database indexes for optimization...')
-  
+
   const indexes = [
     // Single column indexes for common filters
     {
       name: 'idx_platform',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_platform ON posts(platform)'
+      sql: 'CREATE INDEX IF NOT EXISTS idx_platform ON posts(platform)',
     },
     {
       name: 'idx_subreddit',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_subreddit ON posts(subreddit)'
+      sql: 'CREATE INDEX IF NOT EXISTS idx_subreddit ON posts(subreddit)',
     },
     {
       name: 'idx_author',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_author ON posts(author) WHERE author IS NOT NULL'
+      sql: 'CREATE INDEX IF NOT EXISTS idx_author ON posts(author) WHERE author IS NOT NULL',
     },
     {
       name: 'idx_created_utc',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_created_utc ON posts(created_utc DESC)'
+      sql: 'CREATE INDEX IF NOT EXISTS idx_created_utc ON posts(created_utc DESC)',
     },
     {
       name: 'idx_score',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_score ON posts(score DESC)'
+      sql: 'CREATE INDEX IF NOT EXISTS idx_score ON posts(score DESC)',
     },
     {
       name: 'idx_num_comments',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_num_comments ON posts(num_comments DESC)'
+      sql: 'CREATE INDEX IF NOT EXISTS idx_num_comments ON posts(num_comments DESC)',
     },
-    
+
     // Composite indexes for common query patterns
     {
       name: 'idx_platform_created',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_platform_created ON posts(platform, created_utc DESC)'
+      sql: 'CREATE INDEX IF NOT EXISTS idx_platform_created ON posts(platform, created_utc DESC)',
     },
     {
       name: 'idx_platform_score',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_platform_score ON posts(platform, score DESC)'
+      sql: 'CREATE INDEX IF NOT EXISTS idx_platform_score ON posts(platform, score DESC)',
     },
     {
       name: 'idx_author_created',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_author_created ON posts(author, created_utc DESC) WHERE author IS NOT NULL'
+      sql: 'CREATE INDEX IF NOT EXISTS idx_author_created ON posts(author, created_utc DESC) WHERE author IS NOT NULL',
     },
-    
+
     // Covering index for dashboard queries
     {
       name: 'idx_dashboard_covering',
@@ -58,29 +58,29 @@ export function createDatabaseIndexes(): void {
         num_comments, 
         title, 
         author
-      )`
+      )`,
     },
-    
+
     // Partial indexes for specific conditions
     {
       name: 'idx_high_score',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_high_score ON posts(score DESC) WHERE score > 100'
+      sql: 'CREATE INDEX IF NOT EXISTS idx_high_score ON posts(score DESC) WHERE score > 100',
     },
     {
       name: 'idx_has_comments',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_has_comments ON posts(num_comments DESC) WHERE num_comments > 0'
+      sql: 'CREATE INDEX IF NOT EXISTS idx_has_comments ON posts(num_comments DESC) WHERE num_comments > 0',
     },
-    
+
     // Text search optimization
     {
       name: 'idx_title_search',
-      sql: 'CREATE INDEX IF NOT EXISTS idx_title_search ON posts(title COLLATE NOCASE)'
-    }
+      sql: 'CREATE INDEX IF NOT EXISTS idx_title_search ON posts(title COLLATE NOCASE)',
+    },
   ]
-  
+
   let successCount = 0
   let failureCount = 0
-  
+
   indexes.forEach(({ name, sql }) => {
     try {
       executeQuery(sql)
@@ -91,7 +91,7 @@ export function createDatabaseIndexes(): void {
       failureCount++
     }
   })
-  
+
   // Update database statistics
   try {
     executeQuery('ANALYZE')
@@ -99,7 +99,7 @@ export function createDatabaseIndexes(): void {
   } catch (error) {
     console.error('❌ Failed to run ANALYZE:', error)
   }
-  
+
   console.log(`
 Index creation complete:
 - Successfully created: ${successCount} indexes
@@ -124,10 +124,10 @@ export function dropDatabaseIndexes(): void {
     'idx_dashboard_covering',
     'idx_high_score',
     'idx_has_comments',
-    'idx_title_search'
+    'idx_title_search',
   ]
-  
-  indexNames.forEach(name => {
+
+  indexNames.forEach((name) => {
     try {
       executeQuery(`DROP INDEX IF EXISTS ${name}`)
       console.log(`Dropped index: ${name}`)
@@ -148,7 +148,7 @@ export function checkExistingIndexes(): Array<{ name: string; sql: string }> {
     AND tbl_name = 'posts'
     AND name NOT LIKE 'sqlite_%'
   `
-  
+
   try {
     const indexes = executeQuery(sql) as Array<{ name: string; sql: string }>
     return indexes
@@ -165,33 +165,33 @@ export function getIndexUsageStats(): void {
   const queries = [
     {
       name: 'Recent posts query',
-      sql: 'EXPLAIN QUERY PLAN SELECT * FROM posts ORDER BY created_utc DESC LIMIT 10'
+      sql: 'EXPLAIN QUERY PLAN SELECT * FROM posts ORDER BY created_utc DESC LIMIT 10',
     },
     {
       name: 'Platform filter query',
-      sql: "EXPLAIN QUERY PLAN SELECT * FROM posts WHERE platform = 'Reddit'"
+      sql: "EXPLAIN QUERY PLAN SELECT * FROM posts WHERE platform = 'Reddit'",
     },
     {
       name: 'Author search query',
-      sql: "EXPLAIN QUERY PLAN SELECT * FROM posts WHERE author = 'test_user'"
+      sql: "EXPLAIN QUERY PLAN SELECT * FROM posts WHERE author = 'test_user'",
     },
     {
       name: 'Score range query',
-      sql: 'EXPLAIN QUERY PLAN SELECT * FROM posts WHERE score > 100 ORDER BY score DESC'
+      sql: 'EXPLAIN QUERY PLAN SELECT * FROM posts WHERE score > 100 ORDER BY score DESC',
     },
     {
       name: 'Text search query',
-      sql: "EXPLAIN QUERY PLAN SELECT * FROM posts WHERE title LIKE '%search%'"
-    }
+      sql: "EXPLAIN QUERY PLAN SELECT * FROM posts WHERE title LIKE '%search%'",
+    },
   ]
-  
+
   console.log('Index Usage Analysis:\n')
-  
+
   queries.forEach(({ name, sql }) => {
     try {
       const plan = executeQuery(sql) as Array<{ detail: string }>
       console.log(`${name}:`)
-      plan.forEach(step => {
+      plan.forEach((step) => {
         console.log(`  - ${step.detail}`)
       })
       console.log('')

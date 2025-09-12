@@ -58,7 +58,10 @@ export function MobileTimeSeriesChart({
   const [zoomLevel, setZoomLevel] = useState(1)
   const [panEnabled, setPanEnabled] = useState(false)
   const [selectedPoint, setSelectedPoint] = useState<DataPoint | null>(null)
-  const [_brushDomain, setBrushDomain] = useState<{ startIndex?: number; endIndex?: number } | null>(null)
+  const [_brushDomain, setBrushDomain] = useState<{
+    startIndex?: number
+    endIndex?: number
+  } | null>(null)
 
   // Detect if mobile device
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
@@ -99,7 +102,7 @@ export function MobileTimeSeriesChart({
   // Format tick for mobile
   const formatXAxisTick = (tickItem: string) => {
     if (!isMobile) return tickItem
-    
+
     try {
       const date = new Date(tickItem)
       return format(date, 'MM/dd')
@@ -109,13 +112,11 @@ export function MobileTimeSeriesChart({
   }
 
   // Mobile-optimized chart configuration
-  const chartMargin = isMobile 
+  const chartMargin = isMobile
     ? { top: 5, right: 5, left: -20, bottom: 5 }
     : { top: 10, right: 30, left: 0, bottom: 10 }
 
-  const tickStyle = isMobile
-    ? { fontSize: 10, fill: '#666' }
-    : { fontSize: 12, fill: '#666' }
+  const tickStyle = isMobile ? { fontSize: 10, fill: '#666' } : { fontSize: 12, fill: '#666' }
 
   return (
     <Card className={cn('overflow-hidden', className)}>
@@ -129,7 +130,7 @@ export function MobileTimeSeriesChart({
           )}
         </CardHeader>
       )}
-      
+
       <CardContent className={cn('p-0', isMobile && 'pb-2')}>
         <div ref={chartRef}>
           <MobileChart
@@ -140,18 +141,11 @@ export function MobileTimeSeriesChart({
             onZoomChange={setZoomLevel}
             className="relative"
           >
-            <LineChart
-              data={optimizedData}
-              margin={chartMargin}
-            >
+            <LineChart data={optimizedData} margin={chartMargin}>
               {showGrid && (
-                <CartesianGrid 
-                  strokeDasharray="3 3" 
-                  stroke="#e0e0e0"
-                  strokeOpacity={0.3}
-                />
+                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" strokeOpacity={0.3} />
               )}
-              
+
               <XAxis
                 dataKey="date"
                 tick={tickStyle}
@@ -161,7 +155,7 @@ export function MobileTimeSeriesChart({
                 textAnchor={isMobile ? 'end' : 'middle'}
                 height={isMobile ? 50 : 30}
               />
-              
+
               <YAxis
                 tick={tickStyle}
                 width={isMobile ? 35 : 60}
@@ -171,22 +165,16 @@ export function MobileTimeSeriesChart({
                   return value.toString()
                 }}
               />
-              
+
               <Tooltip
-                content={enableMobileOptimizations && isMobile ? (
-                  <MobileChartTooltip />
-                ) : undefined}
+                content={enableMobileOptimizations && isMobile ? <MobileChartTooltip /> : undefined}
                 cursor={{ strokeDasharray: '3 3' }}
               />
-              
+
               {showLegend && !isMobile && (
-                <Legend 
-                  verticalAlign="top"
-                  height={36}
-                  iconType="line"
-                />
+                <Legend verticalAlign="top" height={36} iconType="line" />
               )}
-              
+
               {dataKeys.map((dataKey) => (
                 <Line
                   key={dataKey.key}
@@ -199,7 +187,7 @@ export function MobileTimeSeriesChart({
                   activeDot={isMobile ? { r: 6 } : { r: 8 }}
                 />
               ))}
-              
+
               {selectedPoint && (
                 <ReferenceLine
                   x={selectedPoint.date}
@@ -208,17 +196,19 @@ export function MobileTimeSeriesChart({
                   label={{
                     value: `Selected: ${selectedPoint.value}`,
                     position: 'top',
-                    style: { fontSize: 12, fill: '#ff0000' }
+                    style: { fontSize: 12, fill: '#ff0000' },
                   }}
                 />
               )}
-              
+
               {showBrush && !isMobile && (
                 <Brush
                   dataKey="date"
                   height={30}
                   stroke="#8884d8"
-                  onChange={(domain: { startIndex?: number; endIndex?: number } | null) => setBrushDomain(domain)}
+                  onChange={(domain: { startIndex?: number; endIndex?: number } | null) =>
+                    setBrushDomain(domain)
+                  }
                 />
               )}
             </LineChart>
@@ -240,7 +230,7 @@ export function MobileTimeSeriesChart({
               isPanEnabled={panEnabled}
               className="justify-center"
             />
-            
+
             {/* Legend for mobile */}
             {showLegend && (
               <div className="flex items-center justify-center gap-4 mt-2">

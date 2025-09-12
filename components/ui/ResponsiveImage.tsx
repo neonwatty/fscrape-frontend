@@ -3,9 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
-import { 
-  generateSizes
-} from '@/lib/utils/image-optimization'
+import { generateSizes } from '@/lib/utils/image-optimization'
 import { getBlurPlaceholder } from '@/lib/utils/blur-placeholder'
 
 interface ResponsiveImageProps {
@@ -63,17 +61,16 @@ export function ResponsiveImage({
     onError?.()
   }
 
-  const responsiveSizes = sizes || generateSizes({
-    mobile: '100vw',
-    tablet: '50vw',
-    desktop: '33vw',
-  })
+  const responsiveSizes =
+    sizes ||
+    generateSizes({
+      mobile: '100vw',
+      tablet: '50vw',
+      desktop: '33vw',
+    })
 
   return (
-    <div 
-      ref={containerRef}
-      className={cn('relative overflow-hidden', containerClassName)}
-    >
+    <div ref={containerRef} className={cn('relative overflow-hidden', containerClassName)}>
       <Image
         src={imageSrc}
         alt={alt}
@@ -117,12 +114,7 @@ export function ResponsivePicture({
     <div className={cn('relative', containerClassName)}>
       <picture>
         {sources.map((source, index) => (
-          <source
-            key={index}
-            srcSet={source.srcSet}
-            media={source.media}
-            type={source.type}
-          />
+          <source key={index} srcSet={source.srcSet} media={source.media} type={source.type} />
         ))}
         <img
           src={sources[sources.length - 1].srcSet}
@@ -183,9 +175,7 @@ export function ImageGrid({
             priority={index < 4}
           />
           {image.caption && (
-            <figcaption className="mt-2 text-sm text-muted-foreground">
-              {image.caption}
-            </figcaption>
+            <figcaption className="mt-2 text-sm text-muted-foreground">{image.caption}</figcaption>
           )}
         </figure>
       ))}
@@ -228,15 +218,8 @@ export function BackgroundImage({
         )}
         onLoad={() => setIsLoaded(true)}
       />
-      {overlay && (
-        <div 
-          className="absolute inset-0 bg-black"
-          style={{ opacity: overlayOpacity }}
-        />
-      )}
-      <div className="relative z-10">
-        {children}
-      </div>
+      {overlay && <div className="absolute inset-0 bg-black" style={{ opacity: overlayOpacity }} />}
+      <div className="relative z-10">{children}</div>
     </div>
   )
 }
@@ -291,10 +274,7 @@ export function ZoomableImage({
       <ResponsiveImage
         src={src}
         alt={alt}
-        className={cn(
-          'transition-transform duration-300 group-hover:scale-110',
-          className
-        )}
+        className={cn('transition-transform duration-300 group-hover:scale-110', className)}
         containerClassName="w-full h-full"
       />
     </div>
@@ -304,10 +284,13 @@ export function ZoomableImage({
 /**
  * Hook for responsive image loading
  */
-export function useResponsiveImage(src: string, options?: {
-  threshold?: number
-  rootMargin?: string
-}) {
+export function useResponsiveImage(
+  src: string,
+  options?: {
+    threshold?: number
+    rootMargin?: string
+  }
+) {
   const [isInView, setIsInView] = useState(false)
   const [isLoaded, setIsLoaded] = useState(false)
   const elementRef = useRef<HTMLDivElement>(null)

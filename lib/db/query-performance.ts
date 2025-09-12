@@ -36,9 +36,9 @@ export class QueryPerformanceMonitor {
   private thresholds: PerformanceThresholds = {
     slowQueryMs: 100,
     largeResultSet: 1000,
-    maxScanRows: 10000
+    maxScanRows: 10000,
   }
-  
+
   constructor(thresholds?: Partial<PerformanceThresholds>) {
     if (thresholds) {
       this.thresholds = { ...this.thresholds, ...thresholds }
@@ -54,13 +54,13 @@ export class QueryPerformanceMonitor {
     cached: boolean = false
   ): { result: T; metrics: QueryMetrics } {
     const startTime = performance.now()
-    
+
     // Execute the query
     const result = executeQuery(sql, params) as T
-    
+
     const executionTime = performance.now() - startTime
     const rowsReturned = Array.isArray(result) ? result.length : 1
-    
+
     // Create metrics object
     const metrics: QueryMetrics = {
       query: sql,
@@ -68,19 +68,19 @@ export class QueryPerformanceMonitor {
       executionTime,
       rowsReturned,
       timestamp: Date.now(),
-      cached
+      cached,
     }
-    
+
     // Analyze if it's a slow query
     if (executionTime > this.thresholds.slowQueryMs) {
       this.slowQueries.push(metrics)
       console.warn(`Slow query detected (${executionTime.toFixed(2)}ms):`, sql.substring(0, 100))
     }
-    
+
     // Store metrics
     this.metrics.push(metrics)
     this.cleanOldMetrics()
-    
+
     return { result, metrics }
   }
 
@@ -98,42 +98,42 @@ export class QueryPerformanceMonitor {
   getOptimizationSuggestions(sql: string): string[] {
     const suggestions: string[] = []
     const upperSql = sql.toUpperCase()
-    
+
     // Check for missing indexes
     if (upperSql.includes('WHERE') && !upperSql.includes('INDEX')) {
       const whereClause = sql.substring(upperSql.indexOf('WHERE'))
       const columns = this.extractColumnsFromWhere(whereClause)
-      
-      columns.forEach(col => {
+
+      columns.forEach((col) => {
         suggestions.push(`Consider adding index on column: ${col}`)
       })
     }
-    
+
     // Check for SELECT *
     if (upperSql.includes('SELECT *')) {
       suggestions.push('Avoid SELECT *, specify only needed columns')
     }
-    
+
     // Check for missing LIMIT in queries without aggregation
     if (!upperSql.includes('LIMIT') && !upperSql.includes('COUNT') && !upperSql.includes('SUM')) {
       suggestions.push('Consider adding LIMIT to prevent large result sets')
     }
-    
+
     // Check for LIKE with leading wildcard
-    if (upperSql.includes('LIKE \'%')) {
+    if (upperSql.includes("LIKE '%")) {
       suggestions.push('Leading wildcard in LIKE prevents index usage')
     }
-    
+
     // Check for OR conditions
     if (upperSql.includes(' OR ')) {
       suggestions.push('OR conditions may prevent index usage, consider UNION')
     }
-    
+
     // Check for NOT IN
     if (upperSql.includes('NOT IN')) {
       suggestions.push('NOT IN can be slow, consider NOT EXISTS or LEFT JOIN')
     }
-    
+
     return suggestions
   }
 
@@ -147,10 +147,10 @@ export class QueryPerformanceMonitor {
       /(\w+)\s*>\s*/g,
       /(\w+)\s*<\s*/g,
       /(\w+)\s*LIKE\s*/gi,
-      /(\w+)\s*IN\s*/gi
+      /(\w+)\s*IN\s*/gi,
     ]
-    
-    patterns.forEach(pattern => {
+
+    patterns.forEach((pattern) => {
       let match
       while ((match = pattern.exec(whereClause)) !== null) {
         if (match[1] && !['AND', 'OR', 'NOT', 'WHERE'].includes(match[1].toUpperCase())) {
@@ -158,7 +158,7 @@ export class QueryPerformanceMonitor {
         }
       }
     })
-    
+
     return [...new Set(columns)]
   }
 
@@ -169,16 +169,16 @@ export class QueryPerformanceMonitor {
     if (this.metrics.length === 0) {
       return null
     }
-    
-    const times = this.metrics.map(m => m.executionTime)
+
+    const times = this.metrics.map((m) => m.executionTime)
     const totalTime = times.reduce((a, b) => a + b, 0)
     const avgTime = totalTime / times.length
     const maxTime = Math.max(...times)
     const minTime = Math.min(...times)
-    
+
     const totalRows = this.metrics.reduce((sum, m) => sum + m.rowsReturned, 0)
     const avgRows = totalRows / this.metrics.length
-    
+
     return {
       totalQueries: this.metrics.length,
       totalTime,
@@ -188,7 +188,7 @@ export class QueryPerformanceMonitor {
       totalRows,
       avgRows,
       slowQueries: this.slowQueries.length,
-      cacheHitRate: this.metrics.filter(m => m.cached).length / this.metrics.length
+      cacheHitRate: this.metrics.filter((m) => m.cached).length / this.metrics.length,
     }
   }
 
@@ -196,9 +196,7 @@ export class QueryPerformanceMonitor {
    * Get slow queries
    */
   getSlowQueries(limit: number = 10): QueryMetrics[] {
-    return this.slowQueries
-      .sort((a, b) => b.executionTime - a.executionTime)
-      .slice(0, limit)
+    return this.slowQueries.sort((a, b) => b.executionTime - a.executionTime).slice(0, limit)
   }
 
   /**
@@ -227,17 +225,21 @@ export class QueryPerformanceMonitor {
   exportMetrics(): string {
     const stats = this.getStatistics()
     const slowQueries = this.getSlowQueries()
-    
-    return JSON.stringify({
-      statistics: stats,
-      slowQueries: slowQueries.map(q => ({
-        query: q.query.substring(0, 200),
-        executionTime: q.executionTime,
-        rowsReturned: q.rowsReturned,
-        timestamp: new Date(q.timestamp).toISOString()
-      })),
-      timestamp: new Date().toISOString()
-    }, null, 2)
+
+    return JSON.stringify(
+      {
+        statistics: stats,
+        slowQueries: slowQueries.map((q) => ({
+          query: q.query.substring(0, 200),
+          executionTime: q.executionTime,
+          rowsReturned: q.rowsReturned,
+          timestamp: new Date(q.timestamp).toISOString(),
+        })),
+        timestamp: new Date().toISOString(),
+      },
+      null,
+      2
+    )
   }
 }
 
@@ -258,9 +260,9 @@ export class DatabaseHealth {
       tables: this.getTableStats(),
       indexes: this.getIndexStats(),
       size: this.getDatabaseSize(),
-      performance: this.getPerformanceStats()
+      performance: this.getPerformanceStats(),
     }
-    
+
     return stats
   }
 
@@ -275,7 +277,7 @@ export class DatabaseHealth {
       FROM sqlite_master 
       WHERE type='table' AND name='posts'
     `
-    
+
     return executeQuery(sql) as any[]
   }
 
@@ -290,7 +292,7 @@ export class DatabaseHealth {
       FROM sqlite_master 
       WHERE type='index' AND tbl_name='posts'
     `
-    
+
     return executeQuery(sql) as any[]
   }
 
@@ -299,7 +301,9 @@ export class DatabaseHealth {
    */
   private static getDatabaseSize(): number {
     try {
-      const result = executeQuery('SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()') as any[]
+      const result = executeQuery(
+        'SELECT page_count * page_size as size FROM pragma_page_count(), pragma_page_size()'
+      ) as any[]
       return result[0]?.size || 0
     } catch {
       return 0
@@ -314,15 +318,15 @@ export class DatabaseHealth {
       // Check if statistics are available
       const sql = 'SELECT * FROM sqlite_stat1 LIMIT 1'
       executeQuery(sql)
-      
+
       return {
         analyzed: true,
-        message: 'Database statistics available'
+        message: 'Database statistics available',
       }
     } catch {
       return {
         analyzed: false,
-        message: 'Run ANALYZE to generate statistics'
+        message: 'Run ANALYZE to generate statistics',
       }
     }
   }
@@ -332,12 +336,12 @@ export class DatabaseHealth {
    */
   static optimize(): void {
     const commands = [
-      'ANALYZE',           // Update statistics
-      'VACUUM',           // Reclaim space
-      'PRAGMA optimize'   // Run optimizations
+      'ANALYZE', // Update statistics
+      'VACUUM', // Reclaim space
+      'PRAGMA optimize', // Run optimizations
     ]
-    
-    commands.forEach(cmd => {
+
+    commands.forEach((cmd) => {
       try {
         executeQuery(cmd)
         console.log(`Successfully executed: ${cmd}`)
@@ -359,20 +363,16 @@ export class QueryPrefetcher {
   /**
    * Prefetch query results
    */
-  async prefetch<T>(
-    key: string,
-    queryFn: () => T,
-    ttl: number = 60000
-  ): Promise<void> {
+  async prefetch<T>(key: string, queryFn: () => T, ttl: number = 60000): Promise<void> {
     this.prefetchQueue.push(async () => {
       const result = queryFn()
       this.prefetchCache.set(key, {
         data: result,
         timestamp: Date.now(),
-        ttl
+        ttl,
       })
     })
-    
+
     if (!this.isPrefetching) {
       this.processPrefetchQueue()
     }
@@ -383,15 +383,15 @@ export class QueryPrefetcher {
    */
   get<T>(key: string): T | null {
     const cached = this.prefetchCache.get(key)
-    
+
     if (!cached) return null
-    
+
     const now = Date.now()
     if (now - cached.timestamp > cached.ttl) {
       this.prefetchCache.delete(key)
       return null
     }
-    
+
     return cached.data
   }
 
@@ -400,9 +400,9 @@ export class QueryPrefetcher {
    */
   private async processPrefetchQueue() {
     if (this.isPrefetching || this.prefetchQueue.length === 0) return
-    
+
     this.isPrefetching = true
-    
+
     while (this.prefetchQueue.length > 0) {
       const task = this.prefetchQueue.shift()
       if (task) {
@@ -413,7 +413,7 @@ export class QueryPrefetcher {
         }
       }
     }
-    
+
     this.isPrefetching = false
   }
 
@@ -431,21 +431,20 @@ export const queryMonitor = new QueryPerformanceMonitor()
 export const queryPrefetcher = new QueryPrefetcher()
 
 // Export convenience functions
-export function trackQuery<T>(
-  sql: string,
-  params: unknown[] = [],
-  cached: boolean = false
-): T {
+export function trackQuery<T>(sql: string, params: unknown[] = [], cached: boolean = false): T {
   const { result } = queryMonitor.executeWithMetrics<T>(sql, params, cached)
   return result
 }
 
-export function analyzeQuery(sql: string, params: unknown[] = []): {
+export function analyzeQuery(
+  sql: string,
+  params: unknown[] = []
+): {
   plan: QueryPlan[]
   suggestions: string[]
 } {
   const plan = queryMonitor.analyzeQueryPlan(sql, params)
   const suggestions = queryMonitor.getOptimizationSuggestions(sql)
-  
+
   return { plan, suggestions }
 }

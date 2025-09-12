@@ -20,18 +20,18 @@ export function useServiceWorker() {
   // Check if service worker is supported
   useEffect(() => {
     const isSupported = 'serviceWorker' in navigator
-    setState(prev => ({ ...prev, isSupported }))
-    
+    setState((prev) => ({ ...prev, isSupported }))
+
     // Set online status
-    setState(prev => ({ ...prev, isOnline: navigator.onLine }))
-    
+    setState((prev) => ({ ...prev, isOnline: navigator.onLine }))
+
     // Listen for online/offline events
-    const handleOnline = () => setState(prev => ({ ...prev, isOnline: true }))
-    const handleOffline = () => setState(prev => ({ ...prev, isOnline: false }))
-    
+    const handleOnline = () => setState((prev) => ({ ...prev, isOnline: true }))
+    const handleOffline = () => setState((prev) => ({ ...prev, isOnline: false }))
+
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
-    
+
     return () => {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
@@ -55,12 +55,12 @@ export function useServiceWorker() {
         registration = await navigator.serviceWorker.register('/sw.js', {
           scope: '/',
         })
-        
+
         console.log('[PWA] Service worker registered:', registration)
-        setState(prev => ({ 
-          ...prev, 
-          isRegistered: true, 
-          registration 
+        setState((prev) => ({
+          ...prev,
+          isRegistered: true,
+          registration,
         }))
 
         // Check for updates
@@ -71,17 +71,19 @@ export function useServiceWorker() {
           newWorker.addEventListener('statechange', () => {
             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
               // New service worker available
-              setState(prev => ({ ...prev, isUpdateAvailable: true }))
+              setState((prev) => ({ ...prev, isUpdateAvailable: true }))
               console.log('[PWA] New service worker available')
             }
           })
         })
 
         // Check for updates periodically (every hour)
-        setInterval(() => {
-          registration?.update()
-        }, 60 * 60 * 1000)
-
+        setInterval(
+          () => {
+            registration?.update()
+          },
+          60 * 60 * 1000
+        )
       } catch (error) {
         console.error('[PWA] Service worker registration failed:', error)
       }
@@ -107,7 +109,7 @@ export function useServiceWorker() {
 
     // Tell waiting service worker to skip waiting
     state.registration.waiting?.postMessage({ type: 'SKIP_WAITING' })
-    
+
     // Reload page to use new service worker
     window.location.reload()
   }, [state.registration])
@@ -128,7 +130,7 @@ export function useServiceWorker() {
 
     try {
       const cacheNames = await caches.keys()
-      await Promise.all(cacheNames.map(name => caches.delete(name)))
+      await Promise.all(cacheNames.map((name) => caches.delete(name)))
       console.log('[PWA] All caches cleared')
       return true
     } catch (error) {

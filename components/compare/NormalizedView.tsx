@@ -28,11 +28,11 @@ export function NormalizedView({
   sources,
   normalizationMethod = 'minmax',
   showRawValues = true,
-  className
+  className,
 }: NormalizedViewProps) {
   const [selectedMethod, setSelectedMethod] = useState(normalizationMethod)
 
-  const getSourceById = (id: string) => sources.find(s => s.id === id)
+  const getSourceById = (id: string) => sources.find((s) => s.id === id)
 
   const getNormalizedValue = (metric: NormalizedMetric) => {
     switch (selectedMethod) {
@@ -90,11 +90,9 @@ export function NormalizedView({
     }
   }
 
-  const sortedMetrics = [...metrics].sort((a, b) => 
-    getNormalizedValue(b) - getNormalizedValue(a)
-  )
+  const sortedMetrics = [...metrics].sort((a, b) => getNormalizedValue(b) - getNormalizedValue(a))
 
-  const maxNormalized = Math.max(...metrics.map(m => getNormalizedValue(m)))
+  const maxNormalized = Math.max(...metrics.map((m) => getNormalizedValue(m)))
 
   return (
     <div className={cn('rounded-lg border bg-card', className)}>
@@ -106,7 +104,7 @@ export function NormalizedView({
 
         {/* Normalization method selector */}
         <div className="flex flex-wrap gap-2">
-          {(['minmax', 'zscore', 'percentile', 'log'] as const).map(method => (
+          {(['minmax', 'zscore', 'percentile', 'log'] as const).map((method) => (
             <button
               key={method}
               onClick={() => setSelectedMethod(method)}
@@ -126,10 +124,8 @@ export function NormalizedView({
             </button>
           ))}
         </div>
-        
-        <p className="text-sm text-muted-foreground mt-2">
-          {getMethodDescription(selectedMethod)}
-        </p>
+
+        <p className="text-sm text-muted-foreground mt-2">{getMethodDescription(selectedMethod)}</p>
       </div>
 
       <div className="p-6 space-y-3">
@@ -138,15 +134,11 @@ export function NormalizedView({
           if (!source) return null
 
           const normalizedValue = getNormalizedValue(metric)
-          const percentage = selectedMethod === 'minmax' 
-            ? normalizedValue 
-            : (normalizedValue / maxNormalized)
+          const percentage =
+            selectedMethod === 'minmax' ? normalizedValue : normalizedValue / maxNormalized
 
           return (
-            <div
-              key={metric.sourceId}
-              className="space-y-2"
-            >
+            <div key={metric.sourceId} className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {source.color && (
@@ -155,9 +147,7 @@ export function NormalizedView({
                       style={{ backgroundColor: source.color }}
                     />
                   )}
-                  <span className="font-medium text-sm">
-                    {source.name}
-                  </span>
+                  <span className="font-medium text-sm">{source.name}</span>
                   {index === 0 && (
                     <span className="text-xs bg-green-500/10 text-green-600 px-2 py-0.5 rounded">
                       Best
@@ -182,7 +172,7 @@ export function NormalizedView({
                   className="absolute inset-y-0 left-0 bg-gradient-to-r from-primary/50 to-primary rounded-full transition-all duration-500"
                   style={{
                     width: `${Math.max(5, Math.min(100, percentage * 100))}%`,
-                    backgroundColor: source.color || undefined
+                    backgroundColor: source.color || undefined,
                   }}
                 />
                 <div className="absolute inset-0 flex items-center px-2">
@@ -208,7 +198,9 @@ export function NormalizedView({
           <div>
             <span className="text-muted-foreground">Median</span>
             <p className="font-medium">
-              {[...metrics].sort((a, b) => a.rawValue - b.rawValue)[Math.floor(metrics.length / 2)]?.rawValue.toFixed(0)}
+              {[...metrics]
+                .sort((a, b) => a.rawValue - b.rawValue)
+                [Math.floor(metrics.length / 2)]?.rawValue.toFixed(0)}
             </p>
           </div>
           <div>
@@ -216,7 +208,9 @@ export function NormalizedView({
             <p className="font-medium">
               {(() => {
                 const mean = metrics.reduce((sum, m) => sum + m.rawValue, 0) / metrics.length
-                const variance = metrics.reduce((sum, m) => sum + Math.pow(m.rawValue - mean, 2), 0) / metrics.length
+                const variance =
+                  metrics.reduce((sum, m) => sum + Math.pow(m.rawValue - mean, 2), 0) /
+                  metrics.length
                 return Math.sqrt(variance).toFixed(0)
               })()}
             </p>
@@ -224,7 +218,8 @@ export function NormalizedView({
           <div>
             <span className="text-muted-foreground">Range</span>
             <p className="font-medium">
-              {Math.min(...metrics.map(m => m.rawValue)).toFixed(0)} - {Math.max(...metrics.map(m => m.rawValue)).toFixed(0)}
+              {Math.min(...metrics.map((m) => m.rawValue)).toFixed(0)} -{' '}
+              {Math.max(...metrics.map((m) => m.rawValue)).toFixed(0)}
             </p>
           </div>
         </div>

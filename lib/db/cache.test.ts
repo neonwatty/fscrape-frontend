@@ -48,7 +48,7 @@ describe('LRU Cache', () => {
       expect(cache.get('expiring')).toBe('value')
 
       // Wait for expiration
-      await new Promise(resolve => setTimeout(resolve, 150))
+      await new Promise((resolve) => setTimeout(resolve, 150))
 
       expect(cache.get('expiring')).toBeNull()
       const stats = cache.getStats()
@@ -214,5 +214,4 @@ describe('LRU Cache', () => {
       expect(duration).toBeLessThan(1000)
     })
   })
-
 })

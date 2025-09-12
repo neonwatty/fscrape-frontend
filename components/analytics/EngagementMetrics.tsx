@@ -1,16 +1,19 @@
 'use client'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  MessageSquare, 
-  ThumbsUp, 
+import {
+  TrendingUp,
+  TrendingDown,
+  MessageSquare,
+  ThumbsUp,
   FileText,
   Activity,
-  BarChart3
+  BarChart3,
 } from 'lucide-react'
-import { EngagementMetrics as MetricsType, calculateGrowthRate } from '@/lib/analytics/analytics-utils'
+import {
+  EngagementMetrics as MetricsType,
+  calculateGrowthRate,
+} from '@/lib/analytics/analytics-utils'
 import { cn } from '@/lib/utils'
 
 interface MetricCardProps {
@@ -31,14 +34,16 @@ function MetricCard({ title, value, subtitle, change, icon, className }: MetricC
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        {subtitle && (
-          <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>
-        )}
+        {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
         {change && (
-          <div className={cn(
-            'flex items-center gap-1 mt-2 text-xs font-medium',
-            change.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-          )}>
+          <div
+            className={cn(
+              'flex items-center gap-1 mt-2 text-xs font-medium',
+              change.isPositive
+                ? 'text-green-600 dark:text-green-400'
+                : 'text-red-600 dark:text-red-400'
+            )}
+          >
             {change.isPositive ? (
               <TrendingUp className="h-3 w-3" />
             ) : (
@@ -50,12 +55,16 @@ function MetricCard({ title, value, subtitle, change, icon, className }: MetricC
         )}
       </CardContent>
       {/* Decorative gradient */}
-      <div className={cn(
-        'absolute inset-x-0 bottom-0 h-1',
-        change?.isPositive ? 'bg-gradient-to-r from-green-500 to-green-600' : 
-        change && !change.isPositive ? 'bg-gradient-to-r from-red-500 to-red-600' :
-        'bg-gradient-to-r from-primary/50 to-primary'
-      )} />
+      <div
+        className={cn(
+          'absolute inset-x-0 bottom-0 h-1',
+          change?.isPositive
+            ? 'bg-gradient-to-r from-green-500 to-green-600'
+            : change && !change.isPositive
+              ? 'bg-gradient-to-r from-red-500 to-red-600'
+              : 'bg-gradient-to-r from-primary/50 to-primary'
+        )}
+      />
     </Card>
   )
 }
@@ -68,18 +77,18 @@ interface EngagementMetricsProps {
 
 export function EngagementMetrics({ current, previous, className }: EngagementMetricsProps) {
   // Calculate growth rates if previous data is available
-  const postsGrowth = previous 
+  const postsGrowth = previous
     ? calculateGrowthRate(current.totalPosts, previous.totalPosts)
     : undefined
-    
+
   const scoreGrowth = previous
     ? calculateGrowthRate(current.totalScore, previous.totalScore)
     : undefined
-    
+
   const commentsGrowth = previous
     ? calculateGrowthRate(current.totalComments, previous.totalComments)
     : undefined
-    
+
   const engagementGrowth = previous
     ? calculateGrowthRate(current.engagementRate, previous.engagementRate)
     : undefined
@@ -93,7 +102,7 @@ export function EngagementMetrics({ current, previous, className }: EngagementMe
         change={postsGrowth}
         icon={<FileText className="h-4 w-4" />}
       />
-      
+
       <MetricCard
         title="Total Score"
         value={current.totalScore.toLocaleString()}
@@ -101,7 +110,7 @@ export function EngagementMetrics({ current, previous, className }: EngagementMe
         change={scoreGrowth}
         icon={<ThumbsUp className="h-4 w-4" />}
       />
-      
+
       <MetricCard
         title="Total Comments"
         value={current.totalComments.toLocaleString()}
@@ -109,7 +118,7 @@ export function EngagementMetrics({ current, previous, className }: EngagementMe
         change={commentsGrowth}
         icon={<MessageSquare className="h-4 w-4" />}
       />
-      
+
       <MetricCard
         title="Engagement Rate"
         value={current.engagementRate.toFixed(1)}

@@ -154,7 +154,9 @@ export function getPostsTimeSeries(days: number = 30): TimeSeriesData[] {
 }
 
 // Get posts by hour (for activity patterns)
-export function getPostsByHour(days: number = 7): { hour: number; count: number; avgScore: number }[] {
+export function getPostsByHour(
+  days: number = 7
+): { hour: number; count: number; avgScore: number }[] {
   const now = Math.floor(Date.now() / 1000)
   const timeAgo = now - days * 86400
 
@@ -233,7 +235,9 @@ export function getPostingHeatmap(days: number = 30) {
 }
 
 // Get top sources (subreddits or other sources)
-export function getTopSources(limit: number = 10): { source: string; platform: string; count: number; avgScore: number }[] {
+export function getTopSources(
+  limit: number = 10
+): { source: string; platform: string; count: number; avgScore: number }[] {
   return executeQuery(
     `
     SELECT 
@@ -251,11 +255,11 @@ export function getTopSources(limit: number = 10): { source: string; platform: s
 }
 
 // Get scraping sessions (if we track them)
-export function getScrapingSessions(limit: number = 20): { 
-  platform: string; 
-  sessionDate: string; 
-  postCount: number; 
-  avgScore: number 
+export function getScrapingSessions(limit: number = 20): {
+  platform: string
+  sessionDate: string
+  postCount: number
+  avgScore: number
 }[] {
   return executeQuery(
     `
@@ -275,12 +279,12 @@ export function getScrapingSessions(limit: number = 20): {
 
 // Platform comparison data
 export function getPlatformComparison(): {
-  platform: string;
-  totalPosts: number;
-  avgScore: number;
-  avgComments: number;
-  topHour: number;
-  topDay: number;
+  platform: string
+  totalPosts: number
+  avgScore: number
+  avgComments: number
+  topHour: number
+  topDay: number
 }[] {
   return executeQuery(`
     WITH platform_stats AS (
@@ -372,9 +376,7 @@ export function getUniqueSources(): { platform: string; source: string; count: n
 
 // Get database summary
 export function getDatabaseSummary() {
-  const totalPosts = executeQueryFirst<{ count: number }>(
-    'SELECT COUNT(*) as count FROM posts'
-  )
+  const totalPosts = executeQueryFirst<{ count: number }>('SELECT COUNT(*) as count FROM posts')
   const totalAuthors = executeQueryFirst<{ count: number }>(
     'SELECT COUNT(DISTINCT author) as count FROM posts WHERE author IS NOT NULL'
   )
@@ -397,7 +399,7 @@ export function getDatabaseSummary() {
 // Get trending posts (high score relative to age)
 export function getTrendingPosts(limit: number = 10): ForumPost[] {
   const now = Math.floor(Date.now() / 1000)
-  
+
   return executeQuery<ForumPost>(
     `
     SELECT *,
@@ -413,10 +415,10 @@ export function getTrendingPosts(limit: number = 10): ForumPost[] {
 
 // Get post engagement metrics
 export function getEngagementMetrics(days: number = 30): {
-  avgScore: number;
-  avgComments: number;
-  engagementRate: number;
-  topEngagementHour: number;
+  avgScore: number
+  avgComments: number
+  engagementRate: number
+  topEngagementHour: number
 }[] {
   const now = Math.floor(Date.now() / 1000)
   const timeAgo = now - days * 86400

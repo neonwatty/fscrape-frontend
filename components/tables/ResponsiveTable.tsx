@@ -64,7 +64,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
 }: ResponsiveTableProps<T>) {
   const [isMobile, setIsMobile] = useState(false)
   const [visibleColumns, setVisibleColumns] = useState<Set<string>>(
-    new Set(columns.map(col => col.key))
+    new Set(columns.map((col) => col.key))
   )
   const [expandedRows, setExpandedRows] = useState<Set<string | number>>(new Set())
   const [sortConfig, setSortConfig] = useState<{
@@ -77,31 +77,31 @@ export function ResponsiveTable<T extends { id?: string | number }>({
     const checkMobile = () => {
       setIsMobile(window.innerWidth < mobileBreakpoint)
     }
-    
+
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [mobileBreakpoint])
 
   // Filter columns by visibility
-  const activeColumns = columns.filter(col => visibleColumns.has(col.key))
-  
+  const activeColumns = columns.filter((col) => visibleColumns.has(col.key))
+
   // Get essential columns for mobile
-  const essentialColumns = columns.filter(col => col.priority === 'essential')
+  const essentialColumns = columns.filter((col) => col.priority === 'essential')
   const mobileColumns = essentialColumns.length > 0 ? essentialColumns : columns.slice(0, 2)
 
   // Sort data
   const sortedData = sortConfig
     ? [...data].sort((a, b) => {
-        const column = columns.find(col => col.key === sortConfig.key)
+        const column = columns.find((col) => col.key === sortConfig.key)
         if (!column) return 0
-        
+
         const aValue = column.accessor(a)
         const bValue = column.accessor(b)
-        
+
         if (aValue === null || aValue === undefined) return 1
         if (bValue === null || bValue === undefined) return -1
-        
+
         const comparison = aValue < bValue ? -1 : aValue > bValue ? 1 : 0
         return sortConfig.direction === 'asc' ? comparison : -comparison
       })
@@ -109,7 +109,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
 
   // Handle row expansion
   const toggleRowExpansion = (id: string | number) => {
-    setExpandedRows(prev => {
+    setExpandedRows((prev) => {
       const next = new Set(prev)
       if (next.has(id)) {
         next.delete(id)
@@ -122,7 +122,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
 
   // Handle column sorting
   const handleSort = (key: string) => {
-    setSortConfig(prev => {
+    setSortConfig((prev) => {
       if (!prev || prev.key !== key) {
         return { key, direction: 'asc' }
       }
@@ -135,7 +135,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
 
   // Toggle column visibility
   const toggleColumn = (key: string) => {
-    setVisibleColumns(prev => {
+    setVisibleColumns((prev) => {
       const next = new Set(prev)
       if (next.has(key)) {
         next.delete(key)
@@ -155,11 +155,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
   }
 
   if (data.length === 0) {
-    return (
-      <div className="text-center py-8 text-muted-foreground">
-        {emptyMessage}
-      </div>
-    )
+    return <div className="text-center py-8 text-muted-foreground">{emptyMessage}</div>
   }
 
   // Mobile card view
@@ -178,7 +174,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {columns.map(column => (
+              {columns.map((column) => (
                 <DropdownMenuCheckboxItem
                   key={column.key}
                   checked={visibleColumns.has(column.key)}
@@ -195,7 +191,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
         {sortedData.map((item, index) => {
           const itemId = item.id || index
           const isExpanded = expandedRows.has(itemId)
-          
+
           return (
             <div
               key={itemId}
@@ -207,7 +203,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
               onClick={() => onRowClick?.(item)}
             >
               {/* Show essential columns always */}
-              {mobileColumns.map(column => (
+              {mobileColumns.map((column) => (
                 <div key={column.key} className="flex justify-between items-start">
                   <span className="text-sm font-medium text-muted-foreground">
                     {typeof column.header === 'string' ? column.header : column.key}:
@@ -217,7 +213,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
                   </span>
                 </div>
               ))}
-              
+
               {/* Expandable section for additional columns */}
               {expandableRows && activeColumns.length > mobileColumns.length && (
                 <>
@@ -242,12 +238,12 @@ export function ResponsiveTable<T extends { id?: string | number }>({
                       </>
                     )}
                   </Button>
-                  
+
                   {isExpanded && (
                     <div className="space-y-2 pt-2 border-t">
                       {activeColumns
-                        .filter(col => !mobileColumns.includes(col))
-                        .map(column => (
+                        .filter((col) => !mobileColumns.includes(col))
+                        .map((column) => (
                           <div key={column.key} className="flex justify-between items-start">
                             <span className="text-sm font-medium text-muted-foreground">
                               {typeof column.header === 'string' ? column.header : column.key}:
@@ -283,7 +279,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
           <DropdownMenuContent align="end" className="w-48">
             <DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            {columns.map(column => (
+            {columns.map((column) => (
               <DropdownMenuCheckboxItem
                 key={column.key}
                 checked={visibleColumns.has(column.key)}
@@ -301,7 +297,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
         <Table className={cn(compact && 'table-compact')}>
           <TableHeader className={cn(stickyHeader && 'sticky top-0 bg-background z-10')}>
             <TableRow>
-              {activeColumns.map(column => (
+              {activeColumns.map((column) => (
                 <TableHead
                   key={column.key}
                   className={cn(
@@ -316,9 +312,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
                   <div className="flex items-center gap-2">
                     {column.header}
                     {column.sortable && sortConfig?.key === column.key && (
-                      <span className="text-xs">
-                        {sortConfig.direction === 'asc' ? '↑' : '↓'}
-                      </span>
+                      <span className="text-xs">{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
                     )}
                   </div>
                 </TableHead>
@@ -335,7 +329,7 @@ export function ResponsiveTable<T extends { id?: string | number }>({
                 )}
                 onClick={() => onRowClick?.(item)}
               >
-                {activeColumns.map(column => (
+                {activeColumns.map((column) => (
                   <TableCell
                     key={column.key}
                     className={cn(

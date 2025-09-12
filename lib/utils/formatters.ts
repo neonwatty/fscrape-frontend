@@ -7,9 +7,9 @@
  */
 export function formatLargeNumber(num: number): string {
   if (num === 0) return '0'
-  
+
   const absNum = Math.abs(num)
-  
+
   if (absNum >= 1e9) {
     return `${(num / 1e9).toFixed(1)}B`
   }
@@ -19,7 +19,7 @@ export function formatLargeNumber(num: number): string {
   if (absNum >= 1e3) {
     return `${(num / 1e3).toFixed(1)}K`
   }
-  
+
   return num.toLocaleString()
 }
 
@@ -108,12 +108,12 @@ export function getTrendColorClass(trend: 'up' | 'down' | 'neutral'): string {
 export function formatRelativeTime(timestamp: number): string {
   const now = Date.now()
   const diff = now - timestamp * 1000
-  
+
   const seconds = Math.floor(diff / 1000)
   const minutes = Math.floor(seconds / 60)
   const hours = Math.floor(minutes / 60)
   const days = Math.floor(hours / 24)
-  
+
   if (days > 0) {
     return `${days}d ago`
   }

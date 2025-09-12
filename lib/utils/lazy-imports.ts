@@ -24,44 +24,35 @@ export function createLazyComponent<T extends ComponentType<any>>(
   const { ssr = false, loading = ComponentLoading } = options
 
   if (exportName) {
-    return dynamic(
-      () => importFn().then((mod) => ({ default: (mod as any)[exportName] })),
-      { ssr, loading: loading as any }
-    )
+    return dynamic(() => importFn().then((mod) => ({ default: (mod as any)[exportName] })), {
+      ssr,
+      loading: loading as any,
+    })
   }
 
   return dynamic(importFn as any, { ssr, loading: loading as any })
 }
 
 // Specialized lazy loaders for different component types
-export const lazyLoadChart = (
-  importFn: () => Promise<any>,
-  exportName?: string
-) => {
+export const lazyLoadChart = (importFn: () => Promise<any>, exportName?: string) => {
   return createLazyComponent(importFn, exportName, {
     ssr: false,
-    loading: ChartLoading
+    loading: ChartLoading,
   })
 }
 
-export const lazyLoadTable = (
-  importFn: () => Promise<any>,
-  exportName?: string
-) => {
+export const lazyLoadTable = (importFn: () => Promise<any>, exportName?: string) => {
   return createLazyComponent(importFn, exportName, {
     ssr: false,
-    loading: TableLoading
+    loading: TableLoading,
   })
 }
 
 // Route-level code splitting helper
-export const lazyLoadRoute = (
-  importFn: () => Promise<any>,
-  exportName?: string
-) => {
+export const lazyLoadRoute = (importFn: () => Promise<any>, exportName?: string) => {
   return createLazyComponent(importFn, exportName, {
     ssr: true, // Enable SSR for routes
-    loading: undefined // Use default route loading
+    loading: undefined, // Use default route loading
   })
 }
 
@@ -79,7 +70,7 @@ export function conditionalLazyLoad<T extends ComponentType<any>>(
   if (condition()) {
     return dynamic(importFn as any, {
       ssr: false,
-      loading: ComponentLoading as any
+      loading: ComponentLoading as any,
     })
   }
 
@@ -97,7 +88,7 @@ export function lazyLoadOnVisible<T extends ComponentType<any>>(
 
   return dynamic(importFn as any, {
     ssr: false,
-    loading: ComponentLoading as any
+    loading: ComponentLoading as any,
   })
 }
 
@@ -107,7 +98,7 @@ export const splitBundle = {
   async loadChartLibrary() {
     return await import('recharts')
   },
-  
+
   // Async load heavy utilities when available
   async loadHeavyUtil(utilName: string) {
     switch (utilName) {
@@ -119,19 +110,16 @@ export const splitBundle = {
         console.warn(`Utility ${utilName} not configured for lazy loading`)
         return null
     }
-  }
+  },
 }
 
-
 // Prefetch components for improved perceived performance
-export const prefetchComponents = (
-  components: Array<() => Promise<any>>
-) => {
+export const prefetchComponents = (components: Array<() => Promise<any>>) => {
   if (typeof window === 'undefined') return
 
   // Use requestIdleCallback if available
   if ('requestIdleCallback' in window) {
-    (window as any).requestIdleCallback(() => {
+    ;(window as any).requestIdleCallback(() => {
       components.forEach(preloadComponent)
     })
   } else {
@@ -145,43 +133,31 @@ export const prefetchComponents = (
 // Export commonly used lazy loaded components
 export const LazyComponents = {
   // Analytics components
-  TopAuthors: lazyLoadChart(
-    () => import('@/components/analytics/TopAuthors'),
-    'TopAuthors'
-  ),
+  TopAuthors: lazyLoadChart(() => import('@/components/analytics/TopAuthors'), 'TopAuthors'),
   EngagementMetrics: lazyLoadChart(
     () => import('@/components/analytics/EngagementMetrics'),
     'EngagementMetrics'
   ),
-  
+
   // Chart components
   TimeSeriesChart: lazyLoadChart(
     () => import('@/components/charts/TimeSeriesChart'),
     'TimeSeriesChart'
   ),
-  HeatMap: lazyLoadChart(
-    () => import('@/components/charts/HeatMap'),
-    'HeatMap'
-  ),
-  GrowthChart: lazyLoadChart(
-    () => import('@/components/charts/GrowthChart'),
-    'GrowthChart'
-  ),
+  HeatMap: lazyLoadChart(() => import('@/components/charts/HeatMap'), 'HeatMap'),
+  GrowthChart: lazyLoadChart(() => import('@/components/charts/GrowthChart'), 'GrowthChart'),
   EngagementChart: lazyLoadChart(
     () => import('@/components/charts/EngagementChart'),
     'EngagementChart'
   ),
-  
+
   // Table components
-  PostsTable: lazyLoadTable(
-    () => import('@/components/tables/PostsTable'),
-    'PostsTable'
-  ),
+  PostsTable: lazyLoadTable(() => import('@/components/tables/PostsTable'), 'PostsTable'),
   ResponsivePostsTable: lazyLoadTable(
     () => import('@/components/tables/ResponsivePostsTable'),
     'ResponsivePostsTable'
   ),
-  
+
   // Heavy post components
   PostsExplorer: createLazyComponent(
     () => import('@/components/posts/PostsExplorer'),
@@ -191,5 +167,5 @@ export const LazyComponents = {
   PostsTableEnhanced: lazyLoadTable(
     () => import('@/components/posts/PostsTableEnhanced'),
     'PostsTableEnhanced'
-  )
+  ),
 }

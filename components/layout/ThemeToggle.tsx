@@ -22,9 +22,7 @@ export function ThemeToggle({ className, showLabel = false, variant = 'icon' }: 
   }, [])
 
   if (!mounted) {
-    return (
-      <div className={cn("w-9 h-9 rounded-md bg-muted animate-pulse", className)} />
-    )
+    return <div className={cn('w-9 h-9 rounded-md bg-muted animate-pulse', className)} />
   }
 
   const currentTheme = theme === 'system' ? systemTheme : theme
@@ -35,27 +33,20 @@ export function ThemeToggle({ className, showLabel = false, variant = 'icon' }: 
         <button
           onClick={() => setIsOpen(!isOpen)}
           className={cn(
-            "flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors",
-            "hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary",
+            'flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors',
+            'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary',
             className
           )}
           aria-label="Toggle theme menu"
           aria-expanded={isOpen}
         >
-          {currentTheme === 'dark' ? (
-            <Moon className="h-4 w-4" />
-          ) : (
-            <Sun className="h-4 w-4" />
-          )}
+          {currentTheme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
           {showLabel && <span>Theme</span>}
         </button>
 
         {isOpen && (
           <>
-            <div
-              className="fixed inset-0 z-40"
-              onClick={() => setIsOpen(false)}
-            />
+            <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
             <div className="absolute right-0 mt-2 w-48 rounded-md bg-popover border shadow-lg z-50">
               <div className="py-1">
                 <button
@@ -64,8 +55,8 @@ export function ThemeToggle({ className, showLabel = false, variant = 'icon' }: 
                     setIsOpen(false)
                   }}
                   className={cn(
-                    "flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-muted transition-colors",
-                    theme === 'light' && "bg-muted"
+                    'flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-muted transition-colors',
+                    theme === 'light' && 'bg-muted'
                   )}
                 >
                   <Sun className="h-4 w-4" />
@@ -77,8 +68,8 @@ export function ThemeToggle({ className, showLabel = false, variant = 'icon' }: 
                     setIsOpen(false)
                   }}
                   className={cn(
-                    "flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-muted transition-colors",
-                    theme === 'dark' && "bg-muted"
+                    'flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-muted transition-colors',
+                    theme === 'dark' && 'bg-muted'
                   )}
                 >
                   <Moon className="h-4 w-4" />
@@ -90,8 +81,8 @@ export function ThemeToggle({ className, showLabel = false, variant = 'icon' }: 
                     setIsOpen(false)
                   }}
                   className={cn(
-                    "flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-muted transition-colors",
-                    theme === 'system' && "bg-muted"
+                    'flex items-center gap-2 w-full px-4 py-2 text-sm hover:bg-muted transition-colors',
+                    theme === 'system' && 'bg-muted'
                   )}
                 >
                   <Monitor className="h-4 w-4" />
@@ -120,23 +111,25 @@ export function ThemeToggle({ className, showLabel = false, variant = 'icon' }: 
     <button
       onClick={cycleTheme}
       className={cn(
-        "relative p-2 rounded-md transition-colors",
-        "hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary",
+        'relative p-2 rounded-md transition-colors',
+        'hover:bg-muted focus:outline-none focus:ring-2 focus:ring-primary',
         className
       )}
       aria-label={`Current theme: ${theme}. Click to change theme`}
     >
-      <Sun className={cn(
-        "h-5 w-5 transition-all",
-        currentTheme === 'dark' ? "scale-0 rotate-90" : "scale-100 rotate-0"
-      )} />
-      <Moon className={cn(
-        "absolute top-2 left-2 h-5 w-5 transition-all",
-        currentTheme === 'dark' ? "scale-100 rotate-0" : "scale-0 -rotate-90"
-      )} />
-      {showLabel && (
-        <span className="sr-only">Toggle theme</span>
-      )}
+      <Sun
+        className={cn(
+          'h-5 w-5 transition-all',
+          currentTheme === 'dark' ? 'scale-0 rotate-90' : 'scale-100 rotate-0'
+        )}
+      />
+      <Moon
+        className={cn(
+          'absolute top-2 left-2 h-5 w-5 transition-all',
+          currentTheme === 'dark' ? 'scale-100 rotate-0' : 'scale-0 -rotate-90'
+        )}
+      />
+      {showLabel && <span className="sr-only">Toggle theme</span>}
     </button>
   )
 }
@@ -161,7 +154,7 @@ export function MobileThemeToggle({ className }: { className?: string }) {
   ]
 
   return (
-    <div className={cn("flex rounded-md bg-muted p-1", className)}>
+    <div className={cn('flex rounded-md bg-muted p-1', className)}>
       {themes.map((t) => {
         const Icon = t.icon
         return (
@@ -169,10 +162,10 @@ export function MobileThemeToggle({ className }: { className?: string }) {
             key={t.value}
             onClick={() => setTheme(t.value)}
             className={cn(
-              "flex-1 flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
+              'flex-1 flex items-center justify-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors',
               theme === t.value
-                ? "bg-background text-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground"
+                ? 'bg-background text-foreground shadow-sm'
+                : 'text-muted-foreground hover:text-foreground'
             )}
             aria-label={`Set theme to ${t.label}`}
           >

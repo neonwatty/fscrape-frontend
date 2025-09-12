@@ -24,13 +24,17 @@ const DEFAULT_CONFIG: Required<DatabaseConfig> = {
 
 // Schema validation queries
 const SCHEMA_CHECKS = {
-  tables: [
-    'posts',
-    'authors',
-  ],
+  tables: ['posts', 'authors'],
   postsColumns: [
-    'id', 'platform', 'title', 'author', 'created_utc', 
-    'score', 'num_comments', 'url', 'permalink'
+    'id',
+    'platform',
+    'title',
+    'author',
+    'created_utc',
+    'score',
+    'num_comments',
+    'url',
+    'permalink',
   ],
 }
 
@@ -52,7 +56,9 @@ async function initializeSqlJs(wasmPath: string): Promise<SqlJsStatic> {
     })
     return SQL
   } catch (error) {
-    throw new Error(`Failed to initialize SQL.js: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    throw new Error(
+      `Failed to initialize SQL.js: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
   }
 }
 
@@ -60,9 +66,10 @@ async function initializeSqlJs(wasmPath: string): Promise<SqlJsStatic> {
 async function validateDatabaseSchema(database: Database): Promise<boolean> {
   try {
     // Check if required tables exist
-    const tables = database.exec(
-      "SELECT name FROM sqlite_master WHERE type='table'"
-    )[0]?.values.map(row => row[0]) || []
+    const tables =
+      database
+        .exec("SELECT name FROM sqlite_master WHERE type='table'")[0]
+        ?.values.map((row) => row[0]) || []
 
     for (const requiredTable of SCHEMA_CHECKS.tables) {
       if (!tables.includes(requiredTable)) {
@@ -74,7 +81,7 @@ async function validateDatabaseSchema(database: Database): Promise<boolean> {
     // Check posts table structure
     const postsInfo = database.exec(`PRAGMA table_info(posts)`)[0]
     if (postsInfo) {
-      const columns = postsInfo.values.map(row => row[1] as string)
+      const columns = postsInfo.values.map((row) => row[1] as string)
       for (const requiredColumn of SCHEMA_CHECKS.postsColumns) {
         if (!columns.includes(requiredColumn)) {
           console.warn(`Missing required column in posts table: ${requiredColumn}`)
@@ -110,7 +117,7 @@ export async function initializeDatabase(config: DatabaseConfig = {}): Promise<D
       // Try to load database from path
       try {
         const response = await fetch(finalConfig.databasePath)
-        
+
         if (response.ok) {
           const buffer = await response.arrayBuffer()
           data = new Uint8Array(buffer)
@@ -133,7 +140,7 @@ export async function initializeDatabase(config: DatabaseConfig = {}): Promise<D
 
     // Create database instance (empty if no data)
     db = new sqlJs.Database(data)
-    
+
     // Validate schema if requested and data was loaded
     if (finalConfig.validateSchema && data) {
       const isValid = await validateDatabaseSchema(db)
@@ -154,7 +161,7 @@ export async function initializeDatabase(config: DatabaseConfig = {}): Promise<D
       db = null
     }
     sqliteInitialized = false
-    
+
     const errorMessage = error instanceof Error ? error.message : 'Unknown error'
     console.error('Failed to initialize database:', errorMessage)
     throw new Error(`Database initialization failed: ${errorMessage}`)
@@ -164,14 +171,14 @@ export async function initializeDatabase(config: DatabaseConfig = {}): Promise<D
 // Create a new empty database with schema
 export async function createEmptyDatabase(config: DatabaseConfig = {}): Promise<Database> {
   const finalConfig = { ...DEFAULT_CONFIG, ...config, databasePath: undefined }
-  
+
   try {
     // Initialize SQL.js
     const sqlJs = await initializeSqlJs(finalConfig.wasmPath)
-    
+
     // Create new empty database
     const newDb = new sqlJs.Database()
-    
+
     // Create schema
     newDb.run(`
       CREATE TABLE IF NOT EXISTS posts (
@@ -202,10 +209,12 @@ export async function createEmptyDatabase(config: DatabaseConfig = {}): Promise<
       CREATE INDEX IF NOT EXISTS idx_posts_subreddit ON posts(subreddit);
       CREATE INDEX IF NOT EXISTS idx_posts_platform ON posts(platform);
     `)
-    
+
     return newDb
   } catch (error) {
-    throw new Error(`Failed to create empty database: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    throw new Error(
+      `Failed to create empty database: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
   }
 }
 
@@ -238,7 +247,7 @@ export function closeDatabase(): void {
 // Execute a query and return results with proper typing
 export function executeQuery<T = unknown>(sql: string, params: unknown[] = []): T[] {
   const database = getDatabase()
-  
+
   try {
     const stmt = database.prepare(sql)
     stmt.bind(params as Parameters<typeof stmt.bind>[0])
@@ -252,7 +261,9 @@ export function executeQuery<T = unknown>(sql: string, params: unknown[] = []): 
     stmt.free()
     return results
   } catch (error) {
-    throw new Error(`Query execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`)
+    throw new Error(
+      `Query execution failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
   }
 }
 
@@ -269,9 +280,7 @@ export function getDatabaseStats() {
   }
 
   try {
-    const totalPosts = executeQueryFirst<{ count: number }>(
-      'SELECT COUNT(*) as count FROM posts'
-    )
+    const totalPosts = executeQueryFirst<{ count: number }>('SELECT COUNT(*) as count FROM posts')
 
     const platforms = executeQuery<{ platform: string; count: number }>(
       'SELECT platform, COUNT(*) as count FROM posts GROUP BY platform'
@@ -298,7 +307,7 @@ export function exportDatabase(): Uint8Array | null {
   if (!isDatabaseInitialized()) {
     return null
   }
-  
+
   try {
     const database = getDatabase()
     return database.export()
@@ -309,19 +318,22 @@ export function exportDatabase(): Uint8Array | null {
 }
 
 // Load database from Uint8Array
-export async function loadDatabaseFromData(data: Uint8Array, config: DatabaseConfig = {}): Promise<Database> {
+export async function loadDatabaseFromData(
+  data: Uint8Array,
+  config: DatabaseConfig = {}
+): Promise<Database> {
   const finalConfig = { ...DEFAULT_CONFIG, ...config }
-  
+
   try {
     // Close existing database if any
     closeDatabase()
-    
+
     // Initialize SQL.js
     const sqlJs = await initializeSqlJs(finalConfig.wasmPath)
-    
+
     // Create database from data
     db = new sqlJs.Database(data)
-    
+
     // Validate schema if requested
     if (finalConfig.validateSchema) {
       const isValid = await validateDatabaseSchema(db)
@@ -329,7 +341,7 @@ export async function loadDatabaseFromData(data: Uint8Array, config: DatabaseCon
         throw new Error('Invalid database schema')
       }
     }
-    
+
     sqliteInitialized = true
     return db
   } catch (error) {
@@ -339,7 +351,9 @@ export async function loadDatabaseFromData(data: Uint8Array, config: DatabaseCon
       db = null
     }
     sqliteInitialized = false
-    
-    throw new Error(`Failed to load database from data: ${error instanceof Error ? error.message : 'Unknown error'}`)
+
+    throw new Error(
+      `Failed to load database from data: ${error instanceof Error ? error.message : 'Unknown error'}`
+    )
   }
 }

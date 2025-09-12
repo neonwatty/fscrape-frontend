@@ -9,7 +9,7 @@ import {
   formatEngagementRate,
   getTrendColorClass,
   formatRelativeTime,
-  formatPreciseNumber
+  formatPreciseNumber,
 } from './formatters'
 
 describe('Number Formatters', () => {

@@ -27,7 +27,7 @@ export function MobileCard({
   header,
 }: MobileCardProps) {
   const cardRef = useRef<HTMLDivElement>(null)
-  
+
   useTouchGestures(cardRef, {
     enabled: swipeable,
     onSwipeLeft,
@@ -35,13 +35,16 @@ export function MobileCard({
     threshold: 75,
     velocity: 0.5,
   })
-  
-  const longPressProps = useLongPress(() => {
-    if (onLongPress) onLongPress()
-  }, {
-    enabled: pressable,
-    delay: 500,
-  })
+
+  const longPressProps = useLongPress(
+    () => {
+      if (onLongPress) onLongPress()
+    },
+    {
+      enabled: pressable,
+      delay: 500,
+    }
+  )
 
   return (
     <Card
@@ -79,7 +82,7 @@ export function MobileBottomSheet({
   height = 'auto',
 }: MobileBottomSheetProps) {
   const sheetRef = useRef<HTMLDivElement>(null)
-  
+
   useTouchGestures(sheetRef, {
     enabled: isOpen,
     onSwipeDown: onClose,
@@ -102,7 +105,7 @@ export function MobileBottomSheet({
         onClick={onClose}
         aria-hidden="true"
       />
-      
+
       {/* Bottom Sheet */}
       <div
         ref={sheetRef}
@@ -118,18 +121,16 @@ export function MobileBottomSheet({
         <div className="flex justify-center pt-2 pb-1">
           <div className="w-12 h-1 bg-muted-foreground/30 rounded-full" />
         </div>
-        
+
         {/* Header */}
         {title && (
           <div className="px-6 pb-4 border-b">
             <h3 className="text-lg font-semibold">{title}</h3>
           </div>
         )}
-        
+
         {/* Content */}
-        <div className="px-6 py-4 overflow-y-auto scrolling-touch">
-          {children}
-        </div>
+        <div className="px-6 py-4 overflow-y-auto scrolling-touch">{children}</div>
       </div>
     </>
   )

@@ -18,15 +18,15 @@ interface ThemeProviderProps {
  * Theme Provider Component
  * Wraps the application with theme context and manages theme transitions
  */
-export function ThemeProvider({ 
-  children, 
+export function ThemeProvider({
+  children,
   attribute = 'class',
   defaultTheme = 'system',
   enableSystem = true,
   disableTransitionOnChange = true,
   storageKey = 'fscrape-theme',
   themes = ['light', 'dark'],
-  ...props 
+  ...props
 }: ThemeProviderProps) {
   const [mounted, setMounted] = useState(false)
 
@@ -39,7 +39,7 @@ export function ThemeProvider({
     if (!mounted) return
 
     const root = document.documentElement
-    
+
     // Add transition class after theme is set
     const enableTransitions = () => {
       root.classList.add('theme-transitions')
@@ -70,12 +70,12 @@ export function ThemeProvider({
  * Script to prevent theme flashing on initial load
  * Should be added to the <head> of the document
  */
-export function ThemeScript({ 
+export function ThemeScript({
   storageKey = 'fscrape-theme',
-  defaultTheme = 'system' 
-}: { 
+  defaultTheme = 'system',
+}: {
   storageKey?: string
-  defaultTheme?: string 
+  defaultTheme?: string
 }) {
   const script = `
     (function() {
@@ -99,10 +99,5 @@ export function ThemeScript({
     })();
   `
 
-  return (
-    <script
-      dangerouslySetInnerHTML={{ __html: script }}
-      suppressHydrationWarning
-    />
-  )
+  return <script dangerouslySetInnerHTML={{ __html: script }} suppressHydrationWarning />
 }

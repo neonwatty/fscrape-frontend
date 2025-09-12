@@ -54,10 +54,10 @@ const mobileTransition = {
 
 export function PageTransition({ children, className = '' }: PageTransitionProps) {
   const pathname = usePathname()
-  
+
   // Detect if mobile based on viewport
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
-  
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -78,7 +78,7 @@ export function PageTransition({ children, className = '' }: PageTransitionProps
 // Simplified fade transition for faster performance on mobile
 export function FadeTransition({ children, className = '' }: PageTransitionProps) {
   const pathname = usePathname()
-  
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -96,10 +96,10 @@ export function FadeTransition({ children, className = '' }: PageTransitionProps
 }
 
 // Scale transition for modals and overlays
-export function ScaleTransition({ 
-  children, 
+export function ScaleTransition({
+  children,
   className = '',
-  isOpen = true 
+  isOpen = true,
 }: PageTransitionProps & { isOpen?: boolean }) {
   return (
     <AnimatePresence>
@@ -119,10 +119,10 @@ export function ScaleTransition({
 }
 
 // List item animations for mobile navigation
-export function ListItemTransition({ 
-  children, 
+export function ListItemTransition({
+  children,
   index = 0,
-  className = '' 
+  className = '',
 }: PageTransitionProps & { index?: number }) {
   return (
     <motion.div
@@ -132,7 +132,7 @@ export function ListItemTransition({
       transition={{
         duration: 0.2,
         delay: index * 0.05,
-        ease: 'easeOut'
+        ease: 'easeOut',
       }}
       className={className}
     >

@@ -48,7 +48,7 @@ export function useChartTouch<T extends HTMLElement = HTMLElement>(
 
   const [activeGesture, setActiveGesture] = useState<'none' | 'tap' | 'pan' | 'pinch'>('none')
   const [touchPoints, setTouchPoints] = useState<TouchPoint[]>([])
-  
+
   const lastTapTime = useRef<number>(0)
   const longPressTimer = useRef<NodeJS.Timeout | null>(null)
   const panStartPoint = useRef<TouchPoint | null>(null)
@@ -76,126 +76,135 @@ export function useChartTouch<T extends HTMLElement = HTMLElement>(
     timestamp: Date.now(),
   })
 
-  const handleTouchStart = useCallback((e: TouchEvent) => {
-    if (!enabled) return
+  const handleTouchStart = useCallback(
+    (e: TouchEvent) => {
+      if (!enabled) return
 
-    const touches = Array.from(e.touches).map(touchToPoint)
-    setTouchPoints(touches)
+      const touches = Array.from(e.touches).map(touchToPoint)
+      setTouchPoints(touches)
 
-    // Single touch - potential tap, long press, or pan
-    if (e.touches.length === 1) {
-      const point = touches[0]
-      initialTouchPoint.current = point
+      // Single touch - potential tap, long press, or pan
+      if (e.touches.length === 1) {
+        const point = touches[0]
+        initialTouchPoint.current = point
 
-      // Set up long press timer
-      if (onLongPress) {
-        longPressTimer.current = setTimeout(() => {
-          if (activeGesture === 'tap') {
-            onLongPress(point)
-            setActiveGesture('none')
-          }
-        }, longPressDelay)
+        // Set up long press timer
+        if (onLongPress) {
+          longPressTimer.current = setTimeout(() => {
+            if (activeGesture === 'tap') {
+              onLongPress(point)
+              setActiveGesture('none')
+            }
+          }, longPressDelay)
+        }
+
+        setActiveGesture('tap')
       }
-
-      setActiveGesture('tap')
-    }
-    // Two touches - pinch gesture
-    else if (e.touches.length === 2 && onPinch) {
-      // Clear any existing timers
-      if (longPressTimer.current) {
-        clearTimeout(longPressTimer.current)
-        longPressTimer.current = null
-      }
-
-      pinchStartDistance.current = getDistance(e.touches[0], e.touches[1])
-      setActiveGesture('pinch')
-      onPinchStart?.()
-    }
-  }, [enabled, onLongPress, longPressDelay, onPinch, onPinchStart, activeGesture])
-
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (!enabled) return
-
-    const touches = Array.from(e.touches).map(touchToPoint)
-    setTouchPoints(touches)
-
-    // Handle pan gesture
-    if (e.touches.length === 1 && initialTouchPoint.current) {
-      const currentPoint = touches[0]
-      const dx = currentPoint.x - initialTouchPoint.current.x
-      const dy = currentPoint.y - initialTouchPoint.current.y
-      const distance = Math.sqrt(dx * dx + dy * dy)
-
-      // Convert tap to pan if moved beyond threshold
-      if (activeGesture === 'tap' && distance > tapThreshold) {
-        // Clear long press timer
+      // Two touches - pinch gesture
+      else if (e.touches.length === 2 && onPinch) {
+        // Clear any existing timers
         if (longPressTimer.current) {
           clearTimeout(longPressTimer.current)
           longPressTimer.current = null
         }
 
-        setActiveGesture('pan')
-        panStartPoint.current = initialTouchPoint.current
-        onPanStart?.(panStartPoint.current)
+        pinchStartDistance.current = getDistance(e.touches[0], e.touches[1])
+        setActiveGesture('pinch')
+        onPinchStart?.()
+      }
+    },
+    [enabled, onLongPress, longPressDelay, onPinch, onPinchStart, activeGesture]
+  )
+
+  const handleTouchMove = useCallback(
+    (e: TouchEvent) => {
+      if (!enabled) return
+
+      const touches = Array.from(e.touches).map(touchToPoint)
+      setTouchPoints(touches)
+
+      // Handle pan gesture
+      if (e.touches.length === 1 && initialTouchPoint.current) {
+        const currentPoint = touches[0]
+        const dx = currentPoint.x - initialTouchPoint.current.x
+        const dy = currentPoint.y - initialTouchPoint.current.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+
+        // Convert tap to pan if moved beyond threshold
+        if (activeGesture === 'tap' && distance > tapThreshold) {
+          // Clear long press timer
+          if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current)
+            longPressTimer.current = null
+          }
+
+          setActiveGesture('pan')
+          panStartPoint.current = initialTouchPoint.current
+          onPanStart?.(panStartPoint.current)
+        }
+
+        // Continue panning
+        if (activeGesture === 'pan' && panStartPoint.current) {
+          onPan?.({ dx, dy }, currentPoint)
+        }
+      }
+      // Handle pinch gesture
+      else if (e.touches.length === 2 && activeGesture === 'pinch' && pinchStartDistance.current) {
+        const currentDistance = getDistance(e.touches[0], e.touches[1])
+        const scale = currentDistance / pinchStartDistance.current
+        const center = getCenter(e.touches[0], e.touches[1])
+
+        onPinch?.(scale, center)
+      }
+    },
+    [enabled, activeGesture, tapThreshold, onPanStart, onPan, onPinch]
+  )
+
+  const handleTouchEnd = useCallback(
+    (e: TouchEvent) => {
+      if (!enabled) return
+
+      // Clear long press timer
+      if (longPressTimer.current) {
+        clearTimeout(longPressTimer.current)
+        longPressTimer.current = null
       }
 
-      // Continue panning
-      if (activeGesture === 'pan' && panStartPoint.current) {
-        onPan?.({ dx, dy }, currentPoint)
+      const remainingTouches = Array.from(e.touches).map(touchToPoint)
+      setTouchPoints(remainingTouches)
+
+      // Handle tap or double tap
+      if (activeGesture === 'tap' && initialTouchPoint.current) {
+        const now = Date.now()
+        const timeSinceLastTap = now - lastTapTime.current
+
+        if (timeSinceLastTap < doubleTapDelay && onDoubleTap) {
+          onDoubleTap(initialTouchPoint.current)
+          lastTapTime.current = 0
+        } else if (onTap) {
+          onTap(initialTouchPoint.current)
+          lastTapTime.current = now
+        }
       }
-    }
-    // Handle pinch gesture
-    else if (e.touches.length === 2 && activeGesture === 'pinch' && pinchStartDistance.current) {
-      const currentDistance = getDistance(e.touches[0], e.touches[1])
-      const scale = currentDistance / pinchStartDistance.current
-      const center = getCenter(e.touches[0], e.touches[1])
-      
-      onPinch?.(scale, center)
-    }
-  }, [enabled, activeGesture, tapThreshold, onPanStart, onPan, onPinch])
-
-  const handleTouchEnd = useCallback((e: TouchEvent) => {
-    if (!enabled) return
-
-    // Clear long press timer
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current)
-      longPressTimer.current = null
-    }
-
-    const remainingTouches = Array.from(e.touches).map(touchToPoint)
-    setTouchPoints(remainingTouches)
-
-    // Handle tap or double tap
-    if (activeGesture === 'tap' && initialTouchPoint.current) {
-      const now = Date.now()
-      const timeSinceLastTap = now - lastTapTime.current
-
-      if (timeSinceLastTap < doubleTapDelay && onDoubleTap) {
-        onDoubleTap(initialTouchPoint.current)
-        lastTapTime.current = 0
-      } else if (onTap) {
-        onTap(initialTouchPoint.current)
-        lastTapTime.current = now
+      // End pan gesture
+      else if (activeGesture === 'pan') {
+        onPanEnd?.()
       }
-    }
-    // End pan gesture
-    else if (activeGesture === 'pan') {
-      onPanEnd?.()
-    }
-    // End pinch gesture
-    else if (activeGesture === 'pinch' && e.touches.length < 2) {
-      onPinchEnd?.()
-      pinchStartDistance.current = null
-    }
+      // End pinch gesture
+      else if (activeGesture === 'pinch' && e.touches.length < 2) {
+        onPinchEnd?.()
+        pinchStartDistance.current = null
+      }
 
-    // Reset if no more touches
-    if (e.touches.length === 0) {
-      setActiveGesture('none')
-      initialTouchPoint.current = null
-      panStartPoint.current = null
-    }
-  }, [enabled, activeGesture, doubleTapDelay, onTap, onDoubleTap, onPanEnd, onPinchEnd])
+      // Reset if no more touches
+      if (e.touches.length === 0) {
+        setActiveGesture('none')
+        initialTouchPoint.current = null
+        panStartPoint.current = null
+      }
+    },
+    [enabled, activeGesture, doubleTapDelay, onTap, onDoubleTap, onPanEnd, onPinchEnd]
+  )
 
   const handleTouchCancel = useCallback(() => {
     // Clear all timers and reset state
@@ -257,36 +266,44 @@ export function useMobileTooltip<T extends HTMLElement = HTMLElement>(
     followTouch?: boolean
   } = {}
 ) {
-  const { enabled: _enabled = true, showDelay = 100, hideDelay = 2000, followTouch = true } = options
-  
+  const {
+    enabled: _enabled = true,
+    showDelay = 100,
+    hideDelay = 2000,
+    followTouch = true,
+  } = options
+
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null)
   const [isVisible, setIsVisible] = useState(false)
-  const [content, setContent] = useState<any>(null)
-  
+  const [content, setContent] = useState<unknown>(null)
+
   const showTimer = useRef<NodeJS.Timeout | null>(null)
   const hideTimer = useRef<NodeJS.Timeout | null>(null)
 
-  const showTooltip = useCallback((x: number, y: number, data: any) => {
-    // Clear any existing timers
-    if (hideTimer.current) {
-      clearTimeout(hideTimer.current)
-      hideTimer.current = null
-    }
+  const showTooltip = useCallback(
+    (x: number, y: number, data: unknown) => {
+      // Clear any existing timers
+      if (hideTimer.current) {
+        clearTimeout(hideTimer.current)
+        hideTimer.current = null
+      }
 
-    // Set position and content
-    setTooltipPosition({ x, y })
-    setContent(data)
+      // Set position and content
+      setTooltipPosition({ x, y })
+      setContent(data)
 
-    // Show after delay
-    showTimer.current = setTimeout(() => {
-      setIsVisible(true)
-      
-      // Auto-hide after hideDelay
-      hideTimer.current = setTimeout(() => {
-        setIsVisible(false)
-      }, hideDelay)
-    }, showDelay)
-  }, [showDelay, hideDelay])
+      // Show after delay
+      showTimer.current = setTimeout(() => {
+        setIsVisible(true)
+
+        // Auto-hide after hideDelay
+        hideTimer.current = setTimeout(() => {
+          setIsVisible(false)
+        }, hideDelay)
+      }, showDelay)
+    },
+    [showDelay, hideDelay]
+  )
 
   const hideTooltip = useCallback(() => {
     // Clear timers
@@ -302,11 +319,14 @@ export function useMobileTooltip<T extends HTMLElement = HTMLElement>(
     setIsVisible(false)
   }, [])
 
-  const updatePosition = useCallback((x: number, y: number) => {
-    if (followTouch && isVisible) {
-      setTooltipPosition({ x, y })
-    }
-  }, [followTouch, isVisible])
+  const updatePosition = useCallback(
+    (x: number, y: number) => {
+      if (followTouch && isVisible) {
+        setTooltipPosition({ x, y })
+      }
+    },
+    [followTouch, isVisible]
+  )
 
   useEffect(() => {
     return () => {

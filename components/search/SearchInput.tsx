@@ -4,11 +4,7 @@ import { useState, useEffect, useCallback, useRef } from 'react'
 import { Search, X, Loader2 } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { SearchSuggestion, getSearchSuggestions } from '@/lib/db/search-queries'
@@ -34,7 +30,7 @@ export function SearchInput({
   showSuggestions = true,
   debounceMs = 300,
   autoFocus = false,
-  loading = false
+  loading = false,
 }: SearchInputProps) {
   const [internalValue, setInternalValue] = useState(value)
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
@@ -66,30 +62,33 @@ export function SearchInput({
   )
 
   // Load suggestions
-  const loadSuggestions = useCallback(async (query: string) => {
-    if (!showSuggestions || query.length < 2) {
-      setSuggestions([])
-      return
-    }
+  const loadSuggestions = useCallback(
+    async (query: string) => {
+      if (!showSuggestions || query.length < 2) {
+        setSuggestions([])
+        return
+      }
 
-    setIsLoadingSuggestions(true)
-    try {
-      const results = getSearchSuggestions(query, 8)
-      setSuggestions(results)
-    } catch (error) {
-      console.error('Failed to load suggestions:', error)
-      setSuggestions([])
-    } finally {
-      setIsLoadingSuggestions(false)
-    }
-  }, [showSuggestions])
+      setIsLoadingSuggestions(true)
+      try {
+        const results = getSearchSuggestions(query, 8)
+        setSuggestions(results)
+      } catch (error) {
+        console.error('Failed to load suggestions:', error)
+        setSuggestions([])
+      } finally {
+        setIsLoadingSuggestions(false)
+      }
+    },
+    [showSuggestions]
+  )
 
   // Handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value
     setInternalValue(newValue)
     debouncedSearch(newValue)
-    
+
     if (showSuggestions) {
       loadSuggestions(newValue)
       setShowSuggestionsPopover(newValue.length > 0)
@@ -172,9 +171,7 @@ export function SearchInput({
               autoFocus={autoFocus}
             />
             <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
-              {loading && (
-                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-              )}
+              {loading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
               {internalValue && (
                 <Button
                   type="button"
@@ -200,8 +197,8 @@ export function SearchInput({
           </div>
         </PopoverTrigger>
         {showSuggestions && suggestions.length > 0 && (
-          <PopoverContent 
-            className="w-[var(--radix-popover-trigger-width)] p-0" 
+          <PopoverContent
+            className="w-[var(--radix-popover-trigger-width)] p-0"
             align="start"
             onOpenAutoFocus={(e) => e.preventDefault()}
           >
@@ -220,15 +217,13 @@ export function SearchInput({
                     >
                       <span className="truncate">{suggestion.term}</span>
                       <div className="ml-2 flex items-center gap-2">
-                        <Badge 
-                          variant="secondary" 
+                        <Badge
+                          variant="secondary"
                           className={cn('text-xs', getSuggestionTypeColor(suggestion.type))}
                         >
                           {suggestion.type}
                         </Badge>
-                        <span className="text-xs text-muted-foreground">
-                          {suggestion.count}
-                        </span>
+                        <span className="text-xs text-muted-foreground">{suggestion.count}</span>
                       </div>
                     </button>
                   ))}

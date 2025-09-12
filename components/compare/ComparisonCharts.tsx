@@ -21,12 +21,19 @@ import {
   Legend,
   ResponsiveContainer,
   ReferenceLine,
-  Brush
+  Brush,
 } from 'recharts'
 import { format, parseISO, startOfWeek, startOfMonth } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { Source } from './SourceSelector'
-import { TrendingUp, TrendingDown, BarChart3, LineChart as LineChartIcon, Activity, Layers } from 'lucide-react'
+import {
+  TrendingUp,
+  TrendingDown,
+  BarChart3,
+  LineChart as LineChartIcon,
+  Activity,
+  Layers,
+} from 'lucide-react'
 
 export interface TimeSeriesData {
   date: string
@@ -53,10 +60,10 @@ const chartTypes = [
   { id: 'line', label: 'Line', icon: LineChartIcon },
   { id: 'area', label: 'Area', icon: Layers },
   { id: 'bar', label: 'Bar', icon: BarChart3 },
-  { id: 'composed', label: 'Mixed', icon: Activity }
+  { id: 'composed', label: 'Mixed', icon: Activity },
 ] as const
 
-type ChartType = typeof chartTypes[number]['id']
+type ChartType = (typeof chartTypes)[number]['id']
 
 // Color palette for sources (up to 8 sources)
 const sourceColors = [
@@ -67,25 +74,28 @@ const sourceColors = [
   '#8b5cf6', // violet
   '#ec4899', // pink
   '#14b8a6', // teal
-  '#f97316'  // orange
+  '#f97316', // orange
 ]
 
 // Custom tooltip component
-const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>; label?: string }) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean
+  payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>
+  label?: string
+}) => {
   if (!active || !payload || !payload.length) return null
 
   return (
     <div className="bg-background border rounded-lg shadow-lg p-3">
-      <p className="text-sm font-medium mb-2">
-        {label && format(parseISO(label), 'MMM dd, yyyy')}
-      </p>
+      <p className="text-sm font-medium mb-2">{label && format(parseISO(label), 'MMM dd, yyyy')}</p>
       {payload.map((entry, index) => (
         <div key={index} className="flex items-center justify-between gap-4 text-sm">
           <div className="flex items-center gap-2">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: entry.color }}
-            />
+            <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
             <span>{entry.name}</span>
           </div>
           <span className="font-medium tabular-nums">
@@ -110,7 +120,7 @@ export function ComparisonCharts({
   className,
   enableSideBySide = true,
   normalizeData = false,
-  aggregation = 'daily'
+  aggregation = 'daily',
 }: ComparisonChartsProps) {
   const [chartType, setChartType] = useState<ChartType>('line')
   const [showTrend, setShowTrend] = useState(true)
@@ -120,34 +130,34 @@ export function ComparisonCharts({
     if (aggregation === 'daily') return timeSeriesData
 
     const grouped: Record<string, TimeSeriesData> = {}
-    
-    timeSeriesData.forEach(item => {
+
+    timeSeriesData.forEach((item) => {
       const date = parseISO(item.date)
       let key: string
-      
+
       if (aggregation === 'weekly') {
         key = format(startOfWeek(date), 'yyyy-MM-dd')
       } else {
         key = format(startOfMonth(date), 'yyyy-MM-dd')
       }
-      
+
       if (!grouped[key]) {
         grouped[key] = { date: key }
-        sources.forEach(source => {
+        sources.forEach((source) => {
           grouped[key][source.id] = 0
         })
       }
-      
-      sources.forEach(source => {
+
+      sources.forEach((source) => {
         const value = item[source.id]
         if (typeof value === 'number') {
           grouped[key][source.id] = (grouped[key][source.id] as number) + value
         }
       })
     })
-    
-    return Object.values(grouped).sort((a, b) => 
-      new Date(a.date).getTime() - new Date(b.date).getTime()
+
+    return Object.values(grouped).sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
     )
   }, [timeSeriesData, sources, aggregation])
 
@@ -157,23 +167,23 @@ export function ComparisonCharts({
 
     // Find min and max for each source
     const ranges: Record<string, { min: number; max: number }> = {}
-    
-    sources.forEach(source => {
+
+    sources.forEach((source) => {
       const values = aggregatedData
-        .map(item => item[source.id])
-        .filter(v => typeof v === 'number') as number[]
-      
+        .map((item) => item[source.id])
+        .filter((v) => typeof v === 'number') as number[]
+
       ranges[source.id] = {
         min: Math.min(...values),
-        max: Math.max(...values)
+        max: Math.max(...values),
       }
     })
 
     // Normalize the data
-    return aggregatedData.map(item => {
+    return aggregatedData.map((item) => {
       const normalized: TimeSeriesData = { date: item.date }
-      
-      sources.forEach(source => {
+
+      sources.forEach((source) => {
         const value = item[source.id]
         if (typeof value === 'number') {
           const { min, max } = ranges[source.id]
@@ -182,7 +192,7 @@ export function ComparisonCharts({
           normalized[source.id] = value
         }
       })
-      
+
       return normalized
     })
   }, [aggregatedData, sources, normalizeData])
@@ -192,12 +202,12 @@ export function ComparisonCharts({
     if (!showTrend) return {}
 
     const trends: Record<string, number> = {}
-    
-    sources.forEach(source => {
+
+    sources.forEach((source) => {
       const values = processedData
-        .map(item => item[source.id])
-        .filter(v => typeof v === 'number') as number[]
-      
+        .map((item) => item[source.id])
+        .filter((v) => typeof v === 'number') as number[]
+
       if (values.length > 1) {
         // Simple linear regression for trend
         const n = values.length
@@ -205,12 +215,12 @@ export function ComparisonCharts({
         const sumY = values.reduce((sum, v) => sum + v, 0)
         const sumXY = values.reduce((sum, v, i) => sum + v * i, 0)
         const sumX2 = (n * (n - 1) * (2 * n - 1)) / 6
-        
+
         const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX)
         trends[source.id] = slope
       }
     })
-    
+
     return trends
   }, [processedData, sources, showTrend])
 
@@ -218,12 +228,12 @@ export function ComparisonCharts({
   const renderChart = (data: TimeSeriesData[]) => {
     const chartProps = {
       data,
-      margin: { top: 10, right: 30, left: 0, bottom: 0 }
+      margin: { top: 10, right: 30, left: 0, bottom: 0 },
     }
 
     const commonAxisProps = {
       stroke: '#888',
-      fontSize: 12
+      fontSize: 12,
     }
 
     switch (chartType) {
@@ -231,14 +241,14 @@ export function ComparisonCharts({
         return (
           <AreaChart {...chartProps}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey="date" 
+            <XAxis
+              dataKey="date"
               tickFormatter={(value) => format(parseISO(value), 'MMM dd')}
               {...commonAxisProps}
             />
-            <YAxis 
+            <YAxis
               {...commonAxisProps}
-              tickFormatter={(value) => normalizeData ? `${value}%` : value.toLocaleString()}
+              tickFormatter={(value) => (normalizeData ? `${value}%` : value.toLocaleString())}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
@@ -254,21 +264,27 @@ export function ComparisonCharts({
                 strokeWidth={2}
               />
             ))}
-            {showTrend && sources.map(source => {
-              const trend = trendLines[source.id]
-              if (!trend) return null
-              return (
-                <ReferenceLine
-                  key={`trend-${source.id}`}
-                  stroke={source.color || sourceColors[sources.indexOf(source) % sourceColors.length]}
-                  strokeDasharray="5 5"
-                  segment={[
-                    { x: data[0].date, y: data[0][source.id] as number },
-                    { x: data[data.length - 1].date, y: (data[0][source.id] as number) + trend * data.length }
-                  ]}
-                />
-              )
-            })}
+            {showTrend &&
+              sources.map((source) => {
+                const trend = trendLines[source.id]
+                if (!trend) return null
+                return (
+                  <ReferenceLine
+                    key={`trend-${source.id}`}
+                    stroke={
+                      source.color || sourceColors[sources.indexOf(source) % sourceColors.length]
+                    }
+                    strokeDasharray="5 5"
+                    segment={[
+                      { x: data[0].date, y: data[0][source.id] as number },
+                      {
+                        x: data[data.length - 1].date,
+                        y: (data[0][source.id] as number) + trend * data.length,
+                      },
+                    ]}
+                  />
+                )
+              })}
           </AreaChart>
         )
 
@@ -276,14 +292,14 @@ export function ComparisonCharts({
         return (
           <BarChart {...chartProps}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey="date" 
+            <XAxis
+              dataKey="date"
               tickFormatter={(value) => format(parseISO(value), 'MMM dd')}
               {...commonAxisProps}
             />
-            <YAxis 
+            <YAxis
               {...commonAxisProps}
-              tickFormatter={(value) => normalizeData ? `${value}%` : value.toLocaleString()}
+              tickFormatter={(value) => (normalizeData ? `${value}%` : value.toLocaleString())}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
@@ -302,14 +318,14 @@ export function ComparisonCharts({
         return (
           <ComposedChart {...chartProps}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey="date" 
+            <XAxis
+              dataKey="date"
               tickFormatter={(value) => format(parseISO(value), 'MMM dd')}
               {...commonAxisProps}
             />
-            <YAxis 
+            <YAxis
               {...commonAxisProps}
-              tickFormatter={(value) => normalizeData ? `${value}%` : value.toLocaleString()}
+              tickFormatter={(value) => (normalizeData ? `${value}%` : value.toLocaleString())}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
@@ -347,14 +363,14 @@ export function ComparisonCharts({
         return (
           <LineChart {...chartProps}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis 
-              dataKey="date" 
+            <XAxis
+              dataKey="date"
               tickFormatter={(value) => format(parseISO(value), 'MMM dd')}
               {...commonAxisProps}
             />
-            <YAxis 
+            <YAxis
               {...commonAxisProps}
-              tickFormatter={(value) => normalizeData ? `${value}%` : value.toLocaleString()}
+              tickFormatter={(value) => (normalizeData ? `${value}%` : value.toLocaleString())}
             />
             <Tooltip content={<CustomTooltip />} />
             <Legend />
@@ -370,7 +386,7 @@ export function ComparisonCharts({
                 connectNulls
               />
             ))}
-            <Brush 
+            <Brush
               dataKey="date"
               height={30}
               stroke="#8884d8"
@@ -410,7 +426,7 @@ export function ComparisonCharts({
       {/* Controls */}
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex gap-2">
-          {chartTypes.map(type => (
+          {chartTypes.map((type) => (
             <button
               key={type.id}
               onClick={() => setChartType(type.id)}
@@ -427,7 +443,7 @@ export function ComparisonCharts({
             </button>
           ))}
         </div>
-        
+
         <div className="flex gap-2">
           <button
             onClick={() => setShowTrend(!showTrend)}
@@ -449,8 +465,12 @@ export function ComparisonCharts({
           <div className="space-y-2">
             <h3 className="text-sm font-medium flex items-center gap-2">
               Posting Patterns
-              {Object.values(trendLines).some(t => t > 0) && <TrendingUp className="h-4 w-4 text-green-500" />}
-              {Object.values(trendLines).some(t => t < 0) && <TrendingDown className="h-4 w-4 text-red-500" />}
+              {Object.values(trendLines).some((t) => t > 0) && (
+                <TrendingUp className="h-4 w-4 text-green-500" />
+              )}
+              {Object.values(trendLines).some((t) => t < 0) && (
+                <TrendingDown className="h-4 w-4 text-red-500" />
+              )}
             </h3>
             <div className="border rounded-lg p-4 bg-card">
               <ResponsiveContainer width="100%" height={300}>
@@ -474,7 +494,7 @@ export function ComparisonCharts({
             <h3 className="text-sm font-medium">Growth Trends</h3>
             <div className="border rounded-lg p-4 bg-card">
               <ResponsiveContainer width="100%" height={300}>
-                {renderChart(processedData, 300)}
+                {renderChart(processedData)}
               </ResponsiveContainer>
             </div>
           </div>
@@ -492,7 +512,7 @@ export function ComparisonCharts({
       ) : (
         <div className="border rounded-lg p-4 bg-card">
           <ResponsiveContainer width="100%" height={400}>
-            {renderChart(processedData, 400)}
+            {renderChart(processedData)}
           </ResponsiveContainer>
         </div>
       )}

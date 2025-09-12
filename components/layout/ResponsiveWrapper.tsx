@@ -75,14 +75,10 @@ export function ResponsiveGrid({
     cols.sm && `sm:grid-cols-${cols.sm}`,
     cols.md && `md:grid-cols-${cols.md}`,
     cols.lg && `lg:grid-cols-${cols.lg}`,
-    cols.xl && `xl:grid-cols-${cols.xl}`,
+    cols.xl && `xl:grid-cols-${cols.xl}`
   )
-  
-  return (
-    <div className={cn(gridCols, gapClasses[gap], className)}>
-      {children}
-    </div>
-  )
+
+  return <div className={cn(gridCols, gapClasses[gap], className)}>{children}</div>
 }
 
 // Stack component for vertical layouts on mobile
@@ -106,12 +102,7 @@ const spacingClasses = {
   },
 }
 
-export function Stack({
-  children,
-  className,
-  spacing = 'md',
-  direction = 'vertical',
-}: StackProps) {
+export function Stack({ children, className, spacing = 'md', direction = 'vertical' }: StackProps) {
   return (
     <div
       className={cn(

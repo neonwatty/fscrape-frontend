@@ -11,12 +11,13 @@ import { TableLoading } from '@/app/loading'
 
 // Lazy load the heavy PostsTableEnhanced component
 const PostsTableEnhanced = dynamic(
-  () => import('@/components/posts/PostsTableEnhanced').then(mod => ({ 
-    default: mod.PostsTableEnhanced 
-  })),
-  { 
+  () =>
+    import('@/components/posts/PostsTableEnhanced').then((mod) => ({
+      default: mod.PostsTableEnhanced,
+    })),
+  {
     loading: () => <TableLoading rows={10} />,
-    ssr: false // Disable SSR for this heavy component
+    ssr: false, // Disable SSR for this heavy component
   }
 )
 
@@ -72,7 +73,7 @@ export default function PostsPage() {
             <TabsTrigger value="infinite">Infinite Scroll</TabsTrigger>
             <TabsTrigger value="virtualized">Virtualized</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="enhanced" className="mt-6">
             <Suspense fallback={<PostsExplorerSkeleton />}>
               <PostsTableEnhanced
@@ -85,7 +86,7 @@ export default function PostsPage() {
               />
             </Suspense>
           </TabsContent>
-          
+
           <TabsContent value="infinite" className="mt-6">
             <Suspense fallback={<PostsExplorerSkeleton />}>
               <PostsTableEnhanced
@@ -98,7 +99,7 @@ export default function PostsPage() {
               />
             </Suspense>
           </TabsContent>
-          
+
           <TabsContent value="virtualized" className="mt-6">
             <Suspense fallback={<PostsExplorerSkeleton />}>
               <PostsTableEnhanced

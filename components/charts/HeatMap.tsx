@@ -3,23 +3,24 @@
 import { useState, useMemo } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
-import { 
-  generateEngagementHeatmap, 
+  generateEngagementHeatmap,
   getOptimalPostingTimes,
   getHeatmapColor,
   getHeatmapCellLabel,
   type EngagementHeatmapData,
-  type HeatmapFilters
+  type HeatmapFilters,
 } from '@/lib/analytics/heatmap-utils'
 import { ForumPost } from '@/lib/db/types'
 import { cn } from '@/lib/utils'
@@ -35,19 +36,19 @@ interface HeatMapProps {
   defaultMetric?: HeatmapFilters['metric']
 }
 
-export function HeatMap({ 
-  posts, 
+export function HeatMap({
+  posts,
   title = 'Engagement Heatmap',
   description = 'Discover optimal posting times based on engagement metrics',
   className,
   showFilters = true,
   showOptimalTimes = true,
-  defaultMetric = 'avgEngagement'
+  defaultMetric = 'avgEngagement',
 }: HeatMapProps) {
   const [filters, setFilters] = useState<HeatmapFilters>({
     platform: 'all',
     metric: defaultMetric,
-    minPosts: 0
+    minPosts: 0,
   })
   const [sourceFilter, setSourceFilter] = useState('')
   const [selectedCell, setSelectedCell] = useState<EngagementHeatmapData | null>(null)
@@ -56,7 +57,7 @@ export function HeatMap({
   const heatmapData = useMemo(() => {
     return generateEngagementHeatmap(posts, {
       ...filters,
-      source: sourceFilter || undefined
+      source: sourceFilter || undefined,
     })
   }, [posts, filters, sourceFilter])
 
@@ -69,17 +70,17 @@ export function HeatMap({
   // Calculate max values for color scaling
   const maxValues = useMemo(() => {
     return {
-      posts: Math.max(...heatmapData.map(d => d.posts), 1),
-      avgScore: Math.max(...heatmapData.map(d => d.avgScore), 1),
-      avgComments: Math.max(...heatmapData.map(d => d.avgComments), 1),
-      avgEngagement: Math.max(...heatmapData.map(d => d.avgEngagement), 1),
+      posts: Math.max(...heatmapData.map((d) => d.posts), 1),
+      avgScore: Math.max(...heatmapData.map((d) => d.avgScore), 1),
+      avgComments: Math.max(...heatmapData.map((d) => d.avgComments), 1),
+      avgEngagement: Math.max(...heatmapData.map((d) => d.avgEngagement), 1),
     }
   }, [heatmapData])
 
   // Get unique sources for filtering
   const sources = useMemo(() => {
     const sourceSet = new Set<string>()
-    posts.forEach(post => {
+    posts.forEach((post) => {
       const source = post.source || post.subreddit || ''
       if (source) sourceSet.add(source)
     })
@@ -91,7 +92,7 @@ export function HeatMap({
 
   // Get data for specific cell
   const getCellData = (day: number, hour: number) => {
-    return heatmapData.find(d => d.day === day && d.hour === hour)
+    return heatmapData.find((d) => d.day === day && d.hour === hour)
   }
 
   // Format hour label
@@ -105,10 +106,14 @@ export function HeatMap({
   // Get metric icon
   const getMetricIcon = (metric: HeatmapFilters['metric']) => {
     switch (metric) {
-      case 'posts': return <Activity className="h-4 w-4" />
-      case 'avgScore': return <TrendingUp className="h-4 w-4" />
-      case 'avgComments': return <MessageSquare className="h-4 w-4" />
-      case 'avgEngagement': return <Users className="h-4 w-4" />
+      case 'posts':
+        return <Activity className="h-4 w-4" />
+      case 'avgScore':
+        return <TrendingUp className="h-4 w-4" />
+      case 'avgComments':
+        return <MessageSquare className="h-4 w-4" />
+      case 'avgEngagement':
+        return <Users className="h-4 w-4" />
     }
   }
 
@@ -120,12 +125,15 @@ export function HeatMap({
             <CardTitle>{title}</CardTitle>
             {description && <CardDescription>{description}</CardDescription>}
           </div>
-          
+
           {showFilters && (
             <div className="flex flex-wrap gap-2">
-              <Select value={filters.platform || 'all'} onValueChange={(value) => 
-                setFilters(prev => ({ ...prev, platform: value as HeatmapFilters['platform'] }))
-              }>
+              <Select
+                value={filters.platform || 'all'}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({ ...prev, platform: value as HeatmapFilters['platform'] }))
+                }
+              >
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Platform" />
                 </SelectTrigger>
@@ -136,9 +144,12 @@ export function HeatMap({
                 </SelectContent>
               </Select>
 
-              <Select value={filters.metric || 'avgEngagement'} onValueChange={(value) => 
-                setFilters(prev => ({ ...prev, metric: value as HeatmapFilters['metric'] }))
-              }>
+              <Select
+                value={filters.metric || 'avgEngagement'}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({ ...prev, metric: value as HeatmapFilters['metric'] }))
+                }
+              >
                 <SelectTrigger className="w-[160px]">
                   <SelectValue placeholder="Metric" />
                 </SelectTrigger>
@@ -179,9 +190,12 @@ export function HeatMap({
                 />
               )}
 
-              <Select value={String(filters.minPosts || 0)} onValueChange={(value) => 
-                setFilters(prev => ({ ...prev, minPosts: parseInt(value) }))
-              }>
+              <Select
+                value={String(filters.minPosts || 0)}
+                onValueChange={(value) =>
+                  setFilters((prev) => ({ ...prev, minPosts: parseInt(value) }))
+                }
+              >
                 <SelectTrigger className="w-[140px]">
                   <SelectValue placeholder="Min posts" />
                 </SelectTrigger>
@@ -196,19 +210,19 @@ export function HeatMap({
           )}
         </div>
       </CardHeader>
-      
+
       <CardContent>
         <Tabs defaultValue="heatmap" className="w-full">
           <TabsList className="grid w-full max-w-md grid-cols-2">
             <TabsTrigger value="heatmap">Heatmap View</TabsTrigger>
             <TabsTrigger value="optimal">Optimal Times</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="heatmap" className="mt-6">
             <div className="space-y-4">
               {/* Hour labels */}
               <div className="flex gap-1 ml-12">
-                {hourLabels.map(hour => (
+                {hourLabels.map((hour) => (
                   <div
                     key={hour}
                     className="flex-1 text-xs text-muted-foreground text-center"
@@ -218,7 +232,7 @@ export function HeatMap({
                   </div>
                 ))}
               </div>
-              
+
               {/* Heatmap grid */}
               <TooltipProvider>
                 <div className="space-y-1">
@@ -228,7 +242,7 @@ export function HeatMap({
                         {day}
                       </div>
                       <div className="flex gap-1">
-                        {hourLabels.map(hour => {
+                        {hourLabels.map((hour) => {
                           const cellData = getCellData(dayIndex, hour)
                           if (!cellData) {
                             return (
@@ -239,16 +253,20 @@ export function HeatMap({
                               />
                             )
                           }
-                          
-                          const value = filters.metric === 'posts' ? cellData.posts :
-                                       filters.metric === 'avgScore' ? cellData.avgScore :
-                                       filters.metric === 'avgComments' ? cellData.avgComments :
-                                       cellData.avgEngagement
-                          
+
+                          const value =
+                            filters.metric === 'posts'
+                              ? cellData.posts
+                              : filters.metric === 'avgScore'
+                                ? cellData.avgScore
+                                : filters.metric === 'avgComments'
+                                  ? cellData.avgComments
+                                  : cellData.avgEngagement
+
                           const maxValue = maxValues[filters.metric || 'avgEngagement']
                           const colorClass = getHeatmapColor(value, maxValue, filters.metric)
                           const label = getHeatmapCellLabel(cellData, filters.metric)
-                          
+
                           return (
                             <Tooltip key={hour}>
                               <TooltipTrigger asChild>
@@ -272,18 +290,28 @@ export function HeatMap({
                                     </div>
                                     <div className="flex justify-between gap-4">
                                       <span className="text-muted-foreground">Avg Score:</span>
-                                      <span className="font-mono">{cellData.avgScore.toFixed(0)}</span>
+                                      <span className="font-mono">
+                                        {cellData.avgScore.toFixed(0)}
+                                      </span>
                                     </div>
                                     <div className="flex justify-between gap-4">
                                       <span className="text-muted-foreground">Avg Comments:</span>
-                                      <span className="font-mono">{cellData.avgComments.toFixed(0)}</span>
+                                      <span className="font-mono">
+                                        {cellData.avgComments.toFixed(0)}
+                                      </span>
                                     </div>
                                   </div>
                                   {cellData.bestPost && (
                                     <div className="pt-2 border-t">
-                                      <p className="text-xs text-muted-foreground mb-1">Best post:</p>
-                                      <p className="text-xs line-clamp-2">{cellData.bestPost.title}</p>
-                                      <p className="text-xs font-mono mt-1">Score: {cellData.bestPost.score}</p>
+                                      <p className="text-xs text-muted-foreground mb-1">
+                                        Best post:
+                                      </p>
+                                      <p className="text-xs line-clamp-2">
+                                        {cellData.bestPost.title}
+                                      </p>
+                                      <p className="text-xs font-mono mt-1">
+                                        Score: {cellData.bestPost.score}
+                                      </p>
                                     </div>
                                   )}
                                 </div>
@@ -296,62 +324,87 @@ export function HeatMap({
                   ))}
                 </div>
               </TooltipProvider>
-              
+
               {/* Legend */}
               <div className="flex items-center justify-between mt-6 pt-4 border-t">
                 <div className="flex items-center gap-4">
                   <span className="text-xs text-muted-foreground">Less</span>
                   <div className="flex gap-1">
                     <div className={cn('w-4 h-4 rounded-sm', 'bg-muted')} />
-                    <div className={cn('w-4 h-4 rounded-sm', 
-                      filters.metric === 'posts' ? 'bg-blue-200 dark:bg-blue-900' :
-                      filters.metric === 'avgComments' ? 'bg-purple-200 dark:bg-purple-900' :
-                      'bg-green-200 dark:bg-green-900'
-                    )} />
-                    <div className={cn('w-4 h-4 rounded-sm',
-                      filters.metric === 'posts' ? 'bg-blue-300 dark:bg-blue-800' :
-                      filters.metric === 'avgComments' ? 'bg-purple-300 dark:bg-purple-800' :
-                      'bg-green-300 dark:bg-green-800'
-                    )} />
-                    <div className={cn('w-4 h-4 rounded-sm',
-                      filters.metric === 'posts' ? 'bg-blue-400 dark:bg-blue-700' :
-                      filters.metric === 'avgComments' ? 'bg-purple-400 dark:bg-purple-700' :
-                      'bg-green-400 dark:bg-green-700'
-                    )} />
-                    <div className={cn('w-4 h-4 rounded-sm',
-                      filters.metric === 'posts' ? 'bg-blue-500 dark:bg-blue-600' :
-                      filters.metric === 'avgComments' ? 'bg-purple-500 dark:bg-purple-600' :
-                      'bg-green-500 dark:bg-green-600'
-                    )} />
+                    <div
+                      className={cn(
+                        'w-4 h-4 rounded-sm',
+                        filters.metric === 'posts'
+                          ? 'bg-blue-200 dark:bg-blue-900'
+                          : filters.metric === 'avgComments'
+                            ? 'bg-purple-200 dark:bg-purple-900'
+                            : 'bg-green-200 dark:bg-green-900'
+                      )}
+                    />
+                    <div
+                      className={cn(
+                        'w-4 h-4 rounded-sm',
+                        filters.metric === 'posts'
+                          ? 'bg-blue-300 dark:bg-blue-800'
+                          : filters.metric === 'avgComments'
+                            ? 'bg-purple-300 dark:bg-purple-800'
+                            : 'bg-green-300 dark:bg-green-800'
+                      )}
+                    />
+                    <div
+                      className={cn(
+                        'w-4 h-4 rounded-sm',
+                        filters.metric === 'posts'
+                          ? 'bg-blue-400 dark:bg-blue-700'
+                          : filters.metric === 'avgComments'
+                            ? 'bg-purple-400 dark:bg-purple-700'
+                            : 'bg-green-400 dark:bg-green-700'
+                      )}
+                    />
+                    <div
+                      className={cn(
+                        'w-4 h-4 rounded-sm',
+                        filters.metric === 'posts'
+                          ? 'bg-blue-500 dark:bg-blue-600'
+                          : filters.metric === 'avgComments'
+                            ? 'bg-purple-500 dark:bg-purple-600'
+                            : 'bg-green-500 dark:bg-green-600'
+                      )}
+                    />
                   </div>
                   <span className="text-xs text-muted-foreground">More</span>
                 </div>
-                
+
                 <div className="flex items-center gap-2">
                   {getMetricIcon(filters.metric)}
                   <span className="text-sm font-medium">
-                    {filters.metric === 'posts' ? 'Post Count' :
-                     filters.metric === 'avgScore' ? 'Average Score' :
-                     filters.metric === 'avgComments' ? 'Average Comments' :
-                     'Engagement Score'}
+                    {filters.metric === 'posts'
+                      ? 'Post Count'
+                      : filters.metric === 'avgScore'
+                        ? 'Average Score'
+                        : filters.metric === 'avgComments'
+                          ? 'Average Comments'
+                          : 'Engagement Score'}
                   </span>
                 </div>
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="optimal" className="mt-6">
             {optimalTimes.length > 0 ? (
               <div className="space-y-4">
                 <div className="text-sm text-muted-foreground mb-4">
-                  Top {optimalTimes.length} optimal posting times based on {
-                    filters.metric === 'posts' ? 'post volume' :
-                    filters.metric === 'avgScore' ? 'average score' :
-                    filters.metric === 'avgComments' ? 'average comments' :
-                    'overall engagement'
-                  }
+                  Top {optimalTimes.length} optimal posting times based on{' '}
+                  {filters.metric === 'posts'
+                    ? 'post volume'
+                    : filters.metric === 'avgScore'
+                      ? 'average score'
+                      : filters.metric === 'avgComments'
+                        ? 'average comments'
+                        : 'overall engagement'}
                 </div>
-                
+
                 {optimalTimes.map((slot, index) => (
                   <div
                     key={`${slot.day}-${slot.hour}`}
@@ -364,21 +417,24 @@ export function HeatMap({
                       <div>
                         <div className="flex items-center gap-2">
                           <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span className="font-medium">{slot.day} at {slot.hour}</span>
+                          <span className="font-medium">
+                            {slot.day} at {slot.hour}
+                          </span>
                         </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {slot.recommendation}
-                        </p>
+                        <p className="text-sm text-muted-foreground mt-1">{slot.recommendation}</p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <Badge
                         variant={
-                          slot.performance === 'excellent' ? 'default' :
-                          slot.performance === 'good' ? 'secondary' :
-                          slot.performance === 'average' ? 'outline' :
-                          'destructive'
+                          slot.performance === 'excellent'
+                            ? 'default'
+                            : slot.performance === 'good'
+                              ? 'secondary'
+                              : slot.performance === 'average'
+                                ? 'outline'
+                                : 'destructive'
                         }
                       >
                         {slot.performance}
@@ -397,11 +453,12 @@ export function HeatMap({
                     </div>
                   </div>
                 ))}
-                
+
                 <div className="mt-6 p-4 bg-muted/50 rounded-lg">
                   <p className="text-sm text-muted-foreground">
-                    <strong>💡 Pro tip:</strong> These optimal times are based on historical engagement data. 
-                    Consider your specific audience and test different posting times to find what works best for your content.
+                    <strong>💡 Pro tip:</strong> These optimal times are based on historical
+                    engagement data. Consider your specific audience and test different posting
+                    times to find what works best for your content.
                   </p>
                 </div>
               </div>
@@ -414,17 +471,13 @@ export function HeatMap({
             )}
           </TabsContent>
         </Tabs>
-        
+
         {/* Selected cell details */}
         {selectedCell && (
           <div className="mt-6 p-4 rounded-lg border bg-card">
             <div className="flex items-center justify-between mb-3">
               <h4 className="font-semibold text-sm">Selected Time Slot</h4>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setSelectedCell(null)}
-              >
+              <Button variant="ghost" size="sm" onClick={() => setSelectedCell(null)}>
                 Clear
               </Button>
             </div>
@@ -474,29 +527,29 @@ export function HeatMap({
   )
 }
 
-export function SimpleEngagementHeatmap({ 
-  posts, 
-  className 
-}: { 
+export function SimpleEngagementHeatmap({
+  posts,
+  className,
+}: {
   posts: ForumPost[]
-  className?: string 
+  className?: string
 }) {
   const dayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-  const heatmapData = useMemo(() => 
-    generateEngagementHeatmap(posts, { metric: 'avgEngagement' }), 
+  const heatmapData = useMemo(
+    () => generateEngagementHeatmap(posts, { metric: 'avgEngagement' }),
     [posts]
   )
-  
-  const maxEngagement = Math.max(...heatmapData.map(d => d.avgEngagement), 1)
-  
+
+  const maxEngagement = Math.max(...heatmapData.map((d) => d.avgEngagement), 1)
+
   const getCellData = (day: number, hour: number) => {
-    return heatmapData.find(d => d.day === day && d.hour === hour)
+    return heatmapData.find((d) => d.day === day && d.hour === hour)
   }
-  
+
   const getColorClass = (engagement: number) => {
     if (engagement === 0) return 'bg-muted'
     const intensity = (engagement / maxEngagement) * 100
-    
+
     if (intensity <= 25) return 'bg-emerald-200 dark:bg-emerald-900'
     if (intensity <= 50) return 'bg-emerald-400 dark:bg-emerald-700'
     if (intensity <= 75) return 'bg-emerald-500 dark:bg-emerald-600'
@@ -513,18 +566,15 @@ export function SimpleEngagementHeatmap({
               {Array.from({ length: 24 }, (_, hour) => {
                 const cellData = getCellData(dayIndex, hour)
                 const engagement = cellData?.avgEngagement || 0
-                const label = cellData ? 
-                  `${cellData.posts} posts, ${engagement.toFixed(0)} engagement` : 
-                  'No data'
-                
+                const label = cellData
+                  ? `${cellData.posts} posts, ${engagement.toFixed(0)} engagement`
+                  : 'No data'
+
                 return (
                   <Tooltip key={hour}>
                     <TooltipTrigger asChild>
                       <div
-                        className={cn(
-                          'w-2 h-2 rounded-sm',
-                          getColorClass(engagement)
-                        )}
+                        className={cn('w-2 h-2 rounded-sm', getColorClass(engagement))}
                         aria-label={label}
                       />
                     </TooltipTrigger>

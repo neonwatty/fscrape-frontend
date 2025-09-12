@@ -19,7 +19,7 @@ const config = {
     '^@/lib/(.*)$': '<rootDir>/lib/$1',
     '^@/app/(.*)$': '<rootDir>/app/$1',
     '^@/(.*)$': '<rootDir>/$1',
-    
+
     // Handle CSS imports (with CSS modules)
     '^.+\\.module\\.(css|sass|scss)$': 'identity-obj-proxy',
 
@@ -31,9 +31,7 @@ const config = {
   },
   // Handle absolute imports and module path aliases
   moduleDirectories: ['node_modules', '<rootDir>/'],
-  testMatch: [
-    '**/__tests__/**/*.[jt]s?(x)',
-  ],
+  testMatch: ['**/__tests__/**/*.[jt]s?(x)'],
   collectCoverageFrom: [
     'app/**/*.{js,jsx,ts,tsx}',
     'components/**/*.{js,jsx,ts,tsx}',
@@ -57,31 +55,30 @@ const config = {
   },
   // Transform files with SWC
   transform: {
-    '^.+\\.(t|j)sx?$': ['@swc/jest', {
-      jsc: {
-        parser: {
-          syntax: 'typescript',
-          tsx: true,
-          decorators: true,
-        },
-        transform: {
-          react: {
-            runtime: 'automatic',
+    '^.+\\.(t|j)sx?$': [
+      '@swc/jest',
+      {
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+            tsx: true,
+            decorators: true,
+          },
+          transform: {
+            react: {
+              runtime: 'automatic',
+            },
           },
         },
       },
-    }],
+    ],
   },
   // Mock environment variables for testing
   testEnvironmentOptions: {
     url: 'http://localhost:3000',
   },
   // Ignore e2e tests (those are for Playwright)
-  testPathIgnorePatterns: [
-    '<rootDir>/.next/',
-    '<rootDir>/node_modules/',
-    '<rootDir>/e2e/',
-  ],
+  testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/', '<rootDir>/e2e/'],
   // Global test timeout
   testTimeout: 10000,
   // Verbose output

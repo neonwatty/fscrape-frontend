@@ -47,21 +47,25 @@ describe('Button Component', () => {
   it('handles click events', () => {
     const handleClick = vi.fn()
     render(<Button onClick={handleClick}>Click me</Button>)
-    
+
     const button = screen.getByRole('button')
     fireEvent.click(button)
-    
+
     expect(handleClick).toHaveBeenCalledTimes(1)
   })
 
   it('can be disabled', () => {
     const handleClick = vi.fn()
-    render(<Button disabled onClick={handleClick}>Disabled</Button>)
-    
+    render(
+      <Button disabled onClick={handleClick}>
+        Disabled
+      </Button>
+    )
+
     const button = screen.getByRole('button')
     expect(button).toBeDisabled()
     expect(button).toHaveClass('disabled:pointer-events-none')
-    
+
     fireEvent.click(button)
     expect(handleClick).not.toHaveBeenCalled()
   })
@@ -72,7 +76,7 @@ describe('Button Component', () => {
         <a href="/test">Link Button</a>
       </Button>
     )
-    
+
     const link = screen.getByRole('link', { name: /link button/i })
     expect(link).toBeInTheDocument()
     expect(link).toHaveAttribute('href', '/test')
@@ -96,7 +100,7 @@ describe('Button Component', () => {
         Accessible
       </Button>
     )
-    
+
     const button = screen.getByRole('button')
     expect(button).toHaveAttribute('aria-label', 'Special button')
     expect(button).toHaveAttribute('aria-pressed', 'true')

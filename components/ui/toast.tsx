@@ -17,7 +17,13 @@ export interface Toast {
     onClick: () => void
   }
   dismissible?: boolean
-  position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right'
+  position?:
+    | 'top-left'
+    | 'top-center'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-center'
+    | 'bottom-right'
 }
 
 interface ToastContextType {
@@ -37,44 +43,47 @@ export function useToast() {
   return context
 }
 
-export function ToastProvider({ 
+export function ToastProvider({
   children,
   maxToasts = 5,
-}: { 
+}: {
   children: React.ReactNode
   maxToasts?: number
 }) {
   const [toasts, setToasts] = useState<Toast[]>([])
 
-  const addToast = useCallback((toast: Omit<Toast, 'id'>) => {
-    const id = Math.random().toString(36).substring(2, 9)
-    const newToast: Toast = { 
-      ...toast, 
-      id,
-      dismissible: toast.dismissible !== false,
-      position: toast.position || 'bottom-right'
-    }
-    
-    setToasts((prev) => {
-      // Limit number of toasts
-      const updated = [...prev, newToast]
-      if (updated.length > maxToasts) {
-        return updated.slice(-maxToasts)
-      }
-      return updated
-    })
-
-    // Auto remove after duration
-    if (toast.duration !== 0) {
-      setTimeout(() => {
-        removeToast(id)
-      }, toast.duration || 5000)
-    }
-  }, [maxToasts])
-
   const removeToast = useCallback((id: string) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id))
   }, [])
+
+  const addToast = useCallback(
+    (toast: Omit<Toast, 'id'>) => {
+      const id = Math.random().toString(36).substring(2, 9)
+      const newToast: Toast = {
+        ...toast,
+        id,
+        dismissible: toast.dismissible !== false,
+        position: toast.position || 'bottom-right',
+      }
+
+      setToasts((prev) => {
+        // Limit number of toasts
+        const updated = [...prev, newToast]
+        if (updated.length > maxToasts) {
+          return updated.slice(-maxToasts)
+        }
+        return updated
+      })
+
+      // Auto remove after duration
+      if (toast.duration !== 0) {
+        setTimeout(() => {
+          removeToast(id)
+        }, toast.duration || 5000)
+      }
+    },
+    [maxToasts, removeToast]
+  )
 
   const clearToasts = useCallback(() => {
     setToasts([])
@@ -90,14 +99,17 @@ export function ToastProvider({
 
 function ToastContainer() {
   const { toasts, removeToast } = useToast()
-  
+
   // Group toasts by position
-  const groupedToasts = toasts.reduce((acc, toast) => {
-    const position = toast.position || 'bottom-right'
-    if (!acc[position]) acc[position] = []
-    acc[position].push(toast)
-    return acc
-  }, {} as Record<string, Toast[]>)
+  const groupedToasts = toasts.reduce(
+    (acc, toast) => {
+      const position = toast.position || 'bottom-right'
+      if (!acc[position]) acc[position] = []
+      acc[position].push(toast)
+      return acc
+    },
+    {} as Record<string, Toast[]>
+  )
 
   const positionClasses = {
     'top-left': 'top-4 left-4 sm:top-6 sm:left-6',
@@ -192,7 +204,9 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
     >
       <div className="p-3 sm:p-4">
         <div className="flex items-start gap-3">
-          <div className={cn('mt-0.5 flex-shrink-0', iconColors[toast.type])}>{icons[toast.type]}</div>
+          <div className={cn('mt-0.5 flex-shrink-0', iconColors[toast.type])}>
+            {icons[toast.type]}
+          </div>
           <div className="flex-1 min-w-0">
             <h3 className="font-medium break-words">{toast.title}</h3>
             {toast.description && (
@@ -226,7 +240,7 @@ function ToastItem({ toast, onClose }: { toast: Toast; onClose: () => void }) {
 // Helper hook for toast actions
 export function useToastActions() {
   const { addToast } = useToast()
-  
+
   return {
     success: (title: string, description?: string) => {
       addToast({ type: 'success', title, description })

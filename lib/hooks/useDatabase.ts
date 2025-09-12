@@ -10,11 +10,11 @@ import { DatabaseContext, DatabaseContextType } from '@/components/providers/Dat
  */
 export function useDatabase(): DatabaseContextType {
   const context = useContext(DatabaseContext)
-  
+
   if (context === undefined) {
     throw new Error('useDatabase must be used within a DatabaseProvider')
   }
-  
+
   return context
 }
 
@@ -40,18 +40,13 @@ export function useDatabaseSummary() {
  * Hook for post queries with filters
  */
 export function usePostQueries() {
-  const { 
-    queryPosts, 
-    queryRecentPosts, 
-    queryTrendingPosts,
-    searchPostsQuery 
-  } = useDatabase()
-  
+  const { queryPosts, queryRecentPosts, queryTrendingPosts, searchPostsQuery } = useDatabase()
+
   return {
     queryPosts,
     queryRecentPosts,
     queryTrendingPosts,
-    searchPosts: searchPostsQuery
+    searchPosts: searchPostsQuery,
   }
 }
 
@@ -67,9 +62,9 @@ export function useAnalyticsQueries() {
     queryTopSources,
     queryPostingHeatmap,
     queryEngagementMetrics,
-    queryPlatformComparison
+    queryPlatformComparison,
   } = useDatabase()
-  
+
   return {
     queryPlatformStats,
     queryTimeSeries,
@@ -78,7 +73,7 @@ export function useAnalyticsQueries() {
     queryTopSources,
     queryPostingHeatmap,
     queryEngagementMetrics,
-    queryPlatformComparison
+    queryPlatformComparison,
   }
 }
 
@@ -87,10 +82,10 @@ export function useAnalyticsQueries() {
  */
 export function useDatabaseFileOps() {
   const { loadDatabase, exportDatabase, closeDatabase } = useDatabase()
-  
+
   return {
     loadDatabase,
     exportDatabase,
-    closeDatabase
+    closeDatabase,
   }
 }

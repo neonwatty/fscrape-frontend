@@ -67,22 +67,32 @@
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: var(--font-inter), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family:
+    var(--font-inter),
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
   /* Prevent iOS zoom on input focus */
   touch-action: manipulation;
-  
+
   /* Smooth scrolling */
   scroll-behavior: smooth;
-  
+
   /* Prevent text size adjustment on orientation change */
   -webkit-text-size-adjust: 100%;
 }
 
 /* Monospace font for code blocks */
-code, pre, .font-mono {
+code,
+pre,
+.font-mono {
   font-family: var(--font-mono), 'Courier New', monospace;
 }
 
@@ -226,43 +236,43 @@ code, pre, .font-mono {
   .pb-safe {
     padding-bottom: env(safe-area-inset-bottom);
   }
-  
+
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
-  
+
   /* Touch-friendly tap targets */
   .tap-highlight-transparent {
     -webkit-tap-highlight-color: transparent;
   }
-  
+
   /* Prevent text selection on UI elements */
   .select-none {
     -webkit-user-select: none;
     -moz-user-select: none;
     user-select: none;
   }
-  
+
   /* Smooth momentum scrolling on iOS */
   .scrolling-touch {
     -webkit-overflow-scrolling: touch;
   }
-  
+
   /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
-  
+
   /* Responsive text sizes */
   .text-responsive {
     font-size: clamp(0.875rem, 2vw, 1rem);
   }
-  
+
   .heading-responsive {
     font-size: clamp(1.5rem, 4vw, 2.5rem);
   }
@@ -276,21 +286,21 @@ code, pre, .font-mono {
     padding: 0 2px;
     border-radius: 2px;
   }
-  
+
   .dark mark {
     background-color: rgb(133 77 14 / 0.5);
   }
-  
+
   /* Posts table custom styles */
   .posts-table mark {
     font-weight: 600;
   }
-  
+
   /* Search input custom styles */
   .search-suggestions mark {
     background-color: hsl(var(--primary) / 0.2);
   }
-  
+
   .dark .search-suggestions mark {
     background-color: hsl(var(--primary) / 0.3);
   }

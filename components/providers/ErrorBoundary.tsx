@@ -28,16 +28,16 @@ export class ErrorBoundary extends Component<Props, State> {
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     // Log error to error reporting service
     console.error('ErrorBoundary caught an error:', error, errorInfo)
-    
+
     // You can send error to monitoring service here
     if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
       // Example: Send to analytics or error tracking service
       // analytics.track('Error', { error: error.message, stack: error.stack })
     }
-    
+
     this.setState({
       error,
-      errorInfo
+      errorInfo,
     })
   }
 
@@ -61,9 +61,7 @@ export class ErrorBoundary extends Component<Props, State> {
                   <AlertTriangle className="h-8 w-8 text-destructive" />
                 </div>
                 <div>
-                  <h1 className="text-xl font-semibold text-foreground">
-                    Something went wrong
-                  </h1>
+                  <h1 className="text-xl font-semibold text-foreground">Something went wrong</h1>
                   <p className="text-sm text-muted-foreground mt-1">
                     An unexpected error occurred. Please try refreshing the page.
                   </p>

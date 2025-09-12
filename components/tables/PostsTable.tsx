@@ -13,9 +13,9 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { 
-  ArrowUpDown, 
-  ChevronLeft, 
+import {
+  ArrowUpDown,
+  ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
@@ -23,7 +23,7 @@ import {
   MessageCircle,
   TrendingUp,
   Clock,
-  User
+  User,
 } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 import { Badge } from '@/components/ui/badge'
@@ -87,7 +87,7 @@ const columns: ColumnDef<ForumPost>[] = [
       const title = row.original.title
       const url = row.original.url
       const subreddit = row.original.subreddit
-      
+
       return (
         <div className="space-y-1 max-w-[500px]">
           <div className="flex items-start gap-2">
@@ -104,11 +104,7 @@ const columns: ColumnDef<ForumPost>[] = [
               </a>
             )}
           </div>
-          {subreddit && (
-            <div className="text-xs text-muted-foreground">
-              r/{subreddit}
-            </div>
-          )}
+          {subreddit && <div className="text-xs text-muted-foreground">r/{subreddit}</div>}
         </div>
       )
     },
@@ -294,9 +290,7 @@ export function PostsTable({
   showFilters = true,
   mobileBreakpoint = 768,
 }: PostsTableProps) {
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: 'created_utc', desc: true }
-  ])
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'created_utc', desc: true }])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [globalFilter, setGlobalFilter] = useState('')
@@ -380,8 +374,7 @@ export function PostsTable({
         {showPagination && data.length > 0 && (
           <div className="flex items-center justify-between px-2">
             <div className="text-xs text-muted-foreground">
-              Page {table.getState().pagination.pageIndex + 1} of{' '}
-              {table.getPageCount()}
+              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
             </div>
             <div className="flex items-center gap-2">
               <Button
@@ -435,10 +428,7 @@ export function PostsTable({
                   <TableHead key={header.id}>
                     {header.isPlaceholder
                       ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                      : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 ))}
               </TableRow>
@@ -481,11 +471,8 @@ export function PostsTable({
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
             Showing {table.getState().pagination.pageIndex * pageSize + 1} to{' '}
-            {Math.min(
-              (table.getState().pagination.pageIndex + 1) * pageSize,
-              data.length
-            )}{' '}
-            of {data.length} posts
+            {Math.min((table.getState().pagination.pageIndex + 1) * pageSize, data.length)} of{' '}
+            {data.length} posts
           </div>
           <div className="flex items-center gap-2">
             <Button

@@ -10,27 +10,31 @@ import dynamic from 'next/dynamic'
 import { Skeleton } from '@/components/ui/skeleton'
 
 const HeatMap = dynamic(
-  () => import('@/components/charts/HeatMap').then(mod => ({ default: mod.HeatMap })),
+  () => import('@/components/charts/HeatMap').then((mod) => ({ default: mod.HeatMap })),
   { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
 )
 
 const EngagementChart = dynamic(
-  () => import('@/components/charts/EngagementChart').then(mod => ({ default: mod.EngagementChart })),
+  () =>
+    import('@/components/charts/EngagementChart').then((mod) => ({ default: mod.EngagementChart })),
   { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
 )
 
 const GrowthChart = dynamic(
-  () => import('@/components/charts/GrowthChart').then(mod => ({ default: mod.GrowthChart })),
+  () => import('@/components/charts/GrowthChart').then((mod) => ({ default: mod.GrowthChart })),
   { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
 )
 
 const TopAuthors = dynamic(
-  () => import('@/components/analytics/TopAuthors').then(mod => ({ default: mod.TopAuthors })),
+  () => import('@/components/analytics/TopAuthors').then((mod) => ({ default: mod.TopAuthors })),
   { loading: () => <Skeleton className="h-96 w-full" />, ssr: false }
 )
 
 const EngagementMetrics = dynamic(
-  () => import('@/components/analytics/EngagementMetrics').then(mod => ({ default: mod.EngagementMetrics })),
+  () =>
+    import('@/components/analytics/EngagementMetrics').then((mod) => ({
+      default: mod.EngagementMetrics,
+    })),
   { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
 )
 
@@ -49,16 +53,16 @@ import {
 } from '@/components/ui/select'
 
 // Icons
-import { 
-  TrendingUp, 
-  Activity, 
-  Users, 
-  Download, 
+import {
+  TrendingUp,
+  Activity,
+  Users,
+  Download,
   RefreshCw,
   Filter,
   BarChart3,
   AlertCircle,
-  Layers
+  Layers,
 } from 'lucide-react'
 
 // Utility imports
@@ -86,18 +90,18 @@ function AnalyticsLoading() {
         </div>
         <Skeleton className="h-10 w-40" />
       </div>
-      
+
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map(i => (
+        {[1, 2, 3, 4].map((i) => (
           <Skeleton key={i} className="h-32" />
         ))}
       </div>
-      
+
       <div className="grid gap-6 lg:grid-cols-2">
         <Skeleton className="h-[400px]" />
         <Skeleton className="h-[400px]" />
       </div>
-      
+
       <Skeleton className="h-[500px]" />
     </div>
   )
@@ -110,13 +114,13 @@ function AnalyticsContent() {
   const [error, setError] = useState<string | null>(null)
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date())
   const [viewMode, setViewMode] = useState<ViewMode>('overview')
-  
+
   // Shared filters state
   const [filters, setFilters] = useState<FilterState>({
     dateRange: '30d',
     platform: 'all',
     minScore: 0,
-    minComments: 0
+    minComments: 0,
   })
 
   // Load posts data
@@ -125,7 +129,7 @@ function AnalyticsContent() {
 
     setLoading(true)
     setError(null)
-    
+
     try {
       const allPosts = getRecentPosts(50000) // Load sufficient posts for analytics
       setPosts(allPosts)
@@ -145,42 +149,42 @@ function AnalyticsContent() {
   // Filter posts based on shared filters
   const filteredPosts = useMemo(() => {
     let filtered = [...posts]
-    
+
     // Date range filter
     if (filters.dateRange !== 'all') {
       const now = Date.now() / 1000
       let cutoff = now
-      
+
       switch (filters.dateRange) {
         case '7d':
-          cutoff = now - (7 * 24 * 60 * 60)
+          cutoff = now - 7 * 24 * 60 * 60
           break
         case '30d':
-          cutoff = now - (30 * 24 * 60 * 60)
+          cutoff = now - 30 * 24 * 60 * 60
           break
         case '90d':
-          cutoff = now - (90 * 24 * 60 * 60)
+          cutoff = now - 90 * 24 * 60 * 60
           break
       }
-      
-      filtered = filtered.filter(p => p.created_utc >= cutoff)
+
+      filtered = filtered.filter((p) => p.created_utc >= cutoff)
     }
-    
+
     // Platform filter
     if (filters.platform !== 'all') {
-      filtered = filtered.filter(p => p.platform.toLowerCase() === filters.platform)
+      filtered = filtered.filter((p) => p.platform.toLowerCase() === filters.platform)
     }
-    
+
     // Score filter
     if (filters.minScore > 0) {
-      filtered = filtered.filter(p => p.score >= filters.minScore)
+      filtered = filtered.filter((p) => p.score >= filters.minScore)
     }
-    
+
     // Comments filter
     if (filters.minComments > 0) {
-      filtered = filtered.filter(p => p.num_comments >= filters.minComments)
+      filtered = filtered.filter((p) => p.num_comments >= filters.minComments)
     }
-    
+
     return filtered
   }, [posts, filters])
 
@@ -190,18 +194,19 @@ function AnalyticsContent() {
     const totalScore = filteredPosts.reduce((sum, p) => sum + p.score, 0)
     const totalComments = filteredPosts.reduce((sum, p) => sum + p.num_comments, 0)
     const avgEngagement = totalPosts > 0 ? (totalScore + totalComments * 2) / totalPosts : 0
-    
+
     // Get unique counts
-    const uniqueAuthors = new Set(filteredPosts.map(p => p.author).filter(Boolean)).size
-    const uniqueSources = new Set(filteredPosts.map(p => p.source || p.subreddit).filter(Boolean)).size
-    
+    const uniqueAuthors = new Set(filteredPosts.map((p) => p.author).filter(Boolean)).size
+    const uniqueSources = new Set(filteredPosts.map((p) => p.source || p.subreddit).filter(Boolean))
+      .size
+
     return {
       totalPosts,
       totalScore,
       totalComments,
       avgEngagement,
       uniqueAuthors,
-      uniqueSources
+      uniqueSources,
     }
   }, [filteredPosts])
 
@@ -255,7 +260,7 @@ function AnalyticsContent() {
             Comprehensive insights from {formatLargeNumber(stats.totalPosts)} posts
           </p>
         </div>
-        
+
         <div className="flex items-center gap-2">
           <Badge variant="outline" className="text-xs">
             Last updated: {lastRefresh.toLocaleTimeString()}
@@ -278,10 +283,12 @@ function AnalyticsContent() {
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex items-center gap-2 flex-1">
               <Filter className="w-4 h-4 text-muted-foreground" />
-              
+
               <Select
                 value={filters.dateRange}
-                onValueChange={(v) => setFilters(prev => ({ ...prev, dateRange: v as DateRange }))}
+                onValueChange={(v) =>
+                  setFilters((prev) => ({ ...prev, dateRange: v as DateRange }))
+                }
               >
                 <SelectTrigger className="w-40">
                   <SelectValue />
@@ -296,7 +303,9 @@ function AnalyticsContent() {
 
               <Select
                 value={filters.platform}
-                onValueChange={(v) => setFilters(prev => ({ ...prev, platform: v as FilterState['platform'] }))}
+                onValueChange={(v) =>
+                  setFilters((prev) => ({ ...prev, platform: v as FilterState['platform'] }))
+                }
               >
                 <SelectTrigger className="w-40">
                   <SelectValue />
@@ -310,7 +319,7 @@ function AnalyticsContent() {
 
               <Select
                 value={filters.minScore.toString()}
-                onValueChange={(v) => setFilters(prev => ({ ...prev, minScore: parseInt(v) }))}
+                onValueChange={(v) => setFilters((prev) => ({ ...prev, minScore: parseInt(v) }))}
               >
                 <SelectTrigger className="w-40">
                   <SelectValue />
@@ -359,7 +368,7 @@ function AnalyticsContent() {
             <div className="text-2xl font-bold">{formatLargeNumber(stats.totalPosts)}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Total Score</CardTitle>
@@ -368,7 +377,7 @@ function AnalyticsContent() {
             <div className="text-2xl font-bold">{formatLargeNumber(stats.totalScore)}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Comments</CardTitle>
@@ -377,16 +386,18 @@ function AnalyticsContent() {
             <div className="text-2xl font-bold">{formatLargeNumber(stats.totalComments)}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Avg Engagement</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Avg Engagement
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{formatLargeNumber(stats.avgEngagement)}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Authors</CardTitle>
@@ -395,7 +406,7 @@ function AnalyticsContent() {
             <div className="text-2xl font-bold">{formatLargeNumber(stats.uniqueAuthors)}</div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Sources</CardTitle>
@@ -407,7 +418,11 @@ function AnalyticsContent() {
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs value={viewMode} onValueChange={(v) => setViewMode(v as ViewMode)} className="space-y-6">
+      <Tabs
+        value={viewMode}
+        onValueChange={(v) => setViewMode(v as ViewMode)}
+        className="space-y-6"
+      >
         <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
           <TabsTrigger value="overview" className="flex items-center gap-1">
             <Layers className="w-4 h-4" />
@@ -436,7 +451,7 @@ function AnalyticsContent() {
               description="Discover optimal posting times based on activity"
               showOptimalTimes={true}
             />
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Platform Performance</CardTitle>
@@ -450,13 +465,13 @@ function AnalyticsContent() {
                     totalComments: stats.totalComments,
                     avgScore: stats.totalScore / Math.max(stats.totalPosts, 1),
                     avgComments: stats.totalComments / Math.max(stats.totalPosts, 1),
-                    engagementRate: stats.avgEngagement
+                    engagementRate: stats.avgEngagement,
                   }}
                 />
               </CardContent>
             </Card>
           </div>
-          
+
           <GrowthChart
             posts={filteredPosts}
             title="Growth Overview"
@@ -474,7 +489,7 @@ function AnalyticsContent() {
             description="Analyze correlations between time, scores, and comments"
             showFilters={true}
           />
-          
+
           <div className="grid gap-6 lg:grid-cols-2">
             <HeatMap
               posts={filteredPosts}
@@ -482,7 +497,7 @@ function AnalyticsContent() {
               defaultMetric="avgEngagement"
               showFilters={false}
             />
-            
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -525,7 +540,7 @@ function AnalyticsContent() {
             showFilters={true}
             height={500}
           />
-          
+
           <div className="grid gap-6 lg:grid-cols-2">
             <Card>
               <CardHeader>
@@ -540,12 +555,12 @@ function AnalyticsContent() {
                     totalComments: stats.totalComments,
                     avgScore: stats.totalScore / Math.max(stats.totalPosts, 1),
                     avgComments: stats.totalComments / Math.max(stats.totalPosts, 1),
-                    engagementRate: stats.avgEngagement
+                    engagementRate: stats.avgEngagement,
                   }}
                 />
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -590,7 +605,7 @@ function AnalyticsContent() {
             showTrends={true}
             limit={25}
           />
-          
+
           <div className="grid gap-6 lg:grid-cols-3">
             <Card>
               <CardHeader>
@@ -601,13 +616,15 @@ function AnalyticsContent() {
                   {['user123', 'contributor456', 'active789'].map((author, i) => (
                     <div key={i} className="flex items-center justify-between">
                       <span className="text-sm">{author}</span>
-                      <Badge variant="outline" className="text-xs">Daily</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        Daily
+                      </Badge>
                     </div>
                   ))}
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Rising Stars</CardTitle>
@@ -623,7 +640,7 @@ function AnalyticsContent() {
                 </div>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader>
                 <CardTitle className="text-base">Top Scorers</CardTitle>

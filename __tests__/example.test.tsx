@@ -27,14 +27,14 @@ describe('Jest Setup Verification', () => {
 
     const response = await fetch('/api/test')
     const data = await response.json()
-    
+
     expect(fetch).toHaveBeenCalledWith('/api/test')
     expect(data).toEqual({ data: 'test' })
   })
 
   it('should use test utilities', () => {
     const post = createMockPost({ title: 'Custom Title' })
-    
+
     expect(post.title).toBe('Custom Title')
     expect(post.author).toBe('TestAuthor')
     expect(post.score).toBe(100)

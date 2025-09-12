@@ -67,20 +67,20 @@ import { formatDistanceToNow } from 'date-fns'
 const fuzzyFilter: FilterFn<ForumPost> = (row, columnId, value, _addMeta) => {
   const itemValue = row.getValue(columnId)
   if (typeof itemValue !== 'string') return false
-  
+
   const searchValue = value.toLowerCase()
   const cellValue = itemValue.toLowerCase()
-  
+
   return cellValue.includes(searchValue)
 }
 
 const rangeFilter: FilterFn<ForumPost> = (row, columnId, value) => {
   const rowValue = row.getValue(columnId) as number
   const [min, max] = value as [number, number]
-  
+
   if (min !== undefined && rowValue < min) return false
   if (max !== undefined && rowValue > max) return false
-  
+
   return true
 }
 
@@ -96,9 +96,7 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
   const [searchLoading, setSearchLoading] = useState(false)
   const [globalFilter, setGlobalFilter] = useState('')
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [sorting, setSorting] = useState<SortingState>([
-    { id: 'created_utc', desc: true }
-  ])
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'created_utc', desc: true }])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
   const [pagination, setPagination] = useState({
@@ -108,18 +106,24 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
 
   // Filter states
   const [platformFilter, setPlatformFilter] = useState<string>('all')
-  const [scoreRange, setScoreRange] = useState<[number | undefined, number | undefined]>([undefined, undefined])
-  const [_dateRange, _setDateRange] = useState<[Date | undefined, Date | undefined]>([undefined, undefined])
+  const [scoreRange, setScoreRange] = useState<[number | undefined, number | undefined]>([
+    undefined,
+    undefined,
+  ])
+  const [_dateRange, _setDateRange] = useState<[Date | undefined, Date | undefined]>([
+    undefined,
+    undefined,
+  ])
 
   // Load posts with search support
   const loadPosts = useCallback(async () => {
     if (!isInitialized || !database) return
-    
+
     setLoading(true)
     try {
       let fetchedPosts: ForumPost[] = []
       let searchData: SearchResult[] = []
-      
+
       if (globalFilter) {
         // Use FTS search when available
         searchData = searchPostsFTS(globalFilter, 1000)
@@ -129,23 +133,23 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
         fetchedPosts = getRecentPosts(1000) // Load more posts for exploration
         setSearchResults([])
       }
-      
+
       // Apply platform filter
       if (platformFilter !== 'all') {
-        fetchedPosts = fetchedPosts.filter(post => 
-          post.platform.toLowerCase() === platformFilter.toLowerCase()
+        fetchedPosts = fetchedPosts.filter(
+          (post) => post.platform.toLowerCase() === platformFilter.toLowerCase()
         )
       }
-      
+
       // Apply score range filter
       if (scoreRange[0] !== undefined || scoreRange[1] !== undefined) {
-        fetchedPosts = fetchedPosts.filter(post => {
+        fetchedPosts = fetchedPosts.filter((post) => {
           if (scoreRange[0] !== undefined && post.score < scoreRange[0]) return false
           if (scoreRange[1] !== undefined && post.score > scoreRange[1]) return false
           return true
         })
       }
-      
+
       setPosts(fetchedPosts)
     } catch (error) {
       console.error('Error loading posts:', error)
@@ -197,11 +201,11 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
         cell: ({ row }) => {
           const title = row.getValue('title') as string
           const url = row.original.url || row.original.permalink
-          
+
           // Check if this row has highlighted title from search
-          const searchResult = searchResults.find(sr => sr.id === row.original.id)
+          const searchResult = searchResults.find((sr) => sr.id === row.original.id)
           const displayTitle = searchResult?.titleHighlighted || title
-          
+
           return (
             <div className="max-w-[500px]">
               <a
@@ -356,9 +360,7 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
                 >
                   Copy link
                 </DropdownMenuCheckboxItem>
-                <DropdownMenuCheckboxItem
-                  onClick={() => navigator.clipboard.writeText(post.title)}
-                >
+                <DropdownMenuCheckboxItem onClick={() => navigator.clipboard.writeText(post.title)}>
                   Copy title
                 </DropdownMenuCheckboxItem>
               </DropdownMenuContent>
@@ -409,8 +411,11 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
     _setDateRange([undefined, undefined])
   }
 
-  const hasActiveFilters = globalFilter || platformFilter !== 'all' || 
-    scoreRange[0] !== undefined || scoreRange[1] !== undefined
+  const hasActiveFilters =
+    globalFilter ||
+    platformFilter !== 'all' ||
+    scoreRange[0] !== undefined ||
+    scoreRange[1] !== undefined
 
   return (
     <Card className="w-full">
@@ -422,7 +427,7 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
               {loading ? 'Loading...' : `${table.getFilteredRowModel().rows.length} posts found`}
             </p>
           </div>
-          
+
           <div className="flex flex-col gap-2 sm:flex-row">
             {/* Enhanced search with suggestions */}
             <SearchInput
@@ -439,7 +444,7 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
               showSuggestions={true}
               debounceMs={300}
             />
-            
+
             {/* Column visibility */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -514,12 +519,7 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
 
           {/* Clear filters */}
           {hasActiveFilters && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearFilters}
-              className="h-9"
-            >
+            <Button variant="ghost" size="sm" onClick={clearFilters} className="h-9">
               <X className="mr-2 h-4 w-4" />
               Clear filters
             </Button>
@@ -538,10 +538,7 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
+                        : flexRender(header.column.columnDef.header, header.getContext())}
                     </TableHead>
                   ))}
                 </TableRow>
@@ -559,10 +556,7 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
                 ))
               ) : table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && 'selected'}
-                  >
+                  <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
@@ -608,8 +602,7 @@ export function PostsExplorer({ initialPosts = [] }: PostsExplorerProps) {
             </Select>
           </div>
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} of{' '}
-            {table.getPageCount()}
+            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
           </div>
           <div className="flex items-center space-x-2">
             <Button

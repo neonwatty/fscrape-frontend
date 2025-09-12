@@ -44,7 +44,7 @@ export function MobileTooltip({
       const padding = 10
       const tooltipWidth = 200 // Estimated width
       const tooltipHeight = 80 // Estimated height
-      
+
       let newX = x + offset.x
       let newY = y + offset.y
       let newPlacement = placement
@@ -128,16 +128,20 @@ export function MobileTooltip({
           }}
         >
           {children}
-          
+
           {/* Arrow indicator */}
           {showArrow && (
             <div
               className={cn(
                 'absolute w-2 h-2 bg-popover border rotate-45',
-                actualPlacement === 'top' && 'bottom-[-5px] left-1/2 -translate-x-1/2 border-t-0 border-l-0',
-                actualPlacement === 'bottom' && 'top-[-5px] left-1/2 -translate-x-1/2 border-b-0 border-r-0',
-                actualPlacement === 'left' && 'right-[-5px] top-1/2 -translate-y-1/2 border-l-0 border-b-0',
-                actualPlacement === 'right' && 'left-[-5px] top-1/2 -translate-y-1/2 border-r-0 border-t-0'
+                actualPlacement === 'top' &&
+                  'bottom-[-5px] left-1/2 -translate-x-1/2 border-t-0 border-l-0',
+                actualPlacement === 'bottom' &&
+                  'top-[-5px] left-1/2 -translate-x-1/2 border-b-0 border-r-0',
+                actualPlacement === 'left' &&
+                  'right-[-5px] top-1/2 -translate-y-1/2 border-l-0 border-b-0',
+                actualPlacement === 'right' &&
+                  'left-[-5px] top-1/2 -translate-y-1/2 border-r-0 border-t-0'
               )}
             />
           )}
@@ -155,7 +159,13 @@ export function MobileChartTooltip({
   label,
   coordinate,
   className,
-}: { active?: boolean; payload?: Array<{ color: string; name: string; value: number | string }>; label?: string; coordinate?: { x: number; y: number }; className?: string }) {
+}: {
+  active?: boolean
+  payload?: Array<{ color: string; name: string; value: number | string }>
+  label?: string
+  coordinate?: { x: number; y: number }
+  className?: string
+}) {
   const [touchPoint, setTouchPoint] = useState<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
@@ -178,16 +188,11 @@ export function MobileChartTooltip({
       followCursor={false}
     >
       <div className="space-y-1">
-        {label && (
-          <p className="font-medium text-xs text-muted-foreground">{label}</p>
-        )}
+        {label && <p className="font-medium text-xs text-muted-foreground">{label}</p>}
         {payload.map((entry, index) => (
           <div key={index} className="flex items-center justify-between gap-4">
             <span className="flex items-center gap-1">
-              <span
-                className="w-2 h-2 rounded-full"
-                style={{ backgroundColor: entry.color }}
-              />
+              <span className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-xs">{entry.name}:</span>
             </span>
             <span className="text-xs font-medium">{entry.value}</span>
@@ -219,7 +224,7 @@ export function TouchTooltipTrigger({
     if (!touch) return
 
     setPosition({ x: touch.clientX, y: touch.clientY })
-    
+
     // Show tooltip after delay
     timeoutRef.current = setTimeout(() => {
       setIsVisible(true)
@@ -240,19 +245,10 @@ export function TouchTooltipTrigger({
 
   return (
     <>
-      <div
-        onTouchStart={handleTouch}
-        onTouchEnd={handleTouchEnd}
-        className={className}
-      >
+      <div onTouchStart={handleTouch} onTouchEnd={handleTouchEnd} className={className}>
         {children}
       </div>
-      <MobileTooltip
-        visible={isVisible}
-        x={position.x}
-        y={position.y}
-        placement="auto"
-      >
+      <MobileTooltip visible={isVisible} x={position.x} y={position.y} placement="auto">
         {content}
       </MobileTooltip>
     </>

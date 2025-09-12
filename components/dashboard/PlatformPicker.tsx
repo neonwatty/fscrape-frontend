@@ -39,7 +39,7 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  
+
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([])
   const [selectedSources, setSelectedSources] = useState<string[]>([])
   const [availablePlatforms, setAvailablePlatforms] = useState<PlatformSource[]>([])
@@ -49,7 +49,7 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
   useEffect(() => {
     const platforms = searchParams.get('platforms')?.split(',').filter(Boolean) || []
     const sources = searchParams.get('sources')?.split(',').filter(Boolean) || []
-    
+
     if (platforms.length > 0) {
       setSelectedPlatforms(platforms)
     }
@@ -62,10 +62,10 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
   useEffect(() => {
     if (isInitialized) {
       const stats = getPlatformStats()
-      
+
       // Group sources by platform
       const platformMap = new Map<string, Set<string>>()
-      
+
       stats.forEach((stat: { platform: string; source?: string }) => {
         const platform = stat.platform.toLowerCase()
         if (!platformMap.has(platform)) {
@@ -76,52 +76,57 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
           platformMap.get(platform)?.add(stat.source)
         }
       })
-      
-      const platforms: PlatformSource[] = Array.from(platformMap.entries()).map(([platform, sources]) => ({
-        platform,
-        sources: Array.from(sources)
-      }))
-      
+
+      const platforms: PlatformSource[] = Array.from(platformMap.entries()).map(
+        ([platform, sources]) => ({
+          platform,
+          sources: Array.from(sources),
+        })
+      )
+
       setAvailablePlatforms(platforms)
     }
   }, [isInitialized])
 
   // Update URL when selection changes
-  const updateURL = useCallback((platforms: string[], sources: string[]) => {
-    const params = new URLSearchParams(searchParams.toString())
-    
-    if (platforms.length > 0) {
-      params.set('platforms', platforms.join(','))
-    } else {
-      params.delete('platforms')
-    }
-    
-    if (sources.length > 0) {
-      params.set('sources', sources.join(','))
-    } else {
-      params.delete('sources')
-    }
-    
-    const queryString = params.toString()
-    router.push(`${pathname}${queryString ? '?' + queryString : ''}`)
-  }, [pathname, router, searchParams])
+  const updateURL = useCallback(
+    (platforms: string[], sources: string[]) => {
+      const params = new URLSearchParams(searchParams.toString())
+
+      if (platforms.length > 0) {
+        params.set('platforms', platforms.join(','))
+      } else {
+        params.delete('platforms')
+      }
+
+      if (sources.length > 0) {
+        params.set('sources', sources.join(','))
+      } else {
+        params.delete('sources')
+      }
+
+      const queryString = params.toString()
+      router.push(`${pathname}${queryString ? '?' + queryString : ''}`)
+    },
+    [pathname, router, searchParams]
+  )
 
   const handlePlatformToggle = (platform: string) => {
-    setSelectedPlatforms(prev => {
+    setSelectedPlatforms((prev) => {
       const newPlatforms = prev.includes(platform)
-        ? prev.filter(p => p !== platform)
+        ? prev.filter((p) => p !== platform)
         : [...prev, platform]
-      
+
       // Remove sources from deselected platform
       if (!newPlatforms.includes(platform)) {
-        const platformData = availablePlatforms.find(p => p.platform === platform)
+        const platformData = availablePlatforms.find((p) => p.platform === platform)
         if (platformData) {
-          setSelectedSources(prevSources => 
-            prevSources.filter(s => !platformData.sources.includes(s))
+          setSelectedSources((prevSources) =>
+            prevSources.filter((s) => !platformData.sources.includes(s))
           )
         }
       }
-      
+
       return newPlatforms
     })
   }
@@ -129,13 +134,11 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
   const handleSourceToggle = (source: string, platform: string) => {
     // Auto-select platform when source is selected
     if (!selectedPlatforms.includes(platform)) {
-      setSelectedPlatforms(prev => [...prev, platform])
+      setSelectedPlatforms((prev) => [...prev, platform])
     }
-    
-    setSelectedSources(prev => {
-      return prev.includes(source)
-        ? prev.filter(s => s !== source)
-        : [...prev, source]
+
+    setSelectedSources((prev) => {
+      return prev.includes(source) ? prev.filter((s) => s !== source) : [...prev, source]
     })
   }
 
@@ -143,7 +146,7 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
     updateURL(selectedPlatforms, selectedSources)
     onSelectionChange?.({
       platforms: selectedPlatforms,
-      sources: selectedSources
+      sources: selectedSources,
     })
     setIsOpen(false)
   }
@@ -154,13 +157,13 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
     updateURL([], [])
     onSelectionChange?.({
       platforms: [],
-      sources: []
+      sources: [],
     })
   }
 
   const handleSelectAll = () => {
-    const allPlatforms = availablePlatforms.map(p => p.platform)
-    const allSources = availablePlatforms.flatMap(p => p.sources)
+    const allPlatforms = availablePlatforms.map((p) => p.platform)
+    const allSources = availablePlatforms.flatMap((p) => p.sources)
     setSelectedPlatforms(allPlatforms)
     setSelectedSources(allSources)
   }
@@ -169,14 +172,12 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
   const selectionCount = selectedPlatforms.length + selectedSources.length
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn('w-full', className)}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Platform Filter</CardTitle>
-            <CardDescription>
-              Select platforms and sources to filter dashboard data
-            </CardDescription>
+            <CardDescription>Select platforms and sources to filter dashboard data</CardDescription>
           </div>
           <div className="flex items-center gap-2">
             {hasSelection && (
@@ -240,7 +241,9 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
                               <Checkbox
                                 id={`source-${source}`}
                                 checked={selectedSources.includes(source)}
-                                onCheckedChange={() => handleSourceToggle(source, platformData.platform)}
+                                onCheckedChange={() =>
+                                  handleSourceToggle(source, platformData.platform)
+                                }
                                 disabled={!selectedPlatforms.includes(platformData.platform)}
                               />
                               <Label
@@ -258,17 +261,10 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
                 </div>
                 <DropdownMenuSeparator />
                 <div className="p-2 flex justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsOpen(false)}
-                  >
+                  <Button variant="outline" size="sm" onClick={() => setIsOpen(false)}>
                     Cancel
                   </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleApply}
-                  >
+                  <Button size="sm" onClick={handleApply}>
                     Apply Filter
                   </Button>
                 </div>
@@ -281,11 +277,7 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
         <CardContent>
           <div className="flex flex-wrap gap-2">
             {selectedPlatforms.map((platform) => (
-              <Badge
-                key={platform}
-                variant="secondary"
-                className="gap-1 capitalize"
-              >
+              <Badge key={platform} variant="secondary" className="gap-1 capitalize">
                 <CheckCircle2 className="h-3 w-3" />
                 {platform}
                 <button
@@ -297,16 +289,12 @@ export function PlatformPicker({ onSelectionChange, className }: PlatformPickerP
               </Badge>
             ))}
             {selectedSources.map((source) => (
-              <Badge
-                key={source}
-                variant="outline"
-                className="gap-1"
-              >
+              <Badge key={source} variant="outline" className="gap-1">
                 <Circle className="h-3 w-3" />
                 {source}
                 <button
                   onClick={() => {
-                    setSelectedSources(prev => prev.filter(s => s !== source))
+                    setSelectedSources((prev) => prev.filter((s) => s !== source))
                   }}
                   className="ml-1 hover:text-destructive"
                 >

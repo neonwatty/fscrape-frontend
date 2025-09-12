@@ -30,7 +30,9 @@ export default function NotFound() {
 
           {/* Helpful Information */}
           <div className="bg-muted/50 rounded-lg p-4 text-left space-y-3">
-            <h2 className="font-medium text-sm text-foreground">This might have happened because:</h2>
+            <h2 className="font-medium text-sm text-foreground">
+              This might have happened because:
+            </h2>
             <ul className="text-sm text-muted-foreground space-y-1">
               <li className="flex items-start">
                 <span className="mr-2">•</span>
@@ -67,9 +69,7 @@ export default function NotFound() {
 
           {/* Search Suggestion */}
           <div className="pt-4 border-t">
-            <p className="text-sm text-muted-foreground mb-3">
-              Looking for something specific?
-            </p>
+            <p className="text-sm text-muted-foreground mb-3">Looking for something specific?</p>
             <Link
               href="/search"
               className="inline-flex items-center text-sm text-primary hover:underline"

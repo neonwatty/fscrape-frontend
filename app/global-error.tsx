@@ -14,7 +14,7 @@ export default function GlobalError({
   useEffect(() => {
     // Log critical error
     console.error('Global application error:', error)
-    
+
     // Send to monitoring service
     if (process.env.NODE_ENV === 'production') {
       // Critical error reporting
@@ -43,11 +43,10 @@ export default function GlobalError({
 
               {/* Error Message */}
               <div className="text-center space-y-2">
-                <h1 className="text-2xl font-bold text-foreground">
-                  Application Error
-                </h1>
+                <h1 className="text-2xl font-bold text-foreground">Application Error</h1>
                 <p className="text-muted-foreground">
-                  A critical error has occurred that prevented the application from loading properly.
+                  A critical error has occurred that prevented the application from loading
+                  properly.
                 </p>
                 <p className="text-sm text-muted-foreground">
                   Our team has been notified and is working to resolve this issue.
@@ -57,9 +56,7 @@ export default function GlobalError({
               {/* Error Code */}
               <div className="p-4 bg-muted/50 rounded-md text-center">
                 <p className="text-xs text-muted-foreground mb-1">Error Reference</p>
-                <p className="font-mono text-sm font-medium">
-                  {error.digest || 'GLOBAL_ERROR'}
-                </p>
+                <p className="font-mono text-sm font-medium">{error.digest || 'GLOBAL_ERROR'}</p>
               </div>
 
               {/* Development Error Details */}
@@ -135,7 +132,9 @@ export default function GlobalError({
                     <span className="mr-2">•</span>
                     <span>
                       Contacting support with error code:{' '}
-                      <span className="font-mono font-medium">{error.digest || 'GLOBAL_ERROR'}</span>
+                      <span className="font-mono font-medium">
+                        {error.digest || 'GLOBAL_ERROR'}
+                      </span>
                     </span>
                   </li>
                 </ul>

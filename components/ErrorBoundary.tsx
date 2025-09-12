@@ -54,7 +54,7 @@ export class ErrorBoundary extends Component<Props, State> {
     console.error('ErrorBoundary caught an error:', error, errorInfo)
 
     // Update state with error details
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       errorInfo,
       errorCount: prevState.errorCount + 1,
     }))
@@ -117,14 +117,19 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   toggleDetails = () => {
-    this.setState(prevState => ({
+    this.setState((prevState) => ({
       showDetails: !prevState.showDetails,
     }))
   }
 
   render() {
     const { hasError, error, errorInfo, errorCount, showDetails, isRecovering } = this.state
-    const { children, fallback, level = 'component', showDetails: showDetailsProp = true } = this.props
+    const {
+      children,
+      fallback,
+      level = 'component',
+      showDetails: showDetailsProp = true,
+    } = this.props
 
     if (hasError && error) {
       // Use custom fallback if provided
@@ -154,7 +159,11 @@ export class ErrorBoundary extends Component<Props, State> {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-foreground">
-                    {level === 'page' ? 'Page Error' : level === 'section' ? 'Section Error' : 'Component Error'}
+                    {level === 'page'
+                      ? 'Page Error'
+                      : level === 'section'
+                        ? 'Section Error'
+                        : 'Component Error'}
                   </h3>
                   <p className="text-sm text-muted-foreground mt-1">
                     {error.message || 'An unexpected error occurred'}
@@ -185,14 +194,18 @@ export class ErrorBoundary extends Component<Props, State> {
                   {showDetails && (
                     <div className="mt-2 p-3 bg-muted/30 rounded-md space-y-2">
                       <div>
-                        <p className="text-xs font-medium text-muted-foreground mb-1">Component Stack:</p>
+                        <p className="text-xs font-medium text-muted-foreground mb-1">
+                          Component Stack:
+                        </p>
                         <pre className="text-xs text-muted-foreground overflow-auto max-h-32 p-2 bg-background rounded">
                           {errorInfo.componentStack}
                         </pre>
                       </div>
                       {error.stack && (
                         <div>
-                          <p className="text-xs font-medium text-muted-foreground mb-1">Error Stack:</p>
+                          <p className="text-xs font-medium text-muted-foreground mb-1">
+                            Error Stack:
+                          </p>
                           <pre className="text-xs text-muted-foreground overflow-auto max-h-32 p-2 bg-background rounded">
                             {error.stack}
                           </pre>
@@ -227,7 +240,8 @@ export class ErrorBoundary extends Component<Props, State> {
               {this.props.isolate && (
                 <div className="pt-3 border-t">
                   <p className="text-xs text-muted-foreground text-center">
-                    This error has been isolated and won&apos;t affect other parts of the application
+                    This error has been isolated and won&apos;t affect other parts of the
+                    application
                   </p>
                 </div>
               )}
@@ -239,11 +253,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
     // Add recovering animation class
     if (isRecovering) {
-      return (
-        <div className="animate-fadeIn">
-          {children}
-        </div>
-      )
+      return <div className="animate-fadeIn">{children}</div>
     }
 
     return children
@@ -275,21 +285,21 @@ export function useErrorHandler() {
 }
 
 // Async error boundary wrapper
-export function AsyncBoundary({ 
-  children, 
+export function AsyncBoundary({
+  children,
   fallback: FallbackComponent,
-  ...props 
-}: Props & { 
-  fallback?: React.ComponentType<{ error: Error; retry: () => void }> 
+  ...props
+}: Props & {
+  fallback?: React.ComponentType<{ error: Error; retry: () => void }>
 }) {
   return (
     <ErrorBoundary
       {...props}
       fallback={
         FallbackComponent && (
-          <FallbackComponent 
-            error={new Error('Async operation failed')} 
-            retry={() => window.location.reload()} 
+          <FallbackComponent
+            error={new Error('Async operation failed')}
+            retry={() => window.location.reload()}
           />
         )
       }

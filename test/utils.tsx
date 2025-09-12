@@ -5,10 +5,7 @@ import { ThemeProvider } from 'next-themes'
 import { vi, expect } from 'vitest'
 
 // Create a custom render function that includes providers
-export function render(
-  ui: React.ReactElement,
-  options?: Omit<RenderOptions, 'wrapper'>
-) {
+export function render(ui: React.ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -51,7 +48,7 @@ export const createMockPost = (overrides = {}) => ({
 export const createMockTimeSeriesData = (count = 7) => {
   const now = Date.now()
   const day = 24 * 60 * 60 * 1000
-  
+
   return Array.from({ length: count }, (_, i) => ({
     date: new Date(now - (count - i - 1) * day).toISOString().split('T')[0],
     count: Math.floor(Math.random() * 100) + 50,

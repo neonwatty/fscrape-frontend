@@ -18,13 +18,7 @@ interface WindowedTableProps<T = any> {
 }
 
 // Memoized row component for react-window v2
-const Row = memo(function Row({
-  index,
-  style,
-  items,
-  columns,
-  onRowClick,
-}: any) {
+const Row = memo(function Row({ index, style, items, columns, onRowClick }: any) {
   const item = items[index]
 
   return (
@@ -44,10 +38,7 @@ const Row = memo(function Row({
             width: column.width || `${100 / columns.length}%`,
           }}
         >
-          {column.render 
-            ? column.render(item)
-            : String((item as any)[column.key] || '')
-          }
+          {column.render ? column.render(item) : String((item as any)[column.key] || '')}
         </div>
       ))}
     </div>

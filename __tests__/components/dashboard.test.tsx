@@ -16,7 +16,7 @@ const mockDatabaseContext: DatabaseContextType = {
     totalAuthors: 250,
     platforms: ['reddit', 'hackernews'],
     dateRange: { start: '2024-01-01', end: '2024-01-31' },
-    topSources: ['r/programming', 'r/rust', 'HN']
+    topSources: ['r/programming', 'r/rust', 'HN'],
   },
   loadDatabase: vi.fn(),
   closeDatabase: vi.fn(),
@@ -33,7 +33,7 @@ const mockDatabaseContext: DatabaseContextType = {
   queryTopSources: vi.fn(),
   queryPostingHeatmap: vi.fn(),
   queryEngagementMetrics: vi.fn(),
-  queryPlatformComparison: vi.fn()
+  queryPlatformComparison: vi.fn(),
 }
 
 // Mock the queries module
@@ -50,10 +50,10 @@ vi.mock('@/lib/db/queries', () => ({
         score: 100,
         num_comments: 25,
         created_utc: Date.now() / 1000 - 3600,
-        url: 'https://reddit.com/1'
+        url: 'https://reddit.com/1',
       },
       {
-        id: '2', 
+        id: '2',
         title: 'Test Post 2',
         platform: 'hackernews',
         source: 'HN',
@@ -61,10 +61,10 @@ vi.mock('@/lib/db/queries', () => ({
         score: 250,
         num_comments: 50,
         created_utc: Date.now() / 1000 - 7200,
-        url: 'https://news.ycombinator.com/2'
-      }
+        url: 'https://news.ycombinator.com/2',
+      },
     ]
-    
+
     if (filters?.limit) {
       return mockPosts.slice(0, filters.limit)
     }
@@ -73,8 +73,8 @@ vi.mock('@/lib/db/queries', () => ({
   getPostsTimeSeries: vi.fn(() => [
     { date: '2024-01-01', count: 45, avgScore: 120, avgComments: 15 },
     { date: '2024-01-02', count: 52, avgScore: 150, avgComments: 20 },
-    { date: '2024-01-03', count: 38, avgScore: 110, avgComments: 12 }
-  ])
+    { date: '2024-01-03', count: 38, avgScore: 110, avgComments: 12 },
+  ]),
 }))
 
 // Test wrapper with providers
@@ -82,15 +82,13 @@ const createWrapper = (contextValue = mockDatabaseContext) => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
-      mutations: { retry: false }
-    }
+      mutations: { retry: false },
+    },
   })
 
   return ({ children }: { children: React.ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <DatabaseContext.Provider value={contextValue}>
-        {children}
-      </DatabaseContext.Provider>
+      <DatabaseContext.Provider value={contextValue}>{children}</DatabaseContext.Provider>
     </QueryClientProvider>
   )
 }
@@ -103,7 +101,7 @@ describe.skip('Dashboard Components', () => {
   describe('StatsCards', () => {
     it('should render main stats cards with correct values', () => {
       render(<StatsCards />, { wrapper: createWrapper() })
-      
+
       // Check for main stats
       expect(screen.getByText('Total Posts')).toBeInTheDocument()
       expect(screen.getByText('Active Authors')).toBeInTheDocument()
@@ -113,7 +111,7 @@ describe.skip('Dashboard Components', () => {
 
     it('should display summary data from context', () => {
       render(<StatsCards />, { wrapper: createWrapper() })
-      
+
       // Should display the total posts from summary
       expect(screen.getByText('1,500')).toBeInTheDocument()
       expect(screen.getByText('250')).toBeInTheDocument()
@@ -121,7 +119,7 @@ describe.skip('Dashboard Components', () => {
 
     it('should show activity metrics section', () => {
       render(<StatsCards />, { wrapper: createWrapper() })
-      
+
       expect(screen.getByText('Activity Metrics')).toBeInTheDocument()
       expect(screen.getByText('24 Hour Activity')).toBeInTheDocument()
       expect(screen.getByText('7 Day Activity')).toBeInTheDocument()
@@ -130,13 +128,13 @@ describe.skip('Dashboard Components', () => {
 
     it('should handle period selection for activity metrics', () => {
       render(<StatsCards />, { wrapper: createWrapper() })
-      
+
       const buttons = screen.getAllByRole('button')
-      const period24h = buttons.find(btn => btn.textContent === '24h')
-      const period7d = buttons.find(btn => btn.textContent === '7d')
-      
+      const period24h = buttons.find((btn) => btn.textContent === '24h')
+      const period7d = buttons.find((btn) => btn.textContent === '7d')
+
       expect(period7d).toHaveClass('bg-primary')
-      
+
       // Click 24h period
       fireEvent.click(period24h!)
       expect(period24h).toHaveClass('bg-primary')
@@ -147,11 +145,11 @@ describe.skip('Dashboard Components', () => {
       const loadingContext = {
         ...mockDatabaseContext,
         isInitialized: false,
-        isLoading: true
+        isLoading: true,
       }
-      
+
       render(<StatsCards />, { wrapper: createWrapper(loadingContext) })
-      
+
       // Stats should show 0 when not initialized
       const zeroValues = screen.getAllByText('0')
       expect(zeroValues.length).toBeGreaterThan(0)
@@ -159,7 +157,7 @@ describe.skip('Dashboard Components', () => {
 
     it('should show trend indicators when trends exist', async () => {
       render(<StatsCards />, { wrapper: createWrapper() })
-      
+
       await waitFor(() => {
         // Look for trend labels
         const trendLabels = screen.queryAllByText(/vs (last|prev)/)
@@ -171,52 +169,41 @@ describe.skip('Dashboard Components', () => {
   describe('PlatformSelector', () => {
     it('should render platform options', () => {
       const onSelect = vi.fn()
-      render(
-        <PlatformSelector 
-          selectedPlatform="all"
-          onPlatformChange={onSelect}
-        />, 
-        { wrapper: createWrapper() }
-      )
-      
+      render(<PlatformSelector selectedPlatform="all" onPlatformChange={onSelect} />, {
+        wrapper: createWrapper(),
+      })
+
       expect(screen.getByText('All Platforms')).toBeInTheDocument()
     })
 
     it('should handle platform selection', () => {
       const onSelect = vi.fn()
       const { rerender } = render(
-        <PlatformSelector 
-          selectedPlatform="all"
-          onPlatformChange={onSelect}
-        />, 
+        <PlatformSelector selectedPlatform="all" onPlatformChange={onSelect} />,
         { wrapper: createWrapper() }
       )
-      
+
       // Click the dropdown trigger
       const trigger = screen.getByRole('button', { name: /all platforms/i })
       fireEvent.click(trigger)
-      
+
       // Select Reddit option
       const redditOption = screen.getByText('Reddit')
       fireEvent.click(redditOption)
-      
+
       expect(onSelect).toHaveBeenCalledWith('reddit')
     })
 
     it('should display platform counts from summary', () => {
       const onSelect = vi.fn()
-      render(
-        <PlatformSelector 
-          selectedPlatform="all"
-          onPlatformChange={onSelect}
-        />, 
-        { wrapper: createWrapper() }
-      )
-      
+      render(<PlatformSelector selectedPlatform="all" onPlatformChange={onSelect} />, {
+        wrapper: createWrapper(),
+      })
+
       // Open dropdown
       const trigger = screen.getByRole('button', { name: /all platforms/i })
       fireEvent.click(trigger)
-      
+
       // Check that platforms from summary are shown
       expect(screen.getByText('Reddit')).toBeInTheDocument()
       expect(screen.getByText('Hacker News')).toBeInTheDocument()
@@ -224,14 +211,10 @@ describe.skip('Dashboard Components', () => {
 
     it('should highlight selected platform', () => {
       const onSelect = vi.fn()
-      render(
-        <PlatformSelector 
-          selectedPlatform="reddit"
-          onPlatformChange={onSelect}
-        />, 
-        { wrapper: createWrapper() }
-      )
-      
+      render(<PlatformSelector selectedPlatform="reddit" onPlatformChange={onSelect} />, {
+        wrapper: createWrapper(),
+      })
+
       const trigger = screen.getByRole('button')
       expect(trigger.textContent).toContain('Reddit')
     })
@@ -249,14 +232,14 @@ describe.skip('Dashboard Components', () => {
           platform: 'reddit',
           source: 'r/programming',
           created_utc: Date.now() / 1000 - 3600,
-          url: 'https://reddit.com/1'
-        }
+          url: 'https://reddit.com/1',
+        },
       ]
-      
+
       mockDatabaseContext.queryRecentPosts.mockReturnValue(mockPosts)
-      
+
       render(<RecentPosts limit={5} />, { wrapper: createWrapper() })
-      
+
       await waitFor(() => {
         expect(screen.getByText('Recent Posts')).toBeInTheDocument()
       })
@@ -273,14 +256,14 @@ describe.skip('Dashboard Components', () => {
           platform: 'hackernews',
           source: 'HN',
           created_utc: Date.now() / 1000 - 3600,
-          url: 'https://news.ycombinator.com/1'
-        }
+          url: 'https://news.ycombinator.com/1',
+        },
       ]
-      
+
       mockDatabaseContext.queryRecentPosts.mockReturnValue(mockPosts)
-      
+
       render(<RecentPosts limit={5} />, { wrapper: createWrapper() })
-      
+
       await waitFor(() => {
         expect(screen.getByText('Test Recent Post')).toBeInTheDocument()
         expect(screen.getByText('testauthor')).toBeInTheDocument()
@@ -290,9 +273,9 @@ describe.skip('Dashboard Components', () => {
 
     it('should handle empty posts state', async () => {
       mockDatabaseContext.queryRecentPosts.mockReturnValue([])
-      
+
       render(<RecentPosts limit={5} />, { wrapper: createWrapper() })
-      
+
       await waitFor(() => {
         expect(screen.getByText(/no recent posts/i)).toBeInTheDocument()
       })
@@ -300,16 +283,16 @@ describe.skip('Dashboard Components', () => {
 
     it('should apply limit to posts query', () => {
       render(<RecentPosts limit={10} />, { wrapper: createWrapper() })
-      
+
       expect(mockDatabaseContext.queryRecentPosts).toHaveBeenCalledWith(10)
     })
 
     it('should handle refresh action', async () => {
       render(<RecentPosts limit={5} showRefresh />, { wrapper: createWrapper() })
-      
+
       const refreshButton = screen.getByRole('button', { name: /refresh/i })
       fireEvent.click(refreshButton)
-      
+
       await waitFor(() => {
         expect(mockDatabaseContext.refreshData).toHaveBeenCalled()
       })
@@ -327,14 +310,14 @@ describe.skip('Dashboard Components', () => {
           platform: 'reddit',
           source: 'r/test',
           created_utc: oneHourAgo,
-          url: 'https://reddit.com/1'
-        }
+          url: 'https://reddit.com/1',
+        },
       ]
-      
+
       mockDatabaseContext.queryRecentPosts.mockReturnValue(mockPosts)
-      
+
       render(<RecentPosts limit={5} />, { wrapper: createWrapper() })
-      
+
       await waitFor(() => {
         // Should show relative time
         const timeElements = screen.queryAllByText(/hour|minute|second/i)

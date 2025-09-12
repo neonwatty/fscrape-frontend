@@ -37,7 +37,7 @@ export function MobileChart({
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 })
   const [zoomLevel, setZoomLevel] = useState(1)
   const [touchStartPos, setTouchStartPos] = useState<{ x: number; y: number } | null>(null)
-  
+
   // Use pinch-to-zoom hook
   const { scale, resetScale } = usePinchZoom(containerRef, {
     enabled: enableGestures && enableZoom,
@@ -59,7 +59,7 @@ export function MobileChart({
   // Touch handlers for panning
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!enablePan || e.touches.length !== 1) return
-    
+
     const touch = e.touches[0]
     setTouchStartPos({ x: touch.clientX, y: touch.clientY })
     setIsPanning(true)
@@ -68,16 +68,16 @@ export function MobileChart({
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!enablePan || !touchStartPos || e.touches.length !== 1) return
-    
+
     const touch = e.touches[0]
     const deltaX = touch.clientX - touchStartPos.x
     const deltaY = touch.clientY - touchStartPos.y
-    
+
     setPanOffset((prev) => ({
       x: prev.x + deltaX,
       y: Math.max(-100, Math.min(100, prev.y + deltaY)), // Limit vertical panning
     }))
-    
+
     setTouchStartPos({ x: touch.clientX, y: touch.clientY })
   }
 
@@ -109,7 +109,7 @@ export function MobileChart({
 
   // Detect if device is touch-enabled
   const [isTouchDevice, setIsTouchDevice] = useState(false)
-  
+
   useEffect(() => {
     setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
   }, [])
@@ -212,30 +212,15 @@ export function MobileChartControls({
   return (
     <div className={cn('flex items-center gap-2', className)}>
       <div className="flex items-center gap-1 bg-background/80 backdrop-blur-sm rounded-lg p-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onZoomIn}
-          className="h-7 px-2"
-        >
+        <Button variant="ghost" size="sm" onClick={onZoomIn} className="h-7 px-2">
           <ZoomIn className="h-4 w-4 mr-1" />
           <span className="text-xs">Zoom In</span>
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onZoomOut}
-          className="h-7 px-2"
-        >
+        <Button variant="ghost" size="sm" onClick={onZoomOut} className="h-7 px-2">
           <ZoomOut className="h-4 w-4 mr-1" />
           <span className="text-xs">Zoom Out</span>
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onReset}
-          className="h-7 px-2"
-        >
+        <Button variant="ghost" size="sm" onClick={onReset} className="h-7 px-2">
           <Maximize2 className="h-4 w-4 mr-1" />
           <span className="text-xs">Reset</span>
         </Button>

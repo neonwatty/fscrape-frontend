@@ -21,10 +21,10 @@ export enum DatabaseErrorType {
 
 // Error Severity Levels
 export enum ErrorSeverity {
-  LOW = 'LOW',        // Minor issue, can continue
-  MEDIUM = 'MEDIUM',  // Some functionality affected
-  HIGH = 'HIGH',      // Major functionality affected
-  CRITICAL = 'CRITICAL' // System unusable
+  LOW = 'LOW', // Minor issue, can continue
+  MEDIUM = 'MEDIUM', // Some functionality affected
+  HIGH = 'HIGH', // Major functionality affected
+  CRITICAL = 'CRITICAL', // System unusable
 }
 
 // Custom Database Error Class
@@ -72,16 +72,25 @@ export class DatabaseError extends Error {
 
   private getDefaultUserMessage(type: DatabaseErrorType): string {
     const messages: Record<DatabaseErrorType, string> = {
-      [DatabaseErrorType.INITIALIZATION_ERROR]: 'Failed to initialize the database. Please refresh the page and try again.',
-      [DatabaseErrorType.CONNECTION_ERROR]: 'Unable to connect to the database. Please check your connection and try again.',
-      [DatabaseErrorType.LOADING_ERROR]: 'Failed to load the database file. The file may be corrupted or incompatible.',
-      [DatabaseErrorType.QUERY_ERROR]: 'The database query failed. Please check your input and try again.',
-      [DatabaseErrorType.TRANSACTION_ERROR]: 'The database transaction failed. Your changes have been rolled back.',
-      [DatabaseErrorType.MEMORY_ERROR]: 'The operation requires more memory than available. Try closing other applications.',
-      [DatabaseErrorType.CORRUPTION_ERROR]: 'The database appears to be corrupted. Please restore from a backup.',
+      [DatabaseErrorType.INITIALIZATION_ERROR]:
+        'Failed to initialize the database. Please refresh the page and try again.',
+      [DatabaseErrorType.CONNECTION_ERROR]:
+        'Unable to connect to the database. Please check your connection and try again.',
+      [DatabaseErrorType.LOADING_ERROR]:
+        'Failed to load the database file. The file may be corrupted or incompatible.',
+      [DatabaseErrorType.QUERY_ERROR]:
+        'The database query failed. Please check your input and try again.',
+      [DatabaseErrorType.TRANSACTION_ERROR]:
+        'The database transaction failed. Your changes have been rolled back.',
+      [DatabaseErrorType.MEMORY_ERROR]:
+        'The operation requires more memory than available. Try closing other applications.',
+      [DatabaseErrorType.CORRUPTION_ERROR]:
+        'The database appears to be corrupted. Please restore from a backup.',
       [DatabaseErrorType.PERMISSION_ERROR]: 'You do not have permission to perform this operation.',
-      [DatabaseErrorType.TIMEOUT_ERROR]: 'The operation took too long to complete. Please try again.',
-      [DatabaseErrorType.UNKNOWN_ERROR]: 'An unexpected error occurred. Please try again or contact support.',
+      [DatabaseErrorType.TIMEOUT_ERROR]:
+        'The operation took too long to complete. Please try again.',
+      [DatabaseErrorType.UNKNOWN_ERROR]:
+        'An unexpected error occurred. Please try again or contact support.',
     }
     return messages[type]
   }
@@ -121,7 +130,11 @@ export function classifyError(error: Error): DatabaseErrorType {
   if (message.includes('syntax') || message.includes('query') || message.includes('sql')) {
     return DatabaseErrorType.QUERY_ERROR
   }
-  if (message.includes('transaction') || message.includes('rollback') || message.includes('commit')) {
+  if (
+    message.includes('transaction') ||
+    message.includes('rollback') ||
+    message.includes('commit')
+  ) {
     return DatabaseErrorType.TRANSACTION_ERROR
   }
   if (message.includes('memory') || message.includes('heap') || message.includes('stack')) {
@@ -130,7 +143,11 @@ export function classifyError(error: Error): DatabaseErrorType {
   if (message.includes('corrupt') || message.includes('invalid') || message.includes('malformed')) {
     return DatabaseErrorType.CORRUPTION_ERROR
   }
-  if (message.includes('permission') || message.includes('denied') || message.includes('unauthorized')) {
+  if (
+    message.includes('permission') ||
+    message.includes('denied') ||
+    message.includes('unauthorized')
+  ) {
     return DatabaseErrorType.PERMISSION_ERROR
   }
   if (message.includes('timeout') || message.includes('timed out')) {
@@ -247,7 +264,7 @@ export class ErrorRecovery {
           description: 'Free up memory by closing unused resources',
           execute: async () => {
             if (typeof window !== 'undefined' && 'gc' in window) {
-              (window as any).gc()
+              ;(window as any).gc()
             }
             return true
           },
@@ -298,7 +315,7 @@ export class ErrorLogger {
 
   log(error: DatabaseError): void {
     this.errorHistory.unshift(error)
-    
+
     // Limit history size
     if (this.errorHistory.length > this.maxHistorySize) {
       this.errorHistory = this.errorHistory.slice(0, this.maxHistorySize)
@@ -426,15 +443,11 @@ export async function safeExecuteQuery(
   if (!validation.valid) {
     return {
       success: false,
-      error: new DatabaseError(
-        DatabaseErrorType.QUERY_ERROR,
-        validation.error!,
-        {
-          severity: ErrorSeverity.LOW,
-          retryable: false,
-          context: { query, params },
-        }
-      ),
+      error: new DatabaseError(DatabaseErrorType.QUERY_ERROR, validation.error!, {
+        severity: ErrorSeverity.LOW,
+        retryable: false,
+        context: { query, params },
+      }),
     }
   }
 
@@ -443,13 +456,13 @@ export async function safeExecuteQuery(
     if (params) {
       stmt.bind(params)
     }
-    
+
     const results = []
     while (stmt.step()) {
       results.push(stmt.getAsObject())
     }
     stmt.free()
-    
+
     return {
       success: true,
       data: results,
@@ -466,7 +479,7 @@ export async function safeExecuteQuery(
         technicalDetails: error instanceof Error ? error.stack : undefined,
       }
     )
-    
+
     return {
       success: false,
       error: dbError,
@@ -497,24 +510,18 @@ export class TransactionManager {
       this.db.run('BEGIN TRANSACTION')
       this.inTransaction = true
     } catch (error) {
-      throw new DatabaseError(
-        DatabaseErrorType.TRANSACTION_ERROR,
-        'Failed to begin transaction',
-        {
-          originalError: error instanceof Error ? error : undefined,
-          severity: ErrorSeverity.HIGH,
-        }
-      )
+      throw new DatabaseError(DatabaseErrorType.TRANSACTION_ERROR, 'Failed to begin transaction', {
+        originalError: error instanceof Error ? error : undefined,
+        severity: ErrorSeverity.HIGH,
+      })
     }
   }
 
   async commit(): Promise<void> {
     if (!this.inTransaction) {
-      throw new DatabaseError(
-        DatabaseErrorType.TRANSACTION_ERROR,
-        'No transaction in progress',
-        { severity: ErrorSeverity.LOW }
-      )
+      throw new DatabaseError(DatabaseErrorType.TRANSACTION_ERROR, 'No transaction in progress', {
+        severity: ErrorSeverity.LOW,
+      })
     }
 
     try {
@@ -523,15 +530,11 @@ export class TransactionManager {
       this.savepoints = []
     } catch (error) {
       await this.rollback()
-      throw new DatabaseError(
-        DatabaseErrorType.TRANSACTION_ERROR,
-        'Failed to commit transaction',
-        {
-          originalError: error instanceof Error ? error : undefined,
-          severity: ErrorSeverity.HIGH,
-          recoverable: true,
-        }
-      )
+      throw new DatabaseError(DatabaseErrorType.TRANSACTION_ERROR, 'Failed to commit transaction', {
+        originalError: error instanceof Error ? error : undefined,
+        severity: ErrorSeverity.HIGH,
+        recoverable: true,
+      })
     }
   }
 
@@ -565,25 +568,19 @@ export class TransactionManager {
 
   async savepoint(name: string): Promise<void> {
     if (!this.inTransaction) {
-      throw new DatabaseError(
-        DatabaseErrorType.TRANSACTION_ERROR,
-        'No transaction in progress',
-        { severity: ErrorSeverity.LOW }
-      )
+      throw new DatabaseError(DatabaseErrorType.TRANSACTION_ERROR, 'No transaction in progress', {
+        severity: ErrorSeverity.LOW,
+      })
     }
 
     try {
       this.db.run(`SAVEPOINT ${name}`)
       this.savepoints.push(name)
     } catch (error) {
-      throw new DatabaseError(
-        DatabaseErrorType.TRANSACTION_ERROR,
-        'Failed to create savepoint',
-        {
-          originalError: error instanceof Error ? error : undefined,
-          severity: ErrorSeverity.MEDIUM,
-        }
-      )
+      throw new DatabaseError(DatabaseErrorType.TRANSACTION_ERROR, 'Failed to create savepoint', {
+        originalError: error instanceof Error ? error : undefined,
+        severity: ErrorSeverity.MEDIUM,
+      })
     }
   }
 

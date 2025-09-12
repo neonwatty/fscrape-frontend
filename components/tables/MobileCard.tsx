@@ -2,14 +2,14 @@
 
 import { ReactNode, useState } from 'react'
 import { cn } from '@/lib/utils'
-import { 
-  ChevronDown, 
-  ChevronUp, 
+import {
+  ChevronDown,
+  ChevronUp,
   MoreVertical,
   Copy,
   ExternalLink,
   Maximize2,
-  Minimize2
+  Minimize2,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
@@ -68,14 +68,12 @@ export function MobileCard({
   const [isFullscreen, setIsFullscreen] = useState(false)
 
   // Group fields by priority
-  const primaryFields = fields.filter(f => f.priority === 'primary' || !f.priority)
-  const _secondaryFields = fields.filter(f => f.priority === 'secondary')
-  const _tertiaryFields = fields.filter(f => f.priority === 'tertiary')
+  const primaryFields = fields.filter((f) => f.priority === 'primary' || !f.priority)
+  const _secondaryFields = fields.filter((f) => f.priority === 'secondary')
+  const _tertiaryFields = fields.filter((f) => f.priority === 'tertiary')
 
   // Determine visible fields based on expansion state
-  const visibleFields = isExpanded 
-    ? fields 
-    : primaryFields.slice(0, compact ? 2 : 3)
+  const visibleFields = isExpanded ? fields : primaryFields.slice(0, compact ? 2 : 3)
 
   const hasHiddenFields = !isExpanded && fields.length > visibleFields.length
 
@@ -103,7 +101,7 @@ export function MobileCard({
         transition={{ duration: 0.2 }}
         className={cn(isFullscreen && 'fixed inset-4 z-50')}
       >
-        <Card 
+        <Card
           className={cn(
             'transition-all duration-200',
             onClick && 'cursor-pointer hover:shadow-md',
@@ -134,7 +132,7 @@ export function MobileCard({
                     </div>
                   )}
                 </div>
-                
+
                 {/* Action buttons */}
                 <div className="flex items-center gap-1">
                   {/* Fullscreen toggle */}
@@ -158,8 +156,8 @@ export function MobileCard({
                   {actions.length > 0 && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="ghost" 
+                        <Button
+                          variant="ghost"
                           size="icon"
                           className="h-8 w-8"
                           onClick={(e) => e.stopPropagation()}
@@ -191,31 +189,32 @@ export function MobileCard({
           <CardContent className={cn('space-y-2', compact && 'py-2')}>
             {/* Visible fields */}
             {visibleFields.map((field, index) => (
-              <div 
+              <div
                 key={index}
-                className={cn(
-                  'flex items-start justify-between gap-2',
-                  field.className
-                )}
+                className={cn('flex items-start justify-between gap-2', field.className)}
               >
-                <span className={cn(
-                  'text-muted-foreground flex-shrink-0',
-                  compact ? 'text-xs' : 'text-sm'
-                )}>
+                <span
+                  className={cn(
+                    'text-muted-foreground flex-shrink-0',
+                    compact ? 'text-xs' : 'text-sm'
+                  )}
+                >
                   {field.label}:
                 </span>
                 <div className="flex items-center gap-1 min-w-0 flex-1 justify-end">
-                  <span className={cn(
-                    'text-right',
-                    compact ? 'text-xs' : 'text-sm',
-                    field.badge && 'inline-flex'
-                  )}>
+                  <span
+                    className={cn(
+                      'text-right',
+                      compact ? 'text-xs' : 'text-sm',
+                      field.badge && 'inline-flex'
+                    )}
+                  >
                     {field.badge ? (
                       <Badge variant="secondary" className="text-xs">
                         {field.value}
                       </Badge>
                     ) : field.link ? (
-                      <a 
+                      <a
                         href={field.link}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -284,17 +283,15 @@ interface MobileCardGridProps {
   className?: string
 }
 
-export function MobileCardGrid({ 
-  children, 
-  columns = 1,
-  className 
-}: MobileCardGridProps) {
+export function MobileCardGrid({ children, columns = 1, className }: MobileCardGridProps) {
   return (
-    <div className={cn(
-      'grid gap-4',
-      columns === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1',
-      className
-    )}>
+    <div
+      className={cn(
+        'grid gap-4',
+        columns === 2 ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1',
+        className
+      )}
+    >
       {children}
     </div>
   )
@@ -326,7 +323,7 @@ export function SwipeableCard({
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (startX === null) return
-    
+
     const current = e.touches[0].clientX
     setCurrentX(current)
     setOffset(current - startX)
@@ -334,9 +331,9 @@ export function SwipeableCard({
 
   const handleTouchEnd = () => {
     if (startX === null || currentX === null) return
-    
+
     const diff = currentX - startX
-    
+
     if (Math.abs(diff) > threshold) {
       if (diff > 0 && onSwipeRight) {
         onSwipeRight()
@@ -344,7 +341,7 @@ export function SwipeableCard({
         onSwipeLeft()
       }
     }
-    
+
     // Reset
     setStartX(null)
     setCurrentX(null)

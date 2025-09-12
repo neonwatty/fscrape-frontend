@@ -8,7 +8,7 @@ import {
   useDatabaseSummary,
   usePostQueries,
   useAnalyticsQueries,
-  useDatabaseFileOps
+  useDatabaseFileOps,
 } from '@/lib/hooks/useDatabase'
 import { useToast } from '@/lib/hooks/useToast'
 import { useTheme } from '@/lib/hooks/useTheme'
@@ -26,7 +26,7 @@ const mockDatabaseContext: DatabaseContextType = {
     totalPosts: 100,
     platforms: ['reddit', 'hackernews'],
     dateRange: { start: '2024-01-01', end: '2024-01-31' },
-    topSources: []
+    topSources: [],
   },
   loadDatabase: vi.fn(),
   closeDatabase: vi.fn(),
@@ -43,7 +43,7 @@ const mockDatabaseContext: DatabaseContextType = {
   queryTopSources: vi.fn(),
   queryPostingHeatmap: vi.fn(),
   queryEngagementMetrics: vi.fn(),
-  queryPlatformComparison: vi.fn()
+  queryPlatformComparison: vi.fn(),
 }
 
 // Create wrapper for hooks that need providers
@@ -52,8 +52,8 @@ const createWrapper = (contextValue = mockDatabaseContext) => {
     const queryClient = new QueryClient({
       defaultOptions: {
         queries: { retry: false },
-        mutations: { retry: false }
-      }
+        mutations: { retry: false },
+      },
     })
 
     return (
@@ -76,7 +76,7 @@ describe('useDatabase hooks', () => {
   describe('useDatabase', () => {
     it('should return database context when inside provider', () => {
       const { result } = renderHook(() => useDatabase(), {
-        wrapper: createWrapper()
+        wrapper: createWrapper(),
       })
 
       expect(result.current).toEqual(mockDatabaseContext)
@@ -88,22 +88,20 @@ describe('useDatabase hooks', () => {
       // This test is skipped as it's checking error boundary behavior
       const { result } = renderHook(() => useDatabase())
 
-      expect(result.error).toEqual(
-        new Error('useDatabase must be used within a DatabaseProvider')
-      )
+      expect(result.error).toEqual(new Error('useDatabase must be used within a DatabaseProvider'))
     })
   })
 
   describe('useDatabaseStatus', () => {
     it('should return loading and error states', () => {
       const { result } = renderHook(() => useDatabaseStatus(), {
-        wrapper: createWrapper()
+        wrapper: createWrapper(),
       })
 
       expect(result.current).toEqual({
         isLoading: false,
         isInitialized: true,
-        error: null
+        error: null,
       })
     })
 
@@ -111,11 +109,11 @@ describe('useDatabase hooks', () => {
       const loadingContext = {
         ...mockDatabaseContext,
         isLoading: true,
-        isInitialized: false
+        isInitialized: false,
       }
 
       const { result } = renderHook(() => useDatabaseStatus(), {
-        wrapper: createWrapper(loadingContext)
+        wrapper: createWrapper(loadingContext),
       })
 
       expect(result.current.isLoading).toBe(true)
@@ -125,11 +123,11 @@ describe('useDatabase hooks', () => {
     it('should reflect error state', () => {
       const errorContext = {
         ...mockDatabaseContext,
-        error: 'Database connection failed'
+        error: 'Database connection failed',
       }
 
       const { result } = renderHook(() => useDatabaseStatus(), {
-        wrapper: createWrapper(errorContext)
+        wrapper: createWrapper(errorContext),
       })
 
       expect(result.current.error).toBe('Database connection failed')
@@ -139,21 +137,21 @@ describe('useDatabase hooks', () => {
   describe('useDatabaseSummary', () => {
     it('should return summary data and refresh function', () => {
       const { result } = renderHook(() => useDatabaseSummary(), {
-        wrapper: createWrapper()
+        wrapper: createWrapper(),
       })
 
       expect(result.current.summary).toEqual({
         totalPosts: 100,
         platforms: ['reddit', 'hackernews'],
         dateRange: { start: '2024-01-01', end: '2024-01-31' },
-        topSources: []
+        topSources: [],
       })
       expect(typeof result.current.refreshData).toBe('function')
     })
 
     it('should call refreshData when invoked', () => {
       const { result } = renderHook(() => useDatabaseSummary(), {
-        wrapper: createWrapper()
+        wrapper: createWrapper(),
       })
 
       act(() => {
@@ -167,7 +165,7 @@ describe('useDatabase hooks', () => {
   describe('usePostQueries', () => {
     it('should return post query functions', () => {
       const { result } = renderHook(() => usePostQueries(), {
-        wrapper: createWrapper()
+        wrapper: createWrapper(),
       })
 
       expect(result.current).toHaveProperty('queryPosts')
@@ -181,11 +179,11 @@ describe('useDatabase hooks', () => {
 
     it('should call query functions correctly', () => {
       const { result } = renderHook(() => usePostQueries(), {
-        wrapper: createWrapper()
+        wrapper: createWrapper(),
       })
 
       const filters = { platform: 'reddit' }
-      
+
       act(() => {
         result.current.queryPosts(filters)
         result.current.searchPosts('test query')
@@ -199,7 +197,7 @@ describe('useDatabase hooks', () => {
   describe('useAnalyticsQueries', () => {
     it('should return analytics query functions', () => {
       const { result } = renderHook(() => useAnalyticsQueries(), {
-        wrapper: createWrapper()
+        wrapper: createWrapper(),
       })
 
       expect(result.current).toHaveProperty('queryPlatformStats')
@@ -214,7 +212,7 @@ describe('useDatabase hooks', () => {
 
     it('should call analytics functions correctly', () => {
       const { result } = renderHook(() => useAnalyticsQueries(), {
-        wrapper: createWrapper()
+        wrapper: createWrapper(),
       })
 
       act(() => {
@@ -230,7 +228,7 @@ describe('useDatabase hooks', () => {
   describe('useDatabaseFileOps', () => {
     it('should return file operation functions', () => {
       const { result } = renderHook(() => useDatabaseFileOps(), {
-        wrapper: createWrapper()
+        wrapper: createWrapper(),
       })
 
       expect(result.current).toHaveProperty('loadDatabase')
@@ -240,7 +238,7 @@ describe('useDatabase hooks', () => {
 
     it('should call file operations correctly', async () => {
       const { result } = renderHook(() => useDatabaseFileOps(), {
-        wrapper: createWrapper()
+        wrapper: createWrapper(),
       })
 
       const mockFile = new File([''], 'test.db')
@@ -281,7 +279,7 @@ describe('useTheme hook', () => {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
         </ThemeProvider>
-      )
+      ),
     })
 
     expect(result.current).toHaveProperty('theme')
@@ -295,7 +293,7 @@ describe('useTheme hook', () => {
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           {children}
         </ThemeProvider>
-      )
+      ),
     })
 
     act(() => {
@@ -326,18 +324,18 @@ describe('useInfiniteScroll hook', () => {
       root: null,
       rootMargin: '',
       thresholds: [],
-      takeRecords: () => []
+      takeRecords: () => [],
     }))
   })
 
   it.skip('should call onLoadMore when intersection occurs', () => {
     // Skipped as it requires actual DOM interaction
     const onLoadMore = vi.fn()
-    const { result } = renderHook(() => 
+    const { result } = renderHook(() =>
       useInfiniteScroll({
         onLoadMore,
         hasMore: true,
-        isLoading: false
+        isLoading: false,
       })
     )
 
@@ -348,11 +346,11 @@ describe('useInfiniteScroll hook', () => {
 
   it('should not call onLoadMore when hasMore is false', () => {
     const onLoadMore = vi.fn()
-    const { result } = renderHook(() => 
+    const { result } = renderHook(() =>
       useInfiniteScroll({
         onLoadMore,
         hasMore: false,
-        isLoading: false
+        isLoading: false,
       })
     )
 
@@ -362,11 +360,11 @@ describe('useInfiniteScroll hook', () => {
 
   it('should not call onLoadMore when isLoading is true', () => {
     const onLoadMore = vi.fn()
-    const { result } = renderHook(() => 
+    const { result } = renderHook(() =>
       useInfiniteScroll({
         onLoadMore,
         hasMore: true,
-        isLoading: true
+        isLoading: true,
       })
     )
 
@@ -382,34 +380,34 @@ describe('useTouchGestures hook', () => {
     const onSwipeUp = vi.fn()
     const onSwipeDown = vi.fn()
 
-    const { result } = renderHook(() => 
+    const { result } = renderHook(() =>
       useTouchGestures({
         onSwipeLeft,
         onSwipeRight,
         onSwipeUp,
         onSwipeDown,
-        threshold: 50
+        threshold: 50,
       })
     )
 
     const element = document.createElement('div')
-    
+
     // Attach ref
     act(() => {
       if (result.current.current !== element) {
-        (result.current as any).current = element
+        ;(result.current as any).current = element
       }
     })
 
     // Simulate horizontal swipe right
     act(() => {
       const touchStart = new TouchEvent('touchstart', {
-        touches: [{ clientX: 100, clientY: 100 } as Touch]
+        touches: [{ clientX: 100, clientY: 100 } as Touch],
       })
       element.dispatchEvent(touchStart)
 
       const touchEnd = new TouchEvent('touchend', {
-        changedTouches: [{ clientX: 200, clientY: 100 } as Touch]
+        changedTouches: [{ clientX: 200, clientY: 100 } as Touch],
       })
       element.dispatchEvent(touchEnd)
     })
@@ -419,12 +417,12 @@ describe('useTouchGestures hook', () => {
     // Simulate vertical swipe down
     act(() => {
       const touchStart = new TouchEvent('touchstart', {
-        touches: [{ clientX: 100, clientY: 100 } as Touch]
+        touches: [{ clientX: 100, clientY: 100 } as Touch],
       })
       element.dispatchEvent(touchStart)
 
       const touchEnd = new TouchEvent('touchend', {
-        changedTouches: [{ clientX: 100, clientY: 200 } as Touch]
+        changedTouches: [{ clientX: 100, clientY: 200 } as Touch],
       })
       element.dispatchEvent(touchEnd)
     })
@@ -435,30 +433,30 @@ describe('useTouchGestures hook', () => {
   it('should not trigger swipe below threshold', () => {
     const onSwipeLeft = vi.fn()
 
-    const { result } = renderHook(() => 
+    const { result } = renderHook(() =>
       useTouchGestures({
         onSwipeLeft,
-        threshold: 50
+        threshold: 50,
       })
     )
 
     const element = document.createElement('div')
-    
+
     act(() => {
       if (result.current.current !== element) {
-        (result.current as any).current = element
+        ;(result.current as any).current = element
       }
     })
 
     // Simulate small movement below threshold
     act(() => {
       const touchStart = new TouchEvent('touchstart', {
-        touches: [{ clientX: 100, clientY: 100 } as Touch]
+        touches: [{ clientX: 100, clientY: 100 } as Touch],
       })
       element.dispatchEvent(touchStart)
 
       const touchEnd = new TouchEvent('touchend', {
-        changedTouches: [{ clientX: 110, clientY: 100 } as Touch]
+        changedTouches: [{ clientX: 110, clientY: 100 } as Touch],
       })
       element.dispatchEvent(touchEnd)
     })

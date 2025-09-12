@@ -58,7 +58,7 @@ export class LRUCache<T = unknown> {
     this.config = { ...DEFAULT_CONFIG, ...config }
     this.cache = new Map()
     this.stats = this.initStats()
-    
+
     // Start cleanup timer
     if (this.config.checkInterval > 0) {
       this.startCleanupTimer()
@@ -101,7 +101,7 @@ export class LRUCache<T = unknown> {
    */
   get(key: string): T | null {
     const entry = this.cache.get(key)
-    
+
     if (!entry) {
       if (this.config.enableStats) {
         this.stats.misses++
@@ -138,7 +138,7 @@ export class LRUCache<T = unknown> {
    */
   set(key: string, data: T, ttl?: number): boolean {
     const size = this.calculateSize(data)
-    
+
     // Check if single entry exceeds max size
     if (size > this.config.maxSize) {
       console.warn(`Cache entry ${key} exceeds maximum size limit`)
@@ -167,7 +167,7 @@ export class LRUCache<T = unknown> {
 
     this.cache.set(key, entry)
     this.updateAccessOrder(key)
-    
+
     // Update stats
     if (this.config.enableStats) {
       this.stats.size += size
@@ -240,7 +240,7 @@ export class LRUCache<T = unknown> {
 
     const lruKey = this.accessOrder[0]
     const entry = this.cache.get(lruKey)
-    
+
     if (entry) {
       this.delete(lruKey)
       if (this.config.enableStats) {
@@ -280,7 +280,7 @@ export class LRUCache<T = unknown> {
       }
     })
 
-    keysToDelete.forEach(key => this.delete(key))
+    keysToDelete.forEach((key) => this.delete(key))
   }
 
   /**
@@ -323,7 +323,7 @@ export class LRUCache<T = unknown> {
     let oldest = Infinity
     let newest = 0
 
-    this.cache.forEach(entry => {
+    this.cache.forEach((entry) => {
       if (entry.timestamp < oldest) oldest = entry.timestamp
       if (entry.timestamp > newest) newest = entry.timestamp
     })
@@ -376,7 +376,7 @@ export class LRUCache<T = unknown> {
   getEntryInfo(key: string): Omit<CacheEntry<T>, 'data'> | null {
     const entry = this.cache.get(key)
     if (!entry) return null
-    
+
     const { data: _data, ...info } = entry
     return info
   }
@@ -395,7 +395,7 @@ export class LRUCache<T = unknown> {
    */
   export(): Array<CacheEntry<T>> {
     const entries: CacheEntry<T>[] = []
-    this.cache.forEach(entry => {
+    this.cache.forEach((entry) => {
       if (!this.isExpired(entry)) {
         entries.push({ ...entry })
       }
@@ -408,11 +408,11 @@ export class LRUCache<T = unknown> {
    */
   import(entries: Array<CacheEntry<T>>): void {
     this.clear()
-    entries.forEach(entry => {
+    entries.forEach((entry) => {
       // Recalculate TTL based on original timestamp
       const elapsed = Date.now() - entry.timestamp
       const remainingTTL = Math.max(0, entry.ttl - elapsed)
-      
+
       if (remainingTTL > 0) {
         this.cache.set(entry.key, {
           ...entry,
@@ -422,7 +422,7 @@ export class LRUCache<T = unknown> {
         this.updateAccessOrder(entry.key)
       }
     })
-    
+
     // Recalculate stats
     this.recalculateStats()
   }
@@ -433,15 +433,15 @@ export class LRUCache<T = unknown> {
   private recalculateStats(): void {
     this.stats.entries = this.cache.size
     this.stats.size = 0
-    
-    this.cache.forEach(entry => {
+
+    this.cache.forEach((entry) => {
       this.stats.size += entry.size
     })
-    
+
     if (this.stats.entries > 0) {
       this.stats.avgEntrySize = this.stats.size / this.stats.entries
     }
-    
+
     this.updateEntryTimestamps()
   }
 }
@@ -475,17 +475,17 @@ export function destroyGlobalCache(): void {
 /**
  * Cache key generator for database queries
  */
-export function generateCacheKey(
-  queryType: string,
-  params: Record<string, unknown> = {}
-): string {
+export function generateCacheKey(queryType: string, params: Record<string, unknown> = {}): string {
   const sortedParams = Object.keys(params)
     .sort()
-    .reduce((acc, key) => {
-      acc[key] = params[key]
-      return acc
-    }, {} as Record<string, unknown>)
-  
+    .reduce(
+      (acc, key) => {
+        acc[key] = params[key]
+        return acc
+      },
+      {} as Record<string, unknown>
+    )
+
   return `${queryType}:${JSON.stringify(sortedParams)}`
 }
 
@@ -502,22 +502,22 @@ export function withCache<T extends (...args: any[]) => any>(
 ): T {
   const cache = options.cache || getGlobalCache()
   const keyGen = options.keyGenerator || ((...args) => JSON.stringify(args))
-  
+
   return ((...args: Parameters<T>): ReturnType<T> => {
     const key = keyGen(...args)
-    
+
     // Check cache
     const cached = cache.get(key)
     if (cached !== null) {
       return cached as ReturnType<T>
     }
-    
+
     // Execute function
     const result = fn(...args)
-    
+
     // Store in cache
     cache.set(key, result, options.ttl)
-    
+
     return result
   }) as T
 }

@@ -47,15 +47,9 @@ export function Spinner({
       {...props}
     >
       {type === 'spinner' && (
-        <Loader2 
-          className={cn(
-            'animate-spin',
-            sizeClasses[size],
-            variantClasses[variant]
-          )}
-        />
+        <Loader2 className={cn('animate-spin', sizeClasses[size], variantClasses[variant])} />
       )}
-      
+
       {type === 'dots' && (
         <div className="flex gap-1">
           {[0, 1, 2].map((i) => (
@@ -78,7 +72,7 @@ export function Spinner({
           ))}
         </div>
       )}
-      
+
       {type === 'ring' && (
         <div
           className={cn(
@@ -89,7 +83,7 @@ export function Spinner({
           )}
         />
       )}
-      
+
       {type === 'bars' && (
         <div className="flex gap-1">
           {[0, 1, 2, 3].map((i) => (
@@ -112,9 +106,9 @@ export function Spinner({
           ))}
         </div>
       )}
-      
+
       {showLabel && (
-        <span 
+        <span
           className={cn(
             'text-sm',
             variant === 'muted' ? 'text-muted-foreground' : 'text-foreground'
@@ -184,15 +178,7 @@ export function InlineLoader({
   size?: 'xs' | 'sm' | 'md'
   className?: string
 }) {
-  return (
-    <RefreshCw 
-      className={cn(
-        'animate-spin inline-block',
-        sizeClasses[size],
-        className
-      )}
-    />
-  )
+  return <RefreshCw className={cn('animate-spin inline-block', sizeClasses[size], className)} />
 }
 
 // Progress spinner with percentage
@@ -250,11 +236,7 @@ export function ProgressSpinner({
           }}
         />
       </svg>
-      {showLabel && (
-        <span className="absolute text-xs font-medium">
-          {Math.round(percentage)}%
-        </span>
-      )}
+      {showLabel && <span className="absolute text-xs font-medium">{Math.round(percentage)}%</span>}
     </div>
   )
 }
@@ -267,11 +249,7 @@ export function LazyLoadingBoundary({
   children: React.ReactNode
   fallback?: React.ReactNode
 }) {
-  return (
-    <React.Suspense fallback={fallback}>
-      {children}
-    </React.Suspense>
-  )
+  return <React.Suspense fallback={fallback}>{children}</React.Suspense>
 }
 
 import React from 'react'

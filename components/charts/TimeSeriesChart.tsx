@@ -52,7 +52,11 @@ export interface TimeSeriesChartProps {
     color?: string
   }[]
   className?: string
-  customTooltip?: React.FC<{ active?: boolean; payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>; label?: string }>
+  customTooltip?: React.FC<{
+    active?: boolean
+    payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>
+    label?: string
+  }>
   gradientColors?: {
     id: string
     startColor: string
@@ -72,7 +76,15 @@ interface ZoomState {
   animation: boolean
 }
 
-const DefaultTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>; label?: string }) => {
+const DefaultTooltip = ({
+  active,
+  payload,
+  label,
+}: {
+  active?: boolean
+  payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>
+  label?: string
+}) => {
   if (!active || !payload || payload.length === 0) return null
 
   return (
@@ -80,12 +92,11 @@ const DefaultTooltip = ({ active, payload, label }: { active?: boolean; payload?
       <p className="font-medium text-sm mb-1">{label}</p>
       {payload.map((entry, index) => (
         <div key={index} className="flex items-center gap-2 text-sm">
-          <div 
-            className="w-3 h-3 rounded-full" 
-            style={{ backgroundColor: entry.color }}
-          />
+          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
           <span className="text-muted-foreground">{entry.name}:</span>
-          <span className="font-medium">{formatLargeNumber(entry.value)}</span>
+          <span className="font-medium">
+            {formatLargeNumber(typeof entry.value === 'number' ? entry.value : 0)}
+          </span>
         </div>
       ))}
     </div>
@@ -109,7 +120,7 @@ export function TimeSeriesChart({
   referenceLines = [],
   className = '',
   customTooltip,
-  gradientColors = []
+  gradientColors = [],
 }: TimeSeriesChartProps) {
   const [zoomState, setZoomState] = useState<ZoomState>({
     refAreaLeft: null,
@@ -118,20 +129,20 @@ export function TimeSeriesChart({
     right: null,
     top: null,
     bottom: null,
-    animation: true
+    animation: true,
   })
 
-  const chartRef = useRef<HTMLDivElement>(null)
+  const chartRef = useRef<any>(null)
 
   // Handle mouse down for zoom selection
   const handleMouseDown = (e: { activeLabel?: string }) => {
     if (!zoomEnabled || !e) return
     const { activeLabel } = e
     if (activeLabel) {
-      setZoomState(prev => ({
+      setZoomState((prev) => ({
         ...prev,
         refAreaLeft: activeLabel,
-        refAreaRight: activeLabel
+        refAreaRight: activeLabel,
       }))
     }
   }
@@ -141,9 +152,9 @@ export function TimeSeriesChart({
     if (!zoomEnabled || !e || !zoomState.refAreaLeft) return
     const { activeLabel } = e
     if (activeLabel) {
-      setZoomState(prev => ({
+      setZoomState((prev) => ({
         ...prev,
-        refAreaRight: activeLabel
+        refAreaRight: activeLabel,
       }))
     }
   }
@@ -156,22 +167,22 @@ export function TimeSeriesChart({
     let right = zoomState.refAreaRight
 
     if (left === right || !left || !right) {
-      setZoomState(prev => ({
+      setZoomState((prev) => ({
         ...prev,
         refAreaLeft: null,
-        refAreaRight: null
+        refAreaRight: null,
       }))
       return
     }
 
     // Swap if needed
     if (left > right) {
-      [left, right] = [right, left]
+      ;[left, right] = [right, left]
     }
 
     // Find the indices for zoom
-    const leftIndex = data.findIndex(item => item[xAxisKey] === left)
-    const rightIndex = data.findIndex(item => item[xAxisKey] === right)
+    const leftIndex = data.findIndex((item) => item[xAxisKey] === left)
+    const rightIndex = data.findIndex((item) => item[xAxisKey] === right)
 
     if (onZoom && leftIndex !== -1 && rightIndex !== -1) {
       onZoom(leftIndex, rightIndex)
@@ -179,9 +190,9 @@ export function TimeSeriesChart({
 
     // Calculate Y axis bounds for zoom
     const zoomedData = data.slice(leftIndex, rightIndex + 1)
-    const values = zoomedData.flatMap(item => 
-      lines.map(line => item[line.dataKey] as number)
-    ).filter(v => v !== null && v !== undefined)
+    const values = zoomedData
+      .flatMap((item) => lines.map((line) => item[line.dataKey] as number))
+      .filter((v) => v !== null && v !== undefined)
 
     const minValue = Math.min(...values)
     const maxValue = Math.max(...values)
@@ -194,7 +205,7 @@ export function TimeSeriesChart({
       right,
       top: maxValue + padding,
       bottom: minValue - padding,
-      animation: false
+      animation: false,
     })
   }
 
@@ -207,7 +218,7 @@ export function TimeSeriesChart({
       right: null,
       top: null,
       bottom: null,
-      animation: true
+      animation: true,
     })
   }
 
@@ -217,16 +228,16 @@ export function TimeSeriesChart({
 
     return (
       <defs>
-        {gradientColors.map(gradient => (
+        {gradientColors.map((gradient) => (
           <linearGradient key={gradient.id} id={gradient.id} x1="0" y1="0" x2="0" y2="1">
-            <stop 
-              offset="5%" 
-              stopColor={gradient.startColor} 
+            <stop
+              offset="5%"
+              stopColor={gradient.startColor}
               stopOpacity={gradient.startOpacity ?? 0.8}
             />
-            <stop 
-              offset="95%" 
-              stopColor={gradient.endColor} 
+            <stop
+              offset="95%"
+              stopColor={gradient.endColor}
               stopOpacity={gradient.endOpacity ?? 0}
             />
           </linearGradient>
@@ -275,15 +286,11 @@ export function TimeSeriesChart({
           ref={chartRef}
         >
           {renderGradients()}
-          
+
           {showGrid && (
-            <CartesianGrid 
-              strokeDasharray="3 3" 
-              className="stroke-muted" 
-              opacity={0.3}
-            />
+            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" opacity={0.3} />
           )}
-          
+
           <XAxis
             dataKey={xAxisKey}
             domain={[zoomState.left || 'dataMin', zoomState.right || 'dataMax']}
@@ -291,7 +298,7 @@ export function TimeSeriesChart({
             tick={{ fill: 'currentColor', fontSize: 11 }}
             tickMargin={8}
           />
-          
+
           <YAxis
             domain={yAxisDomain || [zoomState.bottom || 'auto', zoomState.top || 'auto']}
             className="text-xs"
@@ -299,45 +306,44 @@ export function TimeSeriesChart({
             tickFormatter={(value) => formatLargeNumber(value)}
             tickMargin={8}
           />
-          
+
           {showTooltip && <Tooltip content={<TooltipComponent />} />}
           {showLegend && <Legend wrapperStyle={{ fontSize: '12px' }} />}
-          
-          {chartType === 'area' ? (
-            lines.map(line => (
-              <Area
-                key={line.dataKey}
-                type={line.type || 'monotone'}
-                dataKey={line.dataKey}
-                name={line.name}
-                stroke={line.color}
-                strokeWidth={line.strokeWidth || 2}
-                fill={gradientColors.find(g => g.id === line.dataKey) 
-                  ? `url(#${line.dataKey})`
-                  : line.color
-                }
-                fillOpacity={gradientColors.find(g => g.id === line.dataKey) ? 1 : 0.1}
-                dot={line.dot ?? false}
-                animationDuration={zoomState.animation ? 300 : 0}
-              />
-            ))
-          ) : (
-            lines.map(line => (
-              <Line
-                key={line.dataKey}
-                type={line.type || 'monotone'}
-                dataKey={line.dataKey}
-                name={line.name}
-                stroke={line.color}
-                strokeWidth={line.strokeWidth || 2}
-                dot={line.dot ?? false}
-                animationDuration={zoomState.animation ? 300 : 0}
-              />
-            ))
-          )}
-          
+
+          {chartType === 'area'
+            ? lines.map((line) => (
+                <Area
+                  key={line.dataKey}
+                  type={line.type || 'monotone'}
+                  dataKey={line.dataKey}
+                  name={line.name}
+                  stroke={line.color}
+                  strokeWidth={line.strokeWidth || 2}
+                  fill={
+                    gradientColors.find((g) => g.id === line.dataKey)
+                      ? `url(#${line.dataKey})`
+                      : line.color
+                  }
+                  fillOpacity={gradientColors.find((g) => g.id === line.dataKey) ? 1 : 0.1}
+                  dot={line.dot ?? false}
+                  animationDuration={zoomState.animation ? 300 : 0}
+                />
+              ))
+            : lines.map((line) => (
+                <Line
+                  key={line.dataKey}
+                  type={line.type || 'monotone'}
+                  dataKey={line.dataKey}
+                  name={line.name}
+                  stroke={line.color}
+                  strokeWidth={line.strokeWidth || 2}
+                  dot={line.dot ?? false}
+                  animationDuration={zoomState.animation ? 300 : 0}
+                />
+              ))}
+
           {renderReferenceLines()}
-          
+
           {/* Zoom selection area */}
           {zoomEnabled && zoomState.refAreaLeft && zoomState.refAreaRight && (
             <ReferenceArea
@@ -348,7 +354,7 @@ export function TimeSeriesChart({
               fillOpacity={0.3}
             />
           )}
-          
+
           {showBrush && (
             <Brush
               dataKey={xAxisKey}
@@ -356,8 +362,16 @@ export function TimeSeriesChart({
               stroke="#8884d8"
               fill="#f0f0f0"
               fillOpacity={0.2}
-              startIndex={zoomState.left ? data.findIndex(item => item[xAxisKey] === zoomState.left) : undefined}
-              endIndex={zoomState.right ? data.findIndex(item => item[xAxisKey] === zoomState.right) : undefined}
+              startIndex={
+                zoomState.left
+                  ? data.findIndex((item) => item[xAxisKey] === zoomState.left)
+                  : undefined
+              }
+              endIndex={
+                zoomState.right
+                  ? data.findIndex((item) => item[xAxisKey] === zoomState.right)
+                  : undefined
+              }
             />
           )}
         </ChartComponent>

@@ -20,16 +20,28 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { ForumPost } from '@/lib/db/types'
-import { 
-  calculateEngagementMetrics, 
+import {
+  calculateEngagementMetrics,
   generateTrendLine,
   formatCorrelation,
-  getEngagementLevel 
+  getEngagementLevel,
 } from '@/lib/utils/analytics'
 import { formatLargeNumber } from '@/lib/utils/formatters'
-import { TrendingUp, MessageSquare, Activity, Clock, ScatterChart as ScatterIcon } from 'lucide-react'
+import {
+  TrendingUp,
+  MessageSquare,
+  Activity,
+  Clock,
+  ScatterChart as ScatterIcon,
+} from 'lucide-react'
 
 export interface EngagementChartProps {
   posts: ForumPost[]
@@ -60,17 +72,15 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps) => {
   if (!active || !payload || payload.length === 0) return null
 
   const data = payload[0].payload
-  
+
   return (
     <div className="bg-background border rounded-lg shadow-lg p-3">
-      {data.title && (
-        <p className="font-medium text-sm mb-1 max-w-xs truncate">{data.title}</p>
-      )}
+      {data.title && <p className="font-medium text-sm mb-1 max-w-xs truncate">{data.title}</p>}
       {label && <p className="text-xs text-muted-foreground mb-1">{label}</p>}
       {payload.map((entry, index) => (
         <div key={index} className="flex items-center gap-2 text-sm">
-          <div 
-            className="w-3 h-3 rounded-full" 
+          <div
+            className="w-3 h-3 rounded-full"
             style={{ backgroundColor: entry.color || entry.fill }}
           />
           <span className="text-muted-foreground">{entry.name}:</span>
@@ -96,25 +106,32 @@ export function EngagementChart({
   description = 'Analyze correlations between posting time, scores, and comments',
   className = '',
   height = 400,
-  showFilters = true
+  showFilters = true,
 }: EngagementChartProps) {
   const [activeTab, setActiveTab] = useState('scatter')
   const [scatterMetric, setScatterMetric] = useState<'score' | 'comments'>('score')
   const [showTrendLine, setShowTrendLine] = useState(true)
-  const [timeRange, setTimeRange] = useState<'all' | 'morning' | 'afternoon' | 'evening' | 'night'>('all')
+  const [timeRange, setTimeRange] = useState<'all' | 'morning' | 'afternoon' | 'evening' | 'night'>(
+    'all'
+  )
 
   // Filter posts by time range
   const filteredPosts = useMemo(() => {
     if (timeRange === 'all') return posts
-    
-    return posts.filter(post => {
+
+    return posts.filter((post) => {
       const hour = new Date(post.created_utc * 1000).getHours()
       switch (timeRange) {
-        case 'morning': return hour >= 5 && hour < 12
-        case 'afternoon': return hour >= 12 && hour < 17
-        case 'evening': return hour >= 17 && hour < 21
-        case 'night': return hour >= 21 || hour < 5
-        default: return true
+        case 'morning':
+          return hour >= 5 && hour < 12
+        case 'afternoon':
+          return hour >= 12 && hour < 17
+        case 'evening':
+          return hour >= 17 && hour < 21
+        case 'night':
+          return hour >= 21 || hour < 5
+        default:
+          return true
       }
     })
   }, [posts, timeRange])
@@ -127,12 +144,13 @@ export function EngagementChart({
   // Generate trend line data
   const trendLineData = useMemo(() => {
     if (!showTrendLine || metrics.scoreData.length < 2) return []
-    
-    const xValues = metrics.scoreData.map(d => d.x)
-    const yValues = scatterMetric === 'score' 
-      ? metrics.scoreData.map(d => d.y)
-      : metrics.scoreData.map(d => d.comments)
-    
+
+    const xValues = metrics.scoreData.map((d) => d.x)
+    const yValues =
+      scatterMetric === 'score'
+        ? metrics.scoreData.map((d) => d.y)
+        : metrics.scoreData.map((d) => d.comments)
+
     return generateTrendLine(xValues, yValues, 0, 24)
   }, [metrics.scoreData, scatterMetric, showTrendLine])
 
@@ -140,10 +158,14 @@ export function EngagementChart({
   const getScatterColor = (score: number, comments: number) => {
     const level = getEngagementLevel(score, comments)
     switch (level) {
-      case 'viral': return '#ef4444'
-      case 'high': return '#f59e0b'
-      case 'medium': return '#3b82f6'
-      default: return '#94a3b8'
+      case 'viral':
+        return '#ef4444'
+      case 'high':
+        return '#f59e0b'
+      case 'medium':
+        return '#3b82f6'
+      default:
+        return '#94a3b8'
     }
   }
 
@@ -156,7 +178,7 @@ export function EngagementChart({
     return '#94a3b8'
   }
 
-  const maxComments = Math.max(...metrics.commentPatternData.map(d => d.comments))
+  const maxComments = Math.max(...metrics.commentPatternData.map((d) => d.comments))
 
   return (
     <Card className={className}>
@@ -184,7 +206,7 @@ export function EngagementChart({
           </div>
         </div>
       </CardHeader>
-      
+
       <CardContent>
         {/* Filters */}
         {showFilters && (
@@ -201,10 +223,13 @@ export function EngagementChart({
                 <SelectItem value="night">Night (21-5)</SelectItem>
               </SelectContent>
             </Select>
-            
+
             {activeTab === 'scatter' && (
               <>
-                <Select value={scatterMetric} onValueChange={(v) => setScatterMetric(v as typeof scatterMetric)}>
+                <Select
+                  value={scatterMetric}
+                  onValueChange={(v) => setScatterMetric(v as typeof scatterMetric)}
+                >
                   <SelectTrigger className="w-40">
                     <SelectValue />
                   </SelectTrigger>
@@ -213,7 +238,7 @@ export function EngagementChart({
                     <SelectItem value="comments">Comments vs Time</SelectItem>
                   </SelectContent>
                 </Select>
-                
+
                 <Button
                   variant={showTrendLine ? 'default' : 'outline'}
                   size="sm"
@@ -282,25 +307,25 @@ export function EngagementChart({
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                
+
                 {/* Scatter points */}
                 <Scatter
                   name={scatterMetric === 'score' ? 'Post Score' : 'Post Comments'}
-                  data={metrics.scoreData.map(d => ({
+                  data={metrics.scoreData.map((d) => ({
                     ...d,
-                    y: scatterMetric === 'score' ? d.y : d.comments
+                    y: scatterMetric === 'score' ? d.y : d.comments,
                   }))}
                   fill="#8884d8"
                 >
                   {metrics.scoreData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
+                    <Cell
+                      key={`cell-${index}`}
                       fill={getScatterColor(entry.y, entry.comments)}
                       fillOpacity={0.7}
                     />
                   ))}
                 </Scatter>
-                
+
                 {/* Trend line */}
                 {showTrendLine && trendLineData.length > 0 && (
                   <Line
@@ -322,7 +347,10 @@ export function EngagementChart({
           {/* Comment Patterns Bar Chart */}
           <TabsContent value="comments">
             <ResponsiveContainer width="100%" height={height}>
-              <BarChart data={metrics.commentPatternData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+              <BarChart
+                data={metrics.commentPatternData}
+                margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" opacity={0.3} />
                 <XAxis
                   dataKey="hour"
@@ -339,10 +367,7 @@ export function EngagementChart({
                 <Legend />
                 <Bar dataKey="comments" name="Total Comments" fill="#8884d8">
                   {metrics.commentPatternData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={getBarColor(entry.comments, maxComments)}
-                    />
+                    <Cell key={`cell-${index}`} fill={getBarColor(entry.comments, maxComments)} />
                   ))}
                 </Bar>
               </BarChart>
@@ -352,7 +377,10 @@ export function EngagementChart({
           {/* Engagement Trends Line Chart */}
           <TabsContent value="trends">
             <ResponsiveContainer width="100%" height={height}>
-              <ComposedChart data={metrics.engagementTrendData} margin={{ top: 5, right: 5, left: 5, bottom: 5 }}>
+              <ComposedChart
+                data={metrics.engagementTrendData}
+                margin={{ top: 5, right: 5, left: 5, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" className="stroke-muted" opacity={0.3} />
                 <XAxis
                   dataKey="hour"
@@ -374,15 +402,15 @@ export function EngagementChart({
                 />
                 <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                
-                <Bar 
+
+                <Bar
                   yAxisId="right"
-                  dataKey="posts" 
-                  name="Post Count" 
+                  dataKey="posts"
+                  name="Post Count"
                   fill="#94a3b8"
                   opacity={0.3}
                 />
-                
+
                 <Line
                   yAxisId="left"
                   type="monotone"
@@ -393,7 +421,7 @@ export function EngagementChart({
                   dot={{ r: 4 }}
                   activeDot={{ r: 6 }}
                 />
-                
+
                 {/* Add reference line for average */}
                 <ReferenceLine
                   yAxisId="left"

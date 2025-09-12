@@ -23,10 +23,7 @@ const DEFAULT_OPTIONS: Required<RetryOptions> = {
 /**
  * Retry a function with configurable options
  */
-export async function retry<T>(
-  fn: () => Promise<T>,
-  options?: RetryOptions
-): Promise<T> {
+export async function retry<T>(fn: () => Promise<T>, options?: RetryOptions): Promise<T> {
   const opts = { ...DEFAULT_OPTIONS, ...options }
   let lastError: Error
 
@@ -92,14 +89,10 @@ function sleep(ms: number): Promise<void> {
  * Retry decorator for class methods
  */
 export function Retry(options?: RetryOptions) {
-  return function (
-    target: any,
-    propertyKey: string,
-    descriptor: PropertyDescriptor
-  ) {
+  return function (target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value
 
-    descriptor.value = async function (...args: any[]) {
+    descriptor.value = async function (...args: unknown[]) {
       return retry(() => originalMethod.apply(this, args), options)
     }
 
@@ -202,7 +195,7 @@ export async function retryApi<T>(
 
       // Don't retry on certain status codes
       if (error instanceof Error && 'status' in error) {
-        const status = (error as any).status
+        const status = (error as Error & { status: number }).status
         if (status === 401 || status === 403 || status === 404) {
           throw error
         }
@@ -213,7 +206,7 @@ export async function retryApi<T>(
       }
 
       const delay = Math.min(initialDelay * Math.pow(factor, attempt), maxDelay)
-      
+
       if (onRetry) {
         onRetry(lastError, attempt + 1, delay)
       }

@@ -68,30 +68,32 @@ export function AnalyticsDashboard() {
 
     switch (dateRange) {
       case 'last7days':
-        cutoff = now - (7 * 24 * 60 * 60)
-        previousCutoff = now - (14 * 24 * 60 * 60)
+        cutoff = now - 7 * 24 * 60 * 60
+        previousCutoff = now - 14 * 24 * 60 * 60
         break
       case 'last30days':
-        cutoff = now - (30 * 24 * 60 * 60)
-        previousCutoff = now - (60 * 24 * 60 * 60)
+        cutoff = now - 30 * 24 * 60 * 60
+        previousCutoff = now - 60 * 24 * 60 * 60
         break
       case 'last90days':
-        cutoff = now - (90 * 24 * 60 * 60)
-        previousCutoff = now - (180 * 24 * 60 * 60)
+        cutoff = now - 90 * 24 * 60 * 60
+        previousCutoff = now - 180 * 24 * 60 * 60
         break
       default:
         cutoff = 0
         previousCutoff = 0
     }
 
-    const currentPosts = cutoff > 0 ? posts.filter(p => p.created_utc >= cutoff) : posts
-    const previousPosts = previousCutoff > 0 && cutoff > 0 
-      ? posts.filter(p => p.created_utc >= previousCutoff && p.created_utc < cutoff)
-      : []
+    const currentPosts = cutoff > 0 ? posts.filter((p) => p.created_utc >= cutoff) : posts
+    const previousPosts =
+      previousCutoff > 0 && cutoff > 0
+        ? posts.filter((p) => p.created_utc >= previousCutoff && p.created_utc < cutoff)
+        : []
 
     return {
       currentMetrics: calculateEngagementMetrics(currentPosts),
-      previousMetrics: previousPosts.length > 0 ? calculateEngagementMetrics(previousPosts) : undefined,
+      previousMetrics:
+        previousPosts.length > 0 ? calculateEngagementMetrics(previousPosts) : undefined,
       timeSeries: generateTimeSeries(currentPosts, timePeriod),
       platformMetrics: calculatePlatformMetrics(currentPosts),
       topAuthors: calculateTopAuthors(currentPosts, 10),
@@ -160,10 +162,7 @@ export function AnalyticsDashboard() {
       </div>
 
       {/* Engagement Metrics Cards */}
-      <EngagementMetrics
-        current={analytics.currentMetrics}
-        previous={analytics.previousMetrics}
-      />
+      <EngagementMetrics current={analytics.currentMetrics} previous={analytics.previousMetrics} />
 
       {/* Main Charts */}
       <Tabs defaultValue="trends" className="space-y-4">
@@ -188,7 +187,7 @@ export function AnalyticsDashboard() {
 
         <TabsContent value="trends" className="space-y-4">
           <div className="grid gap-4 lg:grid-cols-2">
-            <EngagementTrendChart 
+            <EngagementTrendChart
               data={analytics.timeSeries}
               title="Engagement Over Time"
               description="Track score, comments, and post volume trends"
@@ -203,11 +202,17 @@ export function AnalyticsDashboard() {
 
         <TabsContent value="activity" className="space-y-4">
           <HeatMap
-            posts={posts.filter(p => dateRange === 'all' || p.created_utc >= (Date.now() / 1000) - (
-              dateRange === 'last7days' ? 7 * 24 * 60 * 60 :
-              dateRange === 'last30days' ? 30 * 24 * 60 * 60 :
-              90 * 24 * 60 * 60
-            ))}
+            posts={posts.filter(
+              (p) =>
+                dateRange === 'all' ||
+                p.created_utc >=
+                  Date.now() / 1000 -
+                    (dateRange === 'last7days'
+                      ? 7 * 24 * 60 * 60
+                      : dateRange === 'last30days'
+                        ? 30 * 24 * 60 * 60
+                        : 90 * 24 * 60 * 60)
+            )}
             title="Engagement Heatmap"
             description="Discover optimal posting times based on engagement metrics"
             showFilters={true}
@@ -227,11 +232,12 @@ export function AnalyticsDashboard() {
               <CardContent>
                 <div className="space-y-2">
                   {getPeakTimes(analytics.heatmapData).map((peak, idx) => (
-                    <div key={idx} className="flex justify-between items-center p-2 rounded-lg bg-muted">
+                    <div
+                      key={idx}
+                      className="flex justify-between items-center p-2 rounded-lg bg-muted"
+                    >
                       <span className="text-sm font-medium">{peak.label}</span>
-                      <span className="text-sm text-muted-foreground">
-                        {peak.value} posts
-                      </span>
+                      <span className="text-sm text-muted-foreground">{peak.value} posts</span>
                     </div>
                   ))}
                 </div>
@@ -276,7 +282,7 @@ export function AnalyticsDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {analytics.platformMetrics.map(platform => (
+                  {analytics.platformMetrics.map((platform) => (
                     <div key={platform.platform} className="space-y-2">
                       <div className="flex justify-between items-center">
                         <span className="font-medium capitalize">{platform.platform}</span>
@@ -315,7 +321,7 @@ export function AnalyticsDashboard() {
             description="Most active authors by total score"
           />
           <div className="grid gap-4 lg:grid-cols-2">
-            {analytics.topAuthors.slice(0, 6).map(author => (
+            {analytics.topAuthors.slice(0, 6).map((author) => (
               <Card key={author.author}>
                 <CardContent className="pt-6">
                   <div className="flex justify-between items-start">
@@ -353,7 +359,7 @@ function DashboardSkeleton() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {[1, 2, 3, 4].map(i => (
+        {[1, 2, 3, 4].map((i) => (
           <Card key={i}>
             <CardHeader>
               <Skeleton className="h-4 w-24" />
@@ -391,8 +397,8 @@ function DashboardSkeleton() {
 function getPeakTimes(heatmapData: ReturnType<typeof generateActivityHeatmap>) {
   const sorted = [...heatmapData].sort((a, b) => b.value - a.value).slice(0, 5)
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  
-  return sorted.map(item => ({
+
+  return sorted.map((item) => ({
     label: `${dayNames[item.day]} ${item.hour}:00`,
     value: item.value,
   }))
@@ -400,10 +406,10 @@ function getPeakTimes(heatmapData: ReturnType<typeof generateActivityHeatmap>) {
 
 function getMostActiveDay(heatmapData: ReturnType<typeof generateActivityHeatmap>) {
   const dayTotals = Array(7).fill(0)
-  heatmapData.forEach(item => {
+  heatmapData.forEach((item) => {
     dayTotals[item.day] += item.value
   })
-  
+
   const maxDay = dayTotals.indexOf(Math.max(...dayTotals))
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
   return dayNames[maxDay]
@@ -411,19 +417,23 @@ function getMostActiveDay(heatmapData: ReturnType<typeof generateActivityHeatmap
 
 function getMostActiveHour(heatmapData: ReturnType<typeof generateActivityHeatmap>) {
   const hourTotals = Array(24).fill(0)
-  heatmapData.forEach(item => {
+  heatmapData.forEach((item) => {
     hourTotals[item.hour] += item.value
   })
-  
+
   const maxHour = hourTotals.indexOf(Math.max(...hourTotals))
   return `${maxHour}:00 - ${maxHour + 1}:00`
 }
 
 function getDayCount(dateRange: DateRange): number {
   switch (dateRange) {
-    case 'last7days': return 7
-    case 'last30days': return 30
-    case 'last90days': return 90
-    default: return 365
+    case 'last7days':
+      return 7
+    case 'last30days':
+      return 30
+    case 'last90days':
+      return 90
+    default:
+      return 365
   }
 }

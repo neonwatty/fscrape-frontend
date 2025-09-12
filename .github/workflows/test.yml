@@ -13,18 +13,18 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18.x, 20.x]
-    
+        node-version: [20.x, 22.x]
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      
+
       - name: Cache dependencies
         uses: actions/cache@v4
         with:
@@ -33,27 +33,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-${{ matrix.node-version }}-
             ${{ runner.os }}-node-
-      
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Run type check
         run: npm run type-check
         continue-on-error: false
-        
+
       - name: Run linter
         run: npm run lint
         continue-on-error: false
-        
+
       - name: Run unit tests
         run: npm run test:run
         continue-on-error: false
-        
+
       - name: Generate test coverage
         run: npm run test:coverage || true
-        
+
       - name: Upload coverage reports
-        if: matrix.node-version == '20.x'
+        if: matrix.node-version == '22.x'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -64,32 +64,32 @@ jobs:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: test
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
-        
+
       - name: Build application
         run: npm run build
         env:
           NODE_ENV: test
-          
+
       - name: Run E2E tests
         run: npm run test:e2e
         continue-on-error: false
-        
+
       - name: Upload Playwright report
         if: always()
         uses: actions/upload-artifact@v4
@@ -102,34 +102,34 @@ jobs:
     name: Build Validation
     runs-on: ubuntu-latest
     needs: test
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
-      
+
       - name: Install dependencies
         run: npm ci
-        
+
       - name: Build for production
         run: npm run build:prod
         env:
           NODE_ENV: production
-          
+
       - name: Validate static export
         run: node scripts/validate-export.js --github-pages
-        
+
       - name: Check bundle size
         run: |
           echo "📊 Bundle Size Report"
           du -sh out/
           du -sh out/_next/static/
-          
+
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -140,19 +140,19 @@ jobs:
   security:
     name: Security Checks
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
-      
+
       - name: Run npm audit
         run: npm audit --audit-level=high || true
-        
+
       - name: Check for known vulnerabilities
         run: npx audit-ci --high || true

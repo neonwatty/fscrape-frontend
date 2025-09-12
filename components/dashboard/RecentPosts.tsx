@@ -18,7 +18,7 @@ export function RecentPosts({
   pageSize = 10,
   showPagination = true,
   showFilters = false,
-  className = ''
+  className = '',
 }: RecentPostsProps) {
   const { isInitialized } = useDatabase()
   const [posts, setPosts] = useState<ForumPost[]>([])
@@ -28,10 +28,10 @@ export function RecentPosts({
     if (isInitialized) {
       setLoading(true)
       try {
-        const recentPosts = getPosts({ 
+        const recentPosts = getPosts({
           limit,
           sortBy: 'created_utc',
-          sortOrder: 'desc'
+          sortOrder: 'desc',
         })
         setPosts(recentPosts)
       } catch (error) {

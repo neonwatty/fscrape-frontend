@@ -67,19 +67,19 @@ export function getMetricRating(
   value: number
 ): 'good' | 'needs-improvement' | 'poor' {
   const thresholds = PERFORMANCE_THRESHOLDS[metricName]
-  
+
   if (!thresholds) {
     return 'needs-improvement'
   }
-  
+
   if (value <= thresholds.good) {
     return 'good'
   }
-  
+
   if (value <= thresholds.needsImprovement) {
     return 'needs-improvement'
   }
-  
+
   return 'poor'
 }
 
@@ -91,12 +91,12 @@ export function formatMetricValue(name: string, value: number): string {
   if (name === 'CLS') {
     return value.toFixed(3)
   }
-  
+
   // Convert to seconds if value is large
   if (value >= 10000) {
     return `${(value / 1000).toFixed(2)}s`
   }
-  
+
   return `${Math.round(value)}ms`
 }
 
@@ -107,12 +107,12 @@ export async function reportMetrics(metrics: PerformanceMetric[]): Promise<void>
   if (!performanceConfig.enableReporting || !performanceConfig.reportingEndpoint) {
     return
   }
-  
+
   // Sample based on configured rate
   if (Math.random() > performanceConfig.sampleRate) {
     return
   }
-  
+
   try {
     await fetch(performanceConfig.reportingEndpoint, {
       method: 'POST',
@@ -141,12 +141,12 @@ export async function reportMetrics(metrics: PerformanceMetric[]): Promise<void>
 function getSessionId(): string {
   const key = 'performance-session-id'
   let sessionId = sessionStorage.getItem(key)
-  
+
   if (!sessionId) {
     sessionId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     sessionStorage.setItem(key, sessionId)
   }
-  
+
   return sessionId
 }
 
@@ -157,10 +157,10 @@ export function logMetric(metric: PerformanceMetric): void {
   if (!performanceConfig.enableLogging) {
     return
   }
-  
-  const emoji = metric.rating === 'good' ? '✅' : 
-                metric.rating === 'needs-improvement' ? '⚠️' : '❌'
-  
+
+  const emoji =
+    metric.rating === 'good' ? '✅' : metric.rating === 'needs-improvement' ? '⚠️' : '❌'
+
   console.log(
     `${emoji} ${metric.name}: ${formatMetricValue(metric.name, metric.value)} (${metric.rating})`
   )
@@ -174,30 +174,30 @@ class MetricsBatcher {
   private timer: NodeJS.Timeout | null = null
   private readonly batchSize = 10
   private readonly batchDelay = 5000 // 5 seconds
-  
+
   add(metric: PerformanceMetric): void {
     this.metrics.push(metric)
-    
+
     if (this.metrics.length >= this.batchSize) {
       this.flush()
     } else if (!this.timer) {
       this.timer = setTimeout(() => this.flush(), this.batchDelay)
     }
   }
-  
+
   private async flush(): Promise<void> {
     if (this.timer) {
       clearTimeout(this.timer)
       this.timer = null
     }
-    
+
     if (this.metrics.length === 0) {
       return
     }
-    
+
     const metricsToReport = [...this.metrics]
     this.metrics = []
-    
+
     await reportMetrics(metricsToReport)
   }
 }
@@ -209,13 +209,13 @@ export function getResourceTimings(): PerformanceResourceTiming[] {
   if (!('performance' in window) || !('getEntriesByType' in performance)) {
     return []
   }
-  
+
   return performance.getEntriesByType('resource') as PerformanceResourceTiming[]
 }
 
 export function analyzeResourceTimings() {
   const resources = getResourceTimings()
-  
+
   const analysis = {
     totalResources: resources.length,
     totalSize: 0,
@@ -223,14 +223,14 @@ export function analyzeResourceTimings() {
     slowResources: [] as { name: string; duration: number }[],
     largeResources: [] as { name: string; size: number }[],
   }
-  
-  resources.forEach(resource => {
+
+  resources.forEach((resource) => {
     const duration = resource.responseEnd - resource.startTime
     const size = resource.transferSize || 0
-    
+
     analysis.totalDuration += duration
     analysis.totalSize += size
-    
+
     // Track slow resources (> 1 second)
     if (duration > 1000) {
       analysis.slowResources.push({
@@ -238,7 +238,7 @@ export function analyzeResourceTimings() {
         duration: Math.round(duration),
       })
     }
-    
+
     // Track large resources (> 100KB)
     if (size > 100000) {
       analysis.largeResources.push({
@@ -247,7 +247,7 @@ export function analyzeResourceTimings() {
       })
     }
   })
-  
+
   return analysis
 }
 

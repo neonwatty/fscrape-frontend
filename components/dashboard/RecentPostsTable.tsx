@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { useDatabase } from '@/lib/db/database-context'
 import { getPosts, type ForumPost } from '@/lib/db/queries'
@@ -14,16 +14,16 @@ export function RecentPostsTable() {
   const [loading, setLoading] = useState(false)
   const [pageSize, _setPageSize] = useState(20)
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     if (!isInitialized) return
-    
+
     setLoading(true)
     try {
       // Fetch more posts for better pagination experience
-      const recentPosts = getPosts({ 
+      const recentPosts = getPosts({
         limit: 100,
         sortBy: 'created_utc',
-        sortOrder: 'desc'
+        sortOrder: 'desc',
       })
       setPosts(recentPosts)
     } catch (error) {
@@ -32,16 +32,15 @@ export function RecentPostsTable() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [isInitialized])
 
   useEffect(() => {
     fetchPosts()
-  }, [isInitialized])
+  }, [isInitialized, fetchPosts])
 
   const handleRefresh = () => {
     fetchPosts()
   }
-
 
   return (
     <Card>

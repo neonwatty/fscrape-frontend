@@ -12,16 +12,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { createSampleDatabase } from '@/lib/db/sample-database'
-import { 
-  Database, 
-  Upload, 
-  AlertCircle, 
+import {
+  Database,
+  Upload,
+  AlertCircle,
   TrendingUp,
   BarChart3,
   Activity,
   Users,
   MessageSquare,
-  Loader2
+  Loader2,
 } from 'lucide-react'
 
 // Loading skeleton components
@@ -115,12 +115,12 @@ function _LoadingState() {
 }
 
 // Welcome screen for uninitialized state
-function WelcomeScreen({ 
-  onLoadSample, 
-  onUploadFile, 
-  isLoading, 
-  error 
-}: { 
+function WelcomeScreen({
+  onLoadSample,
+  onUploadFile,
+  isLoading,
+  error,
+}: {
   onLoadSample: () => void
   onUploadFile?: () => void
   isLoading: boolean
@@ -149,7 +149,7 @@ function WelcomeScreen({
             </p>
           </CardContent>
         </Card>
-        
+
         <Card className="border-primary/20">
           <CardHeader>
             <BarChart3 className="h-8 w-8 text-primary mb-2" />
@@ -161,7 +161,7 @@ function WelcomeScreen({
             </p>
           </CardContent>
         </Card>
-        
+
         <Card className="border-primary/20">
           <CardHeader>
             <Users className="h-8 w-8 text-primary mb-2" />
@@ -185,14 +185,9 @@ function WelcomeScreen({
         </CardHeader>
         <CardContent className="space-y-4">
           {error && <ErrorDisplay error={error} />}
-          
+
           <div className="grid gap-4 sm:grid-cols-2">
-            <Button 
-              onClick={onLoadSample} 
-              disabled={isLoading}
-              size="lg"
-              className="w-full"
-            >
+            <Button onClick={onLoadSample} disabled={isLoading} size="lg" className="w-full">
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -205,9 +200,9 @@ function WelcomeScreen({
                 </>
               )}
             </Button>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               disabled={isLoading || !onUploadFile}
               size="lg"
               className="w-full"
@@ -217,7 +212,7 @@ function WelcomeScreen({
               Upload Database
             </Button>
           </div>
-          
+
           <p className="text-sm text-muted-foreground text-center">
             Sample data includes posts from Reddit and Hacker News for demonstration
           </p>
@@ -233,7 +228,7 @@ function DashboardContent() {
   const [loadingComponents, setLoadingComponents] = useState({
     stats: true,
     charts: true,
-    table: true
+    table: true,
   })
 
   const handleLoadSampleData = async () => {
@@ -242,7 +237,7 @@ function DashboardContent() {
       const data = sampleDb.export()
       const blob = new Blob([data as unknown as BlobPart], { type: 'application/octet-stream' })
       const url = URL.createObjectURL(blob)
-      
+
       await loadDatabase(url)
       URL.revokeObjectURL(url)
     } catch (err) {
@@ -259,9 +254,9 @@ function DashboardContent() {
     if (isInitialized) {
       refreshData()
       // Simulate component loading
-      setTimeout(() => setLoadingComponents(prev => ({ ...prev, stats: false })), 500)
-      setTimeout(() => setLoadingComponents(prev => ({ ...prev, charts: false })), 1000)
-      setTimeout(() => setLoadingComponents(prev => ({ ...prev, table: false })), 1500)
+      setTimeout(() => setLoadingComponents((prev) => ({ ...prev, stats: false })), 500)
+      setTimeout(() => setLoadingComponents((prev) => ({ ...prev, charts: false })), 1000)
+      setTimeout(() => setLoadingComponents((prev) => ({ ...prev, table: false })), 1500)
     }
   }, [isInitialized, refreshData])
 
@@ -329,7 +324,7 @@ function DashboardContent() {
       <div className="space-y-6 lg:space-y-8">
         {/* Platform Filter Section */}
         <section className="space-y-4">
-          <PlatformPicker 
+          <PlatformPicker
             onSelectionChange={(selection) => {
               console.log('Platform selection changed:', selection)
               // Trigger refresh with filters
@@ -381,14 +376,12 @@ function DashboardContent() {
                 <Suspense fallback={<ChartSkeleton />}>
                   <TrendChart />
                 </Suspense>
-                
+
                 <Suspense fallback={<ChartSkeleton />}>
                   <Card>
                     <CardHeader>
                       <CardTitle>Platform Distribution</CardTitle>
-                      <CardDescription>
-                        Posts distribution across platforms
-                      </CardDescription>
+                      <CardDescription>Posts distribution across platforms</CardDescription>
                     </CardHeader>
                     <CardContent>
                       {summary?.platforms && summary.platforms.length > 0 ? (
@@ -414,7 +407,9 @@ function DashboardContent() {
                               <div className="flex justify-between text-xs text-muted-foreground">
                                 <span>{platform.totalPosts.toLocaleString()} posts</span>
                                 <span>
-                                  {platform.avgScore ? `Avg score: ${Math.round(platform.avgScore)}` : ''}
+                                  {platform.avgScore
+                                    ? `Avg score: ${Math.round(platform.avgScore)}`
+                                    : ''}
                                 </span>
                               </div>
                             </div>

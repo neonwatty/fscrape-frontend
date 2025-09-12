@@ -34,8 +34,8 @@ export function createFTSTable(): void {
 
   try {
     // Drop existing FTS table if it exists
-    db.run("DROP TABLE IF EXISTS posts_fts")
-    
+    db.run('DROP TABLE IF EXISTS posts_fts')
+
     // Create FTS5 virtual table
     db.run(`
       CREATE VIRTUAL TABLE posts_fts USING fts5(
@@ -49,7 +49,7 @@ export function createFTSTable(): void {
         prefix = '2 3'
       )
     `)
-    
+
     // Populate FTS table with existing data
     db.run(`
       INSERT INTO posts_fts (id, title, content, author, platform, source)
@@ -62,10 +62,10 @@ export function createFTSTable(): void {
         COALESCE(source, subreddit, '')
       FROM posts
     `)
-    
+
     // Optimize the FTS index
     db.run("INSERT INTO posts_fts(posts_fts) VALUES('optimize')")
-    
+
     console.log('FTS5 table created and populated successfully')
   } catch (error) {
     console.error('Failed to create FTS table:', error)
@@ -85,9 +85,10 @@ export function searchPostsFTS(
 
   // Prepare the search query for FTS5
   const ftsQuery = prepareFTSQuery(query)
-  
+
   try {
-    const results = executeQuery<SearchResult>(`
+    const results = executeQuery<SearchResult>(
+      `
       SELECT 
         p.*,
         highlight(posts_fts, 1, '<mark>', '</mark>') as titleHighlighted,
@@ -98,8 +99,10 @@ export function searchPostsFTS(
       WHERE posts_fts MATCH ?
       ORDER BY relevanceScore
       LIMIT ? OFFSET ?
-    `, [ftsQuery, limit, offset])
-    
+    `,
+      [ftsQuery, limit, offset]
+    )
+
     return results.map(formatSearchResult)
   } catch (error) {
     console.error('FTS search failed, falling back to regular search:', error)
@@ -114,8 +117,9 @@ export function searchPostsRegular(
   offset: number = 0
 ): SearchResult[] {
   const searchPattern = `%${query}%`
-  
-  const results = executeQuery<ForumPost>(`
+
+  const results = executeQuery<ForumPost>(
+    `
     SELECT *,
       CASE 
         WHEN title LIKE ? THEN 10
@@ -132,17 +136,25 @@ export function searchPostsRegular(
       subreddit LIKE ?
     ORDER BY relevanceScore DESC, score DESC
     LIMIT ? OFFSET ?
-  `, [
-    searchPattern, searchPattern, searchPattern,
-    searchPattern, searchPattern, searchPattern, 
-    searchPattern, searchPattern,
-    limit, offset
-  ])
-  
-  return results.map(result => ({
+  `,
+    [
+      searchPattern,
+      searchPattern,
+      searchPattern,
+      searchPattern,
+      searchPattern,
+      searchPattern,
+      searchPattern,
+      searchPattern,
+      limit,
+      offset,
+    ]
+  )
+
+  return results.map((result) => ({
     ...result,
     titleHighlighted: highlightText(result.title, query),
-    contentHighlighted: highlightText(result.content || '', query)
+    contentHighlighted: highlightText(result.content || '', query),
   }))
 }
 
@@ -164,7 +176,7 @@ export function searchPostsAdvanced(
 ): SearchResult[] {
   const conditions: string[] = []
   const params: (string | number | boolean | null)[] = []
-  
+
   // Add search condition
   if (query) {
     if (checkFTSSupport()) {
@@ -185,47 +197,45 @@ export function searchPostsAdvanced(
       params.push(pattern, pattern, pattern)
     }
   }
-  
+
   // Add filter conditions
   if (filters.platform) {
     conditions.push('platform = ?')
     params.push(filters.platform)
   }
-  
+
   if (filters.author) {
     conditions.push('author LIKE ?')
     params.push(`%${filters.author}%`)
   }
-  
+
   if (filters.dateFrom) {
     conditions.push('created_utc >= ?')
     params.push(Math.floor(filters.dateFrom.getTime() / 1000))
   }
-  
+
   if (filters.dateTo) {
     conditions.push('created_utc <= ?')
     params.push(Math.floor(filters.dateTo.getTime() / 1000))
   }
-  
+
   if (filters.scoreMin !== undefined) {
     conditions.push('score >= ?')
     params.push(filters.scoreMin)
   }
-  
+
   if (filters.scoreMax !== undefined) {
     conditions.push('score <= ?')
     params.push(filters.scoreMax)
   }
-  
+
   if (filters.hasComments) {
     conditions.push('num_comments > 0')
   }
-  
+
   // Build the WHERE clause
-  const whereClause = conditions.length > 0 
-    ? `WHERE ${conditions.join(' AND ')}` 
-    : ''
-  
+  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+
   // Determine sort order
   let orderBy = 'score DESC'
   switch (filters.sortBy) {
@@ -244,7 +254,7 @@ export function searchPostsAdvanced(
       }
       break
   }
-  
+
   // Build and execute query
   const sql = `
     SELECT p.*
@@ -255,27 +265,25 @@ export function searchPostsAdvanced(
     ORDER BY ${orderBy}
     LIMIT ? OFFSET ?
   `
-  
+
   params.push(limit, offset)
   const results = executeQuery<any>(sql, params)
-  
-  return results.map(result => ({
+
+  return results.map((result) => ({
     ...result,
     titleHighlighted: query ? highlightText(result.title, query) : result.title,
-    contentHighlighted: query ? highlightText(result.content || '', query) : result.content
+    contentHighlighted: query ? highlightText(result.content || '', query) : result.content,
   }))
 }
 
 // Get search suggestions based on partial query
-export function getSearchSuggestions(
-  partial: string,
-  limit: number = 10
-): SearchSuggestion[] {
+export function getSearchSuggestions(partial: string, limit: number = 10): SearchSuggestion[] {
   const suggestions: SearchSuggestion[] = []
   const pattern = `${partial}%`
-  
+
   // Get title suggestions
-  const titleSuggestions = executeQuery<{ term: string; count: number }>(`
+  const titleSuggestions = executeQuery<{ term: string; count: number }>(
+    `
     SELECT 
       SUBSTR(title, 1, 50) as term,
       COUNT(*) as count
@@ -284,15 +292,20 @@ export function getSearchSuggestions(
     GROUP BY SUBSTR(title, 1, 50)
     ORDER BY count DESC
     LIMIT ?
-  `, [pattern, Math.ceil(limit / 3)])
-  
-  suggestions.push(...titleSuggestions.map(s => ({
-    ...s,
-    type: 'title' as const
-  })))
-  
+  `,
+    [pattern, Math.ceil(limit / 3)]
+  )
+
+  suggestions.push(
+    ...titleSuggestions.map((s) => ({
+      ...s,
+      type: 'title' as const,
+    }))
+  )
+
   // Get author suggestions
-  const authorSuggestions = executeQuery<{ term: string; count: number }>(`
+  const authorSuggestions = executeQuery<{ term: string; count: number }>(
+    `
     SELECT 
       author as term,
       COUNT(*) as count
@@ -301,15 +314,20 @@ export function getSearchSuggestions(
     GROUP BY author
     ORDER BY count DESC
     LIMIT ?
-  `, [pattern, Math.ceil(limit / 3)])
-  
-  suggestions.push(...authorSuggestions.map(s => ({
-    ...s,
-    type: 'author' as const
-  })))
-  
+  `,
+    [pattern, Math.ceil(limit / 3)]
+  )
+
+  suggestions.push(
+    ...authorSuggestions.map((s) => ({
+      ...s,
+      type: 'author' as const,
+    }))
+  )
+
   // Get tag/flair suggestions
-  const tagSuggestions = executeQuery<{ term: string; count: number }>(`
+  const tagSuggestions = executeQuery<{ term: string; count: number }>(
+    `
     SELECT 
       link_flair_text as term,
       COUNT(*) as count
@@ -318,24 +336,27 @@ export function getSearchSuggestions(
     GROUP BY link_flair_text
     ORDER BY count DESC
     LIMIT ?
-  `, [pattern, Math.ceil(limit / 3)])
-  
-  suggestions.push(...tagSuggestions.map(s => ({
-    ...s,
-    type: 'tag' as const
-  })))
-  
+  `,
+    [pattern, Math.ceil(limit / 3)]
+  )
+
+  suggestions.push(
+    ...tagSuggestions.map((s) => ({
+      ...s,
+      type: 'tag' as const,
+    }))
+  )
+
   // Sort by count and limit
-  return suggestions
-    .sort((a, b) => b.count - a.count)
-    .slice(0, limit)
+  return suggestions.sort((a, b) => b.count - a.count).slice(0, limit)
 }
 
 // Get popular search terms
 export function getPopularSearchTerms(limit: number = 20): string[] {
   // This would ideally track actual search queries
   // For now, return most common terms from titles
-  const results = executeQuery<{ term: string }>(`
+  const results = executeQuery<{ term: string }>(
+    `
     SELECT 
       LOWER(SUBSTR(title, 1, 30)) as term
     FROM posts
@@ -343,48 +364,52 @@ export function getPopularSearchTerms(limit: number = 20): string[] {
     GROUP BY LOWER(SUBSTR(title, 1, 30))
     ORDER BY COUNT(*) DESC, AVG(score) DESC
     LIMIT ?
-  `, [limit])
-  
-  return results.map(r => r.term)
+  `,
+    [limit]
+  )
+
+  return results.map((r) => r.term)
 }
 
 // Helper: Prepare query for FTS5
 function prepareFTSQuery(query: string): string {
   // Escape special characters
   let ftsQuery = query.replace(/[^\w\s]/g, ' ')
-  
+
   // Handle phrases (quoted text)
   const phrases = query.match(/"[^"]+"/g) || []
-  phrases.forEach(phrase => {
+  phrases.forEach((phrase) => {
     ftsQuery = ftsQuery.replace(phrase, phrase)
   })
-  
+
   // Add prefix matching to each word (for autocomplete)
-  const words = ftsQuery.split(/\s+/).filter(w => w.length > 0)
+  const words = ftsQuery.split(/\s+/).filter((w) => w.length > 0)
   if (words.length > 0) {
-    ftsQuery = words.map(word => {
-      // Don't add * to quoted phrases
-      if (word.startsWith('"') && word.endsWith('"')) {
-        return word
-      }
-      // Add prefix matching
-      return word + '*'
-    }).join(' ')
+    ftsQuery = words
+      .map((word) => {
+        // Don't add * to quoted phrases
+        if (word.startsWith('"') && word.endsWith('"')) {
+          return word
+        }
+        // Add prefix matching
+        return word + '*'
+      })
+      .join(' ')
   }
-  
+
   return ftsQuery
 }
 
 // Helper: Highlight matching text
 function highlightText(text: string, query: string): string {
   if (!text || !query) return text
-  
+
   // Escape special regex characters in query
   const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  
+
   // Create regex for case-insensitive matching
   const regex = new RegExp(`(${escapedQuery})`, 'gi')
-  
+
   // Replace matches with highlighted version
   return text.replace(regex, '<mark>$1</mark>')
 }
@@ -426,6 +451,6 @@ function formatSearchResult(row: any): SearchResult {
     removed: row.removed,
     titleHighlighted: row.titleHighlighted,
     contentHighlighted: row.contentHighlighted,
-    relevanceScore: row.relevanceScore
+    relevanceScore: row.relevanceScore,
   }
 }

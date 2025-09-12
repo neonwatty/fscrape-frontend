@@ -15,7 +15,7 @@ function AnalyticsTracking() {
   useEffect(() => {
     // Track page view on route change
     const url = pathname + (searchParams.toString() ? `?${searchParams.toString()}` : '')
-    
+
     // Log page view in development
     if (process.env.NODE_ENV === 'development') {
       console.log('[Analytics] Page view:', url)
@@ -39,7 +39,13 @@ function AnalyticsTracking() {
   useEffect(() => {
     if (typeof window !== 'undefined' && 'web-vital' in window) {
       // Track Core Web Vitals
-      const reportWebVital = ({ name, value, id }: any) => {
+      interface WebVital {
+        name: string
+        value: number
+        id: string
+      }
+
+      const reportWebVital = ({ name, value, id }: WebVital) => {
         if (process.env.NODE_ENV === 'development') {
           console.log('[Analytics] Web Vital:', { name, value, id })
         }
@@ -53,8 +59,9 @@ function AnalyticsTracking() {
 
       // Listen for web vitals
       if ('addEventListener' in window) {
-        window.addEventListener('web-vital', reportWebVital as any)
-        return () => window.removeEventListener('web-vital', reportWebVital as any)
+        window.addEventListener('web-vital', reportWebVital as unknown as EventListener)
+        return () =>
+          window.removeEventListener('web-vital', reportWebVital as unknown as EventListener)
       }
     }
   }, [])
@@ -79,7 +86,7 @@ export function AnalyticsProvider({ children }: AnalyticsProviderProps) {
 
 // Custom hook for tracking events
 export function useAnalytics() {
-  const trackEvent = (eventName: string, properties?: Record<string, any>) => {
+  const trackEvent = (eventName: string, properties?: Record<string, unknown>) => {
     if (process.env.NODE_ENV === 'development') {
       console.log('[Analytics] Event:', eventName, properties)
     }
@@ -95,7 +102,7 @@ export function useAnalytics() {
     }
   }
 
-  const trackError = (error: Error, errorInfo?: any) => {
+  const trackError = (error: Error, errorInfo?: unknown) => {
     if (process.env.NODE_ENV === 'development') {
       console.error('[Analytics] Error:', error, errorInfo)
     }
@@ -133,6 +140,6 @@ export function useAnalytics() {
 // Extend Window interface for analytics
 declare global {
   interface Window {
-    gtag?: (...args: any[]) => void
+    gtag?: (...args: unknown[]) => void
   }
 }

@@ -6,7 +6,7 @@ import {
   FilterPreset,
   defaultFilterPresets,
   getActiveFilterCount,
-  clearFilters
+  clearFilters,
 } from '@/lib/utils/filters'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -20,11 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import {
   Sheet,
@@ -45,7 +41,7 @@ import {
   Settings2,
   RotateCcw,
   Save,
-  SlidersHorizontal
+  SlidersHorizontal,
 } from 'lucide-react'
 
 interface TableFiltersProps {
@@ -68,7 +64,7 @@ export function TableFilters({
   filterOptions = {},
   showPresets = true,
   showAdvanced = true,
-  className
+  className,
 }: TableFiltersProps) {
   const [localFilters, setLocalFilters] = useState<PostFilters>(filters)
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(false)
@@ -99,7 +95,7 @@ export function TableFilters({
         id: `custom-${Date.now()}`,
         name,
         description: 'Custom filter preset',
-        filters: { ...localFilters }
+        filters: { ...localFilters },
       }
       setCustomPresets([...customPresets, newPreset])
       // Could persist to localStorage here
@@ -127,19 +123,21 @@ export function TableFilters({
           <Button
             variant="outline"
             className={cn(
-              "justify-start text-left font-normal",
-              !localFilters.dateFrom && "text-muted-foreground"
+              'justify-start text-left font-normal',
+              !localFilters.dateFrom && 'text-muted-foreground'
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {localFilters.dateFrom ? format(localFilters.dateFrom, "PPP") : "From date"}
+            {localFilters.dateFrom ? format(localFilters.dateFrom, 'PPP') : 'From date'}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
             selected={localFilters.dateFrom}
-            onSelect={(date: Date | undefined) => handleFilterChange({ ...localFilters, dateFrom: date || undefined })}
+            onSelect={(date: Date | undefined) =>
+              handleFilterChange({ ...localFilters, dateFrom: date || undefined })
+            }
             initialFocus
           />
         </PopoverContent>
@@ -150,19 +148,21 @@ export function TableFilters({
           <Button
             variant="outline"
             className={cn(
-              "justify-start text-left font-normal",
-              !localFilters.dateTo && "text-muted-foreground"
+              'justify-start text-left font-normal',
+              !localFilters.dateTo && 'text-muted-foreground'
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
-            {localFilters.dateTo ? format(localFilters.dateTo, "PPP") : "To date"}
+            {localFilters.dateTo ? format(localFilters.dateTo, 'PPP') : 'To date'}
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
             selected={localFilters.dateTo}
-            onSelect={(date: Date | undefined) => handleFilterChange({ ...localFilters, dateTo: date || undefined })}
+            onSelect={(date: Date | undefined) =>
+              handleFilterChange({ ...localFilters, dateTo: date || undefined })
+            }
             initialFocus
           />
         </PopoverContent>
@@ -171,16 +171,15 @@ export function TableFilters({
   )
 
   return (
-    <Card className={cn("w-full", className)}>
+    <Card className={cn('w-full', className)}>
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
             <CardTitle>Filters</CardTitle>
             <CardDescription>
-              {activeFilterCount > 0 
+              {activeFilterCount > 0
                 ? `${activeFilterCount} filter${activeFilterCount > 1 ? 's' : ''} active`
-                : 'Configure filters to refine your search'
-              }
+                : 'Configure filters to refine your search'}
             </CardDescription>
           </div>
           <div className="flex gap-2">
@@ -209,7 +208,7 @@ export function TableFilters({
                       Fine-tune your search with detailed filter options
                     </SheetDescription>
                   </SheetHeader>
-                  
+
                   <div className="mt-6 space-y-6">
                     {/* Score Range */}
                     <div className="space-y-2">
@@ -219,10 +218,12 @@ export function TableFilters({
                           type="number"
                           placeholder="Min"
                           value={localFilters.scoreMin ?? ''}
-                          onChange={(e) => handleFilterChange({
-                            ...localFilters,
-                            scoreMin: e.target.value ? Number(e.target.value) : undefined
-                          })}
+                          onChange={(e) =>
+                            handleFilterChange({
+                              ...localFilters,
+                              scoreMin: e.target.value ? Number(e.target.value) : undefined,
+                            })
+                          }
                           className="w-24"
                         />
                         <span className="text-muted-foreground">to</span>
@@ -230,10 +231,12 @@ export function TableFilters({
                           type="number"
                           placeholder="Max"
                           value={localFilters.scoreMax ?? ''}
-                          onChange={(e) => handleFilterChange({
-                            ...localFilters,
-                            scoreMax: e.target.value ? Number(e.target.value) : undefined
-                          })}
+                          onChange={(e) =>
+                            handleFilterChange({
+                              ...localFilters,
+                              scoreMax: e.target.value ? Number(e.target.value) : undefined,
+                            })
+                          }
                           className="w-24"
                         />
                       </div>
@@ -247,10 +250,12 @@ export function TableFilters({
                           type="number"
                           placeholder="Min"
                           value={localFilters.commentsMin ?? ''}
-                          onChange={(e) => handleFilterChange({
-                            ...localFilters,
-                            commentsMin: e.target.value ? Number(e.target.value) : undefined
-                          })}
+                          onChange={(e) =>
+                            handleFilterChange({
+                              ...localFilters,
+                              commentsMin: e.target.value ? Number(e.target.value) : undefined,
+                            })
+                          }
                           className="w-24"
                         />
                         <span className="text-muted-foreground">to</span>
@@ -258,10 +263,12 @@ export function TableFilters({
                           type="number"
                           placeholder="Max"
                           value={localFilters.commentsMax ?? ''}
-                          onChange={(e) => handleFilterChange({
-                            ...localFilters,
-                            commentsMax: e.target.value ? Number(e.target.value) : undefined
-                          })}
+                          onChange={(e) =>
+                            handleFilterChange({
+                              ...localFilters,
+                              commentsMax: e.target.value ? Number(e.target.value) : undefined,
+                            })
+                          }
                           className="w-24"
                         />
                       </div>
@@ -274,10 +281,12 @@ export function TableFilters({
                         id="author"
                         placeholder="Search by author..."
                         value={localFilters.author ?? ''}
-                        onChange={(e) => handleFilterChange({
-                          ...localFilters,
-                          author: e.target.value || undefined
-                        })}
+                        onChange={(e) =>
+                          handleFilterChange({
+                            ...localFilters,
+                            author: e.target.value || undefined,
+                          })
+                        }
                       />
                     </div>
 
@@ -287,17 +296,19 @@ export function TableFilters({
                         <Label>Source</Label>
                         <Select
                           value={localFilters.source ?? ''}
-                          onValueChange={(value) => handleFilterChange({
-                            ...localFilters,
-                            source: value || undefined
-                          })}
+                          onValueChange={(value) =>
+                            handleFilterChange({
+                              ...localFilters,
+                              source: value || undefined,
+                            })
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="All sources" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="">All sources</SelectItem>
-                            {filterOptions.sources.map(source => (
+                            {filterOptions.sources.map((source) => (
                               <SelectItem key={source} value={source}>
                                 {source}
                               </SelectItem>
@@ -313,17 +324,19 @@ export function TableFilters({
                         <Label>Category</Label>
                         <Select
                           value={localFilters.category ?? ''}
-                          onValueChange={(value) => handleFilterChange({
-                            ...localFilters,
-                            category: value || undefined
-                          })}
+                          onValueChange={(value) =>
+                            handleFilterChange({
+                              ...localFilters,
+                              category: value || undefined,
+                            })
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue placeholder="All categories" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="">All categories</SelectItem>
-                            {filterOptions.categories.map(category => (
+                            {filterOptions.categories.map((category) => (
                               <SelectItem key={category} value={category}>
                                 {category}
                               </SelectItem>
@@ -355,10 +368,12 @@ export function TableFilters({
           <Input
             placeholder="Search posts..."
             value={localFilters.searchTerm ?? ''}
-            onChange={(e) => handleFilterChange({
-              ...localFilters,
-              searchTerm: e.target.value || undefined
-            })}
+            onChange={(e) =>
+              handleFilterChange({
+                ...localFilters,
+                searchTerm: e.target.value || undefined,
+              })
+            }
             className="pl-10"
           />
         </div>
@@ -368,17 +383,19 @@ export function TableFilters({
           {/* Platform Filter */}
           <Select
             value={localFilters.platform ?? 'all'}
-            onValueChange={(value) => handleFilterChange({
-              ...localFilters,
-              platform: value === 'all' ? undefined : value
-            })}
+            onValueChange={(value) =>
+              handleFilterChange({
+                ...localFilters,
+                platform: value === 'all' ? undefined : value,
+              })
+            }
           >
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Platform" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Platforms</SelectItem>
-              {filterOptions.platforms?.map(platform => (
+              {filterOptions.platforms?.map((platform) => (
                 <SelectItem key={platform} value={platform}>
                   {platform}
                 </SelectItem>
@@ -389,10 +406,12 @@ export function TableFilters({
           {/* Time Range Filter */}
           <Select
             value={localFilters.timeRange ?? 'all'}
-            onValueChange={(value) => handleFilterChange({
-              ...localFilters,
-              timeRange: value === 'all' ? undefined : value as PostFilters['timeRange']
-            })}
+            onValueChange={(value) =>
+              handleFilterChange({
+                ...localFilters,
+                timeRange: value === 'all' ? undefined : (value as PostFilters['timeRange']),
+              })
+            }
           >
             <SelectTrigger className="w-[140px]">
               <Clock className="h-4 w-4 mr-2" />
@@ -410,10 +429,12 @@ export function TableFilters({
           {/* Sort By */}
           <Select
             value={localFilters.sortBy ?? 'created_utc'}
-            onValueChange={(value) => handleFilterChange({
-              ...localFilters,
-              sortBy: value as PostFilters['sortBy']
-            })}
+            onValueChange={(value) =>
+              handleFilterChange({
+                ...localFilters,
+                sortBy: value as PostFilters['sortBy'],
+              })
+            }
           >
             <SelectTrigger className="w-[140px]">
               <SlidersHorizontal className="h-4 w-4 mr-2" />
@@ -431,10 +452,12 @@ export function TableFilters({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => handleFilterChange({
-              ...localFilters,
-              sortOrder: localFilters.sortOrder === 'asc' ? 'desc' : 'asc'
-            })}
+            onClick={() =>
+              handleFilterChange({
+                ...localFilters,
+                sortOrder: localFilters.sortOrder === 'asc' ? 'desc' : 'asc',
+              })
+            }
           >
             {localFilters.sortOrder === 'asc' ? '↑' : '↓'}
           </Button>
@@ -448,7 +471,7 @@ export function TableFilters({
           <div className="space-y-2">
             <Label className="text-sm text-muted-foreground">Quick Presets</Label>
             <div className="flex flex-wrap gap-2">
-              {defaultFilterPresets.map(preset => (
+              {defaultFilterPresets.map((preset) => (
                 <Button
                   key={preset.id}
                   variant="outline"
@@ -460,7 +483,7 @@ export function TableFilters({
                   {preset.name}
                 </Button>
               ))}
-              {customPresets.map(preset => (
+              {customPresets.map((preset) => (
                 <div key={preset.id} className="relative group">
                   <Button
                     variant="outline"
@@ -472,7 +495,7 @@ export function TableFilters({
                   </Button>
                   <button
                     onClick={() => {
-                      const filtered = customPresets.filter(p => p.id !== preset.id)
+                      const filtered = customPresets.filter((p) => p.id !== preset.id)
                       setCustomPresets(filtered)
                       localStorage.setItem('customFilterPresets', JSON.stringify(filtered))
                     }}

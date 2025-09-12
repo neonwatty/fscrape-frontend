@@ -83,14 +83,16 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
     }
 
     const stored = localStorage.getItem(ANALYTICS_KEY)
-    return stored ? JSON.parse(stored) : {
-      promptShown: 0,
-      promptDismissed: 0,
-      promptAccepted: 0,
-      lastPromptDate: null,
-      installDate: null,
-      platform: null,
-    }
+    return stored
+      ? JSON.parse(stored)
+      : {
+          promptShown: 0,
+          promptDismissed: 0,
+          promptAccepted: 0,
+          lastPromptDate: null,
+          installDate: null,
+          platform: null,
+        }
   })
 
   /**
@@ -98,7 +100,7 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
    */
   const getDisplayMode = useCallback((): InstallState['displayMode'] => {
     if (typeof window === 'undefined') return 'browser'
-    
+
     if (window.matchMedia('(display-mode: fullscreen)').matches) return 'fullscreen'
     if (window.matchMedia('(display-mode: standalone)').matches) return 'standalone'
     if (window.matchMedia('(display-mode: minimal-ui)').matches) return 'minimal-ui'
@@ -110,24 +112,24 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
    */
   const detectPlatform = useCallback((): InstallState['platform'] => {
     if (typeof window === 'undefined') return null
-    
+
     const userAgent = window.navigator.userAgent.toLowerCase()
-    
+
     // iOS detection
     if (/iphone|ipad|ipod/.test(userAgent) || (window.navigator as any).standalone) {
       return 'ios'
     }
-    
+
     // Android detection
     if (/android/.test(userAgent)) {
       return 'android'
     }
-    
+
     // Desktop detection
     if (/windows|mac|linux/.test(userAgent) && !/mobile/.test(userAgent)) {
       return 'desktop'
     }
-    
+
     return 'web'
   }, [])
 
@@ -137,32 +139,36 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
   const checkInstallState = useCallback(() => {
     const displayMode = getDisplayMode()
     const platform = detectPlatform()
-    
+
     // Check if running as installed PWA
-    const isInstalled = displayMode === 'standalone' || 
-                       displayMode === 'fullscreen' ||
-                       (window.navigator as any).standalone === true ||
-                       document.referrer.includes('android-app://')
-    
-    setInstallState(prev => ({
+    const isInstalled =
+      displayMode === 'standalone' ||
+      displayMode === 'fullscreen' ||
+      (window.navigator as any).standalone === true ||
+      document.referrer.includes('android-app://')
+
+    setInstallState((prev) => ({
       ...prev,
       isInstalled,
       displayMode,
       platform,
     }))
-    
+
     return isInstalled
   }, [getDisplayMode, detectPlatform])
 
   /**
    * Save analytics to localStorage
    */
-  const saveAnalytics = useCallback((data: InstallAnalytics) => {
-    if (!enableAnalytics) return
-    
-    localStorage.setItem(ANALYTICS_KEY, JSON.stringify(data))
-    setAnalytics(data)
-  }, [enableAnalytics])
+  const saveAnalytics = useCallback(
+    (data: InstallAnalytics) => {
+      if (!enableAnalytics) return
+
+      localStorage.setItem(ANALYTICS_KEY, JSON.stringify(data))
+      setAnalytics(data)
+    },
+    [enableAnalytics]
+  )
 
   /**
    * Check if should show prompt
@@ -170,10 +176,10 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
   const shouldShowPrompt = useCallback((): boolean => {
     const dismissed = localStorage.getItem(DISMISS_KEY)
     if (!dismissed) return true
-    
+
     const dismissedTime = parseInt(dismissed)
     const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24)
-    
+
     return daysSinceDismissed > reminderDelay
   }, [reminderDelay])
 
@@ -188,15 +194,15 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
       return false
     }
 
-    setInstallState(prev => ({ ...prev, isPending: true }))
+    setInstallState((prev) => ({ ...prev, isPending: true }))
 
     try {
       // Show the install prompt
       await deferredPrompt.prompt()
-      
+
       // Wait for user choice
       const { outcome, platform } = await deferredPrompt.userChoice
-      
+
       if (outcome === 'accepted') {
         // Update analytics
         const updatedAnalytics: InstallAnalytics = {
@@ -206,20 +212,20 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
           platform,
         }
         saveAnalytics(updatedAnalytics)
-        
+
         // Update state
-        setInstallState(prev => ({
+        setInstallState((prev) => ({
           ...prev,
           isInstalled: true,
           isInstallable: false,
           isPending: false,
         }))
-        
+
         // Call callback
         if (onInstall) {
           onInstall(updatedAnalytics)
         }
-        
+
         setShowPrompt(false)
         setDeferredPrompt(null)
         return true
@@ -231,21 +237,21 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
           lastPromptDate: new Date().toISOString(),
         }
         saveAnalytics(updatedAnalytics)
-        
+
         localStorage.setItem(DISMISS_KEY, Date.now().toString())
-        
+
         if (onDismiss) {
           onDismiss(updatedAnalytics)
         }
-        
+
         setShowPrompt(false)
-        setInstallState(prev => ({ ...prev, isPending: false }))
+        setInstallState((prev) => ({ ...prev, isPending: false }))
         return false
       }
     } catch (error) {
       console.error('Installation error:', error)
-      setInstallState(prev => ({ ...prev, isPending: false }))
-      
+      setInstallState((prev) => ({ ...prev, isPending: false }))
+
       if (onError) {
         onError(error as Error)
       }
@@ -259,14 +265,14 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
   const dismiss = useCallback(() => {
     setShowPrompt(false)
     localStorage.setItem(DISMISS_KEY, Date.now().toString())
-    
+
     const updatedAnalytics: InstallAnalytics = {
       ...analytics,
       promptDismissed: analytics.promptDismissed + 1,
       lastPromptDate: new Date().toISOString(),
     }
     saveAnalytics(updatedAnalytics)
-    
+
     if (onDismiss) {
       onDismiss(updatedAnalytics)
     }
@@ -302,8 +308,8 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
       e.preventDefault()
       const promptEvent = e as BeforeInstallPromptEvent
       setDeferredPrompt(promptEvent)
-      setInstallState(prev => ({ ...prev, isInstallable: true }))
-      
+      setInstallState((prev) => ({ ...prev, isInstallable: true }))
+
       // Check if should show prompt
       if (shouldShowPrompt()) {
         // Update analytics
@@ -313,7 +319,7 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
           lastPromptDate: new Date().toISOString(),
         }
         saveAnalytics(updatedAnalytics)
-        
+
         // Show prompt after delay
         setTimeout(() => setShowPrompt(true), promptDelay)
       }
@@ -321,14 +327,14 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
 
     // Handle app installed event
     const handleAppInstalled = () => {
-      setInstallState(prev => ({
+      setInstallState((prev) => ({
         ...prev,
         isInstalled: true,
         isInstallable: false,
       }))
       setShowPrompt(false)
       setDeferredPrompt(null)
-      
+
       // Update analytics
       const updatedAnalytics: InstallAnalytics = {
         ...analytics,
@@ -346,7 +352,7 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
     // Add event listeners
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
     window.addEventListener('appinstalled', handleAppInstalled)
-    
+
     // Listen for display mode changes
     const displayModeQuery = window.matchMedia('(display-mode: standalone)')
     displayModeQuery.addEventListener('change', handleDisplayModeChange)
@@ -364,12 +370,12 @@ export function useInstallPrompt(options: UseInstallPromptOptions = {}) {
     showPrompt,
     analytics,
     deferredPrompt: !!deferredPrompt,
-    
+
     // Actions
     install,
     dismiss,
     clearAnalytics,
-    
+
     // Utilities
     checkInstallState,
     shouldShowPrompt,
