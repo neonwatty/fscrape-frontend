@@ -155,7 +155,7 @@ export class PerformanceMonitor {
 export function collectWebVitals(callback: (metrics: PerformanceMetrics) => void) {
   if (typeof window === 'undefined') return
 
-  const metrics: Partial<PerformanceMetrics> = {}
+  const _metrics: Partial<PerformanceMetrics> = {}
 
   // Use native performance monitoring since web-vitals is not installed
   const monitor = new PerformanceMonitor()

@@ -271,7 +271,7 @@ export class LRUCache<T = unknown> {
    * Clean up expired entries
    */
   private cleanup(): void {
-    const now = Date.now()
+    const _now = Date.now()
     const keysToDelete: string[] = []
 
     this.cache.forEach((entry, key) => {
@@ -377,7 +377,7 @@ export class LRUCache<T = unknown> {
     const entry = this.cache.get(key)
     if (!entry) return null
     
-    const { data, ...info } = entry
+    const { data: _data, ...info } = entry
     return info
   }
 

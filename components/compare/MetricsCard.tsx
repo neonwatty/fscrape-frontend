@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowUp, ArrowDown, Minus, TrendingUp, TrendingDown, Activity } from 'lucide-react'
+import { ArrowUp, ArrowDown, Minus, Activity } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Source } from './SourceSelector'
 

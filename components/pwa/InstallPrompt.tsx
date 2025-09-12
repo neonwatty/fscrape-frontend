@@ -6,11 +6,10 @@ import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useServiceWorker } from '@/lib/hooks/useServiceWorker'
 import { useInstallPrompt } from '@/lib/hooks/useInstallPrompt'
-import { cn } from '@/lib/utils'
 
 export function InstallPrompt() {
   const [showUpdateNotification, setShowUpdateNotification] = useState(false)
-  const { isSupported, isRegistered, isOnline, isUpdateAvailable, updateServiceWorker } = useServiceWorker()
+  const { isSupported, isOnline, isUpdateAvailable, updateServiceWorker } = useServiceWorker()
   
   // Use the new install prompt hook
   const {

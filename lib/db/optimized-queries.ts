@@ -148,7 +148,7 @@ export class OptimizedPostQuery {
   }
 
   // Get query plan for debugging
-  explain(): any {
+  explain(): unknown {
     const explainSql = `EXPLAIN QUERY PLAN ${this.sql}`
     return executeQuery(explainSql, this.params)
   }
@@ -341,7 +341,12 @@ export function getTimeSeriesOptimized(
     ORDER BY time_bucket ASC
   `
   
-  const results = executeQuery(sql, params) as any[]
+  const results = executeQuery(sql, params) as Array<{
+    time_bucket: number
+    post_count: number
+    avg_score: number
+    total_comments: number
+  }>
   
   return results.map(row => ({
     date: new Date(row.time_bucket * 1000).toISOString(),

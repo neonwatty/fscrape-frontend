@@ -279,7 +279,7 @@ export function EnhancedVirtualizedTable<T = any>(
   }
 ) {
   const [searchTerm, setSearchTerm] = useState('')
-  const [sortConfig, setSortConfig] = useState<{
+  const [sortConfig, _setSortConfig] = useState<{
     key: string
     direction: 'asc' | 'desc'
   } | null>(null)

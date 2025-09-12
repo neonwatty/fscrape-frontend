@@ -134,7 +134,7 @@ export function MobileBreadcrumbs({ className, customItems }: BreadcrumbsProps) 
       >
         <Home className="h-3 w-3" />
       </Link>
-      {displayItems.map((item, index) => (
+      {displayItems.map((item, _index) => (
         <Fragment key={item.href}>
           <ChevronRight className="h-3 w-3 text-muted-foreground" />
           {item.current ? (

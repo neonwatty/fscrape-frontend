@@ -57,7 +57,7 @@ const metricConfigs = {
   }
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>; label?: string | number }) => {
   if (!active || !payload || !payload.length) return null
 
   return (
@@ -65,7 +65,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       <p className="text-sm font-medium mb-2">
         {format(new Date(label as string), 'MMM dd, yyyy')}
       </p>
-      {payload.map((entry: any, index: number) => (
+      {payload.map((entry, index) => (
         <div key={index} className="flex items-center justify-between gap-4 text-sm">
           <div className="flex items-center gap-2">
             <div

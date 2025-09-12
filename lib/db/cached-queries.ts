@@ -4,7 +4,7 @@
 
 import { LRUCache, withCache, generateCacheKey } from './cache'
 import * as queries from './queries'
-import type { ForumPost, PostFilters, PlatformStats, TimeSeriesData, AuthorStats } from './types'
+import type { PostFilters } from './types'
 
 // Create dedicated cache for database queries
 const queryCache = new LRUCache({

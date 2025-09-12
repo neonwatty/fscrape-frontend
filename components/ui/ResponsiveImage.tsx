@@ -4,11 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
 import { 
-  generateSizes, 
-  IMAGE_SIZES, 
-  getOptimalQuality,
-  ImageLazyLoader,
-  ProgressiveImageLoader
+  generateSizes
 } from '@/lib/utils/image-optimization'
 import { getBlurPlaceholder } from '@/lib/utils/blur-placeholder'
 
@@ -42,7 +38,7 @@ export function ResponsiveImage({
   onError,
   fallbackSrc = '/images/placeholder.svg',
   placeholderType = 'shimmer',
-  progressive = true,
+  progressive: _progressive = true,
 }: ResponsiveImageProps) {
   const [imageSrc, setImageSrc] = useState(src)
   const [blurDataURL, setBlurDataURL] = useState<string>()
@@ -282,7 +278,7 @@ export function ZoomableImage({
   alt,
   className,
   containerClassName,
-  zoomScale = 1.1,
+  zoomScale: _zoomScale = 1.1,
 }: {
   src: string
   alt: string

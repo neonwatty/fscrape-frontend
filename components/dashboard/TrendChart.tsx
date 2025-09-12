@@ -30,8 +30,8 @@ export function TrendChart() {
   const [selectedPlatform, setSelectedPlatform] = useState<'all' | 'reddit' | 'hackernews'>('all')
   const [timeRange, setTimeRange] = useState<7 | 14 | 30 | 60>(30)
   const [platforms, setPlatforms] = useState<string[]>([])
-  const [loading, setLoading] = useState(false)
-  const [zoomRange, setZoomRange] = useState<{ start: number, end: number } | null>(null)
+  const [_loading, setLoading] = useState(false)
+  const [_zoomRange, setZoomRange] = useState<{ start: number, end: number } | null>(null)
 
   // Fetch data based on filters
   const fetchData = () => {

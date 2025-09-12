@@ -32,7 +32,7 @@ interface UseDatabaseReturn {
   closeDb: () => void
   retry: () => Promise<void>
   clearError: () => void
-  executeQuery: (query: string, params?: any[]) => Promise<any>
+  executeQuery: (query: string, params?: unknown[]) => Promise<unknown>
   transaction: TransactionManager | null
 }
 

@@ -41,7 +41,7 @@ export function PullToRefresh({
   
   // Motion values for smooth animations
   const pullY = useMotionValue(0)
-  const pullProgress = useTransform(pullY, [0, threshold], [0, 1])
+  const _pullProgress = useTransform(pullY, [0, threshold], [0, 1])
   const pullOpacity = useTransform(pullY, [0, threshold / 2], [0, 1])
   const iconRotation = useTransform(pullY, [0, threshold], [0, 180])
 

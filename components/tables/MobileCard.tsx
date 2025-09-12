@@ -7,7 +7,6 @@ import {
   ChevronUp, 
   MoreVertical,
   Copy,
-  Share2,
   ExternalLink,
   Maximize2,
   Minimize2
@@ -19,7 +18,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -71,8 +69,8 @@ export function MobileCard({
 
   // Group fields by priority
   const primaryFields = fields.filter(f => f.priority === 'primary' || !f.priority)
-  const secondaryFields = fields.filter(f => f.priority === 'secondary')
-  const tertiaryFields = fields.filter(f => f.priority === 'tertiary')
+  const _secondaryFields = fields.filter(f => f.priority === 'secondary')
+  const _tertiaryFields = fields.filter(f => f.priority === 'tertiary')
 
   // Determine visible fields based on expansion state
   const visibleFields = isExpanded 

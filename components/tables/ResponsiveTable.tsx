@@ -2,7 +2,7 @@
 
 import { ReactNode, useState, useEffect } from 'react'
 import { cn } from '@/lib/utils'
-import { ChevronDown, ChevronUp, Menu, X, Eye, EyeOff } from 'lucide-react'
+import { ChevronDown, ChevronUp, Menu, Eye } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   Table,

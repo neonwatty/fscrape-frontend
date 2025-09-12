@@ -49,7 +49,7 @@ export function generateEngagementHeatmap(
   filters: HeatmapFilters = {}
 ): EngagementHeatmapData[] {
   const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
-  const shortDayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  const _shortDayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   
   // Apply filters
   let filteredPosts = posts

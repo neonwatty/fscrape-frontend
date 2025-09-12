@@ -25,9 +25,7 @@ import {
 import { cn } from '@/lib/utils'
 import { Source } from './SourceSelector'
 import {
-  ComparisonMetric,
   StatisticalSummary,
-  PerformanceInsight,
   compareMetrics,
   calculateStatistics,
   generateInsights,
@@ -142,7 +140,7 @@ export function MetricsTable({
     return formatters[metricName] || formatters.default
   }
 
-  const getTrendIcon = (value: number, higherIsBetter: boolean = true) => {
+  const _getTrendIcon = (value: number, higherIsBetter: boolean = true) => {
     if (value === 0) return <Minus className="h-4 w-4 text-muted-foreground" />
     if ((value > 0 && higherIsBetter) || (value < 0 && !higherIsBetter)) {
       return <TrendingUp className="h-4 w-4 text-green-500" />
@@ -260,7 +258,7 @@ export function MetricsTable({
             {sortedMetrics.map(metric => {
               const isExpanded = expandedMetrics.has(metric.name)
               const stats = statistics[metric.name]
-              const higherBetter = isHigherBetter(metric.name)
+              const _higherBetter = isHigherBetter(metric.name)
               const formatter = getFormatter(metric.name)
               
               return (

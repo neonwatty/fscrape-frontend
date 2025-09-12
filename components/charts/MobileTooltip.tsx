@@ -52,7 +52,7 @@ export function MobileTooltip({
       if (placement === 'auto') {
         // Determine best placement based on available space
         const viewportWidth = window.innerWidth
-        const viewportHeight = window.innerHeight
+        const _viewportHeight = window.innerHeight
 
         // Check horizontal space
         if (x + tooltipWidth + padding > viewportWidth) {
@@ -155,7 +155,7 @@ export function MobileChartTooltip({
   label,
   coordinate,
   className,
-}: any) {
+}: { active?: boolean; payload?: Array<{ color: string; name: string; value: number | string }>; label?: string; coordinate?: { x: number; y: number }; className?: string }) {
   const [touchPoint, setTouchPoint] = useState<{ x: number; y: number } | null>(null)
 
   useEffect(() => {
@@ -181,7 +181,7 @@ export function MobileChartTooltip({
         {label && (
           <p className="font-medium text-xs text-muted-foreground">{label}</p>
         )}
-        {payload.map((entry: any, index: number) => (
+        {payload.map((entry, index) => (
           <div key={index} className="flex items-center justify-between gap-4">
             <span className="flex items-center gap-1">
               <span

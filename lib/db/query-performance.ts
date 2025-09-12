@@ -248,7 +248,12 @@ export class DatabaseHealth {
   /**
    * Get database size and statistics
    */
-  static getStatistics(): any {
+  static getStatistics(): {
+    tables: unknown
+    indexes: unknown
+    size: unknown
+    performance: unknown
+  } {
     const stats = {
       tables: this.getTableStats(),
       indexes: this.getIndexStats(),
@@ -262,7 +267,7 @@ export class DatabaseHealth {
   /**
    * Get table statistics
    */
-  private static getTableStats(): any[] {
+  private static getTableStats(): unknown[] {
     const sql = `
       SELECT 
         name as table_name,

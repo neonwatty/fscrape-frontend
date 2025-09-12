@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils'
-import { Loader2, RefreshCw, Circle } from 'lucide-react'
+import { Loader2, RefreshCw } from 'lucide-react'
 
 interface SpinnerProps extends React.HTMLAttributes<HTMLDivElement> {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'

@@ -257,7 +257,7 @@ export function useMobileTooltip<T extends HTMLElement = HTMLElement>(
     followTouch?: boolean
   } = {}
 ) {
-  const { enabled = true, showDelay = 100, hideDelay = 2000, followTouch = true } = options
+  const { enabled: _enabled = true, showDelay = 100, hideDelay = 2000, followTouch = true } = options
   
   const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number } | null>(null)
   const [isVisible, setIsVisible] = useState(false)

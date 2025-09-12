@@ -17,10 +17,6 @@ const SourceSelector = dynamic(
   { loading: () => <Skeleton className="h-20 w-full" />, ssr: false }
 )
 
-const ComparisonChart = dynamic(
-  () => import('@/components/compare/ComparisonChart').then(mod => ({ default: mod.ComparisonChart })),
-  { loading: () => <Skeleton className="h-64 w-full" />, ssr: false }
-)
 
 const ComparisonCharts = dynamic(
   () => import('@/components/compare/ComparisonCharts').then(mod => ({ default: mod.ComparisonCharts })),

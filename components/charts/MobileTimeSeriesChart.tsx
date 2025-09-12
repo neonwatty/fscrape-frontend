@@ -22,7 +22,7 @@ import { format } from 'date-fns'
 interface DataPoint {
   date: string
   value: number
-  [key: string]: any
+  [key: string]: string | number
 }
 
 interface MobileTimeSeriesChartProps {
@@ -58,7 +58,7 @@ export function MobileTimeSeriesChart({
   const [zoomLevel, setZoomLevel] = useState(1)
   const [panEnabled, setPanEnabled] = useState(false)
   const [selectedPoint, setSelectedPoint] = useState<DataPoint | null>(null)
-  const [brushDomain, setBrushDomain] = useState<[number, number] | null>(null)
+  const [_brushDomain, setBrushDomain] = useState<{ startIndex?: number; endIndex?: number } | null>(null)
 
   // Detect if mobile device
   const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
@@ -218,7 +218,7 @@ export function MobileTimeSeriesChart({
                   dataKey="date"
                   height={30}
                   stroke="#8884d8"
-                  onChange={(domain: any) => setBrushDomain(domain)}
+                  onChange={(domain: { startIndex?: number; endIndex?: number } | null) => setBrushDomain(domain)}
                 />
               )}
             </LineChart>

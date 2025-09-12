@@ -144,14 +144,6 @@ export function TopAuthors({
     return [...new Set(posts.map(p => p.platform))]
   }, [posts])
 
-  const sources = useMemo(() => {
-    const sourceSet = new Set<string>()
-    posts.forEach(post => {
-      const source = post.source || post.subreddit || ''
-      if (source) sourceSet.add(source)
-    })
-    return Array.from(sourceSet).sort()
-  }, [posts])
 
   // Handle sorting
   const handleSort = (key: AuthorSortKey) => {

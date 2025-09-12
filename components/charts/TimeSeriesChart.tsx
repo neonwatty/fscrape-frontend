@@ -21,7 +21,7 @@ import { formatLargeNumber } from '@/lib/utils/formatters'
 export interface TimeSeriesDataPoint {
   date: string
   value: number
-  [key: string]: any // Allow additional data fields
+  [key: string]: string | number // Allow additional data fields
 }
 
 export interface TimeSeriesChartProps {
@@ -52,7 +52,7 @@ export interface TimeSeriesChartProps {
     color?: string
   }[]
   className?: string
-  customTooltip?: React.FC<any>
+  customTooltip?: React.FC<{ active?: boolean; payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>; label?: string }>
   gradientColors?: {
     id: string
     startColor: string
@@ -72,13 +72,13 @@ interface ZoomState {
   animation: boolean
 }
 
-const DefaultTooltip = ({ active, payload, label }: any) => {
+const DefaultTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>; label?: string }) => {
   if (!active || !payload || payload.length === 0) return null
 
   return (
     <div className="bg-background border rounded-lg shadow-lg p-3">
       <p className="font-medium text-sm mb-1">{label}</p>
-      {payload.map((entry: any, index: number) => (
+      {payload.map((entry, index) => (
         <div key={index} className="flex items-center gap-2 text-sm">
           <div 
             className="w-3 h-3 rounded-full" 
@@ -121,10 +121,10 @@ export function TimeSeriesChart({
     animation: true
   })
 
-  const chartRef = useRef<any>(null)
+  const chartRef = useRef<HTMLDivElement>(null)
 
   // Handle mouse down for zoom selection
-  const handleMouseDown = (e: any) => {
+  const handleMouseDown = (e: { activeLabel?: string }) => {
     if (!zoomEnabled || !e) return
     const { activeLabel } = e
     if (activeLabel) {
@@ -137,7 +137,7 @@ export function TimeSeriesChart({
   }
 
   // Handle mouse move for zoom selection
-  const handleMouseMove = (e: any) => {
+  const handleMouseMove = (e: { activeLabel?: string }) => {
     if (!zoomEnabled || !e || !zoomState.refAreaLeft) return
     const { activeLabel } = e
     if (activeLabel) {

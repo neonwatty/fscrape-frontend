@@ -89,7 +89,7 @@ export function conditionalLazyLoad<T extends ComponentType<any>>(
 // Intersection Observer based lazy loading
 export function lazyLoadOnVisible<T extends ComponentType<any>>(
   importFn: () => Promise<{ default: T } | { [key: string]: T }>,
-  options: IntersectionObserverInit = {}
+  _options: IntersectionObserverInit = {}
 ) {
   if (typeof window === 'undefined') {
     return dynamic(importFn as any, { ssr: true })

@@ -1,7 +1,7 @@
 import { Database } from 'sql.js'
 
 export async function createSampleDatabase(): Promise<Database> {
-  const SQL = await (window as any).initSqlJs({
+  const SQL = await (window as Window & { initSqlJs: (config: { locateFile: (file: string) => string }) => Promise<typeof import('sql.js')> }).initSqlJs({
     locateFile: (file: string) => `/sql-js/${file}`,
   })
 

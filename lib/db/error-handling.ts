@@ -32,7 +32,7 @@ export class DatabaseError extends Error {
   public readonly type: DatabaseErrorType
   public readonly severity: ErrorSeverity
   public readonly timestamp: Date
-  public readonly context?: Record<string, any>
+  public readonly context?: Record<string, unknown>
   public readonly originalError?: Error
   public readonly recoverable: boolean
   public readonly retryable: boolean
@@ -44,7 +44,7 @@ export class DatabaseError extends Error {
     message: string,
     options?: {
       severity?: ErrorSeverity
-      context?: Record<string, any>
+      context?: Record<string, unknown>
       originalError?: Error
       recoverable?: boolean
       retryable?: boolean
@@ -106,7 +106,7 @@ export class DatabaseError extends Error {
 // Error Detection Utilities
 export function classifyError(error: Error): DatabaseErrorType {
   const message = error.message.toLowerCase()
-  const name = error.name.toLowerCase()
+  const _name = error.name.toLowerCase()
 
   // Check for specific error patterns
   if (message.includes('wasm') || message.includes('webassembly')) {
@@ -320,7 +320,7 @@ export class ErrorLogger {
     }
   }
 
-  private sendToMonitoring(error: DatabaseError): void {
+  private sendToMonitoring(_error: DatabaseError): void {
     // Implementation would send to service like Sentry
     // Example:
     // Sentry.captureException(error, {

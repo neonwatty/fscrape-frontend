@@ -49,12 +49,12 @@ export function OptimizedImage({
   aspectRatio,
   objectFit = 'cover',
   lazy = true,
-  threshold = 0.1,
+  threshold: _threshold = 0.1,
   fallbackSrc = '/images/placeholder.svg',
   showLoader = true,
 }: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState(false)
+  const [_error, setError] = useState(false)
   const [imageSrc, setImageSrc] = useState(src)
 
   useEffect(() => {

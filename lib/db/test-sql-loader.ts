@@ -3,7 +3,6 @@ import {
   initializeDatabase, 
   createEmptyDatabase, 
   loadDatabaseFromData,
-  isDatabaseInitialized,
   closeDatabase 
 } from './sql-loader'
 
@@ -24,7 +23,7 @@ export async function testDatabaseLoader() {
   console.log('\nTest 2: Testing missing file handling...')
   try {
     closeDatabase() // Ensure clean state
-    const db = await initializeDatabase({ databasePath: '/.fscrape/nonexistent.db' })
+    const _db = await initializeDatabase({ databasePath: '/.fscrape/nonexistent.db' })
     console.log('✅ Handled missing file gracefully, created new database')
     closeDatabase()
   } catch (error) {
@@ -38,7 +37,7 @@ export async function testDatabaseLoader() {
     const data = db.export()
     db.close()
     
-    const loadedDb = await loadDatabaseFromData(data, { validateSchema: true })
+    const _loadedDb = await loadDatabaseFromData(data, { validateSchema: true })
     console.log('✅ Schema validation passed')
     closeDatabase()
   } catch (error) {
@@ -51,7 +50,7 @@ export async function testDatabaseLoader() {
     const corruptedData = new Uint8Array([1, 2, 3, 4, 5]) // Invalid SQLite data
     await loadDatabaseFromData(corruptedData)
     console.error('❌ Should have thrown error for corrupted data')
-  } catch (error) {
+  } catch {
     console.log('✅ Correctly rejected corrupted data')
   }
   

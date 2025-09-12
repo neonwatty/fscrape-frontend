@@ -14,7 +14,7 @@ import {
   Minus
 } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { getPosts, getPostsTimeSeries } from '@/lib/db/queries'
+import { getPosts } from '@/lib/db/queries'
 import { 
   formatLargeNumber, 
   formatTrend, 

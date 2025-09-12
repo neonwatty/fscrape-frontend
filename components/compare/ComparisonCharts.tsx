@@ -26,7 +26,7 @@ import {
 import { format, parseISO, startOfWeek, startOfMonth } from 'date-fns'
 import { cn } from '@/lib/utils'
 import { Source } from './SourceSelector'
-import { TrendingUp, TrendingDown, Minus, BarChart3, LineChart as LineChartIcon, Activity, Layers } from 'lucide-react'
+import { TrendingUp, TrendingDown, BarChart3, LineChart as LineChartIcon, Activity, Layers } from 'lucide-react'
 
 export interface TimeSeriesData {
   date: string
@@ -71,7 +71,7 @@ const sourceColors = [
 ]
 
 // Custom tooltip component
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: Array<{ color?: string; fill?: string; name: string; value: number | string }>; label?: string }) => {
   if (!active || !payload || !payload.length) return null
 
   return (
@@ -79,7 +79,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
       <p className="text-sm font-medium mb-2">
         {label && format(parseISO(label), 'MMM dd, yyyy')}
       </p>
-      {payload.map((entry: any, index: number) => (
+      {payload.map((entry, index) => (
         <div key={index} className="flex items-center justify-between gap-4 text-sm">
           <div className="flex items-center gap-2">
             <div
@@ -114,7 +114,6 @@ export function ComparisonCharts({
 }: ComparisonChartsProps) {
   const [chartType, setChartType] = useState<ChartType>('line')
   const [showTrend, setShowTrend] = useState(true)
-  const [selectedMetrics, setSelectedMetrics] = useState<string[]>(['posts', 'engagement'])
 
   // Aggregate data based on selected period
   const aggregatedData = useMemo(() => {
@@ -216,7 +215,7 @@ export function ComparisonCharts({
   }, [processedData, sources, showTrend])
 
   // Render chart based on type
-  const renderChart = (data: TimeSeriesData[], height: number = 300) => {
+  const renderChart = (data: TimeSeriesData[]) => {
     const chartProps = {
       data,
       margin: { top: 10, right: 30, left: 0, bottom: 0 }

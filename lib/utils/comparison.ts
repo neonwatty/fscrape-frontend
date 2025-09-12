@@ -323,7 +323,7 @@ export function compareMetrics(
  */
 export function generateInsights(
   metrics: ComparisonMetric[],
-  threshold: number = 0.2 // 20% difference threshold
+  _threshold: number = 0.2 // 20% difference threshold
 ): PerformanceInsight[] {
   const insights: PerformanceInsight[] = []
   

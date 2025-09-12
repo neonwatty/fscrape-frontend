@@ -87,7 +87,7 @@ export function searchPostsFTS(
   const ftsQuery = prepareFTSQuery(query)
   
   try {
-    const results = executeQuery<any>(`
+    const results = executeQuery<SearchResult>(`
       SELECT 
         p.*,
         highlight(posts_fts, 1, '<mark>', '</mark>') as titleHighlighted,
@@ -163,7 +163,7 @@ export function searchPostsAdvanced(
   offset: number = 0
 ): SearchResult[] {
   const conditions: string[] = []
-  const params: any[] = []
+  const params: (string | number | boolean | null)[] = []
   
   // Add search condition
   if (query) {
